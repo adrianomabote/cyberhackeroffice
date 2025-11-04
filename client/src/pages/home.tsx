@@ -72,8 +72,8 @@ export default function Home() {
           >
             <h1 className="text-center font-display font-bold tracking-wide"
               style={{
-                color: '#ff0000',
-                fontSize: 'clamp(1.25rem, 4vw, 2.5rem)',
+                color: '#cc0000',
+                fontSize: 'clamp(1rem, 3vw, 2rem)',
               }}
             >
               CYBER HACKER
@@ -87,7 +87,7 @@ export default function Home() {
             className="relative rounded-xl p-4 border w-full"
             style={{
               borderColor: '#444444',
-              borderWidth: '1px',
+              borderWidth: '2px',
               backgroundColor: 'transparent',
             }}
             data-testid="card-multipliers"
