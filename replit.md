@@ -20,7 +20,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 ### Backend (`server/`)
 - **API Routes** (`server/routes.ts`): 
-  - POST /api/vela - Recebe multiplicadores
+  - POST /api/velas - Recebe multiplicadores
   - GET /api/apos - Retorna última vela
   - GET /api/sacar - Previsão com algoritmo ML avançado
   - GET /api/historico - Últimas 50+ velas para gráfico
@@ -101,7 +101,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 1. **Usuário acessa** → Interface cyberpunk carrega
 2. **Script no console** → Captura multiplicadores a cada 1s
-3. **POST /api/vela** → Backend armazena no PostgreSQL
+3. **POST /api/velas** → Backend armazena no PostgreSQL
 4. **Frontend polling** → Atualiza cards, gráfico e estatísticas
 5. **Detecção de padrões** → Sistema monitora e notifica via toasts
 6. **Algoritmo ML** → Calcula previsão usando regressão + EMA + padrões

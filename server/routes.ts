@@ -91,8 +91,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
-  // POST /api/vela - Recebe multiplicadores do Aviator
-  app.post("/api/vela", async (req, res) => {
+  // POST /api/velas - Recebe multiplicadores do Aviator
+  app.post("/api/velas", async (req, res) => {
     try {
       const validatedData = insertVelaSchema.parse(req.body);
       const vela = await storage.addVela(validatedData);
