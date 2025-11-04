@@ -149,6 +149,21 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Iframe Txuna Bet */}
+        <div className="w-full px-4 py-4">
+          <div className="relative w-full rounded-xl overflow-hidden border" style={{ borderColor: '#444444', borderWidth: '1px' }}>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                src="https://www.txunabet.co.mz/"
+                className="absolute inset-0 w-full h-full"
+                title="Txuna Bet"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
