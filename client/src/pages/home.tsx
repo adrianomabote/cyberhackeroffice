@@ -72,7 +72,7 @@ export default function Home() {
           >
             <h1 className="text-center font-display font-bold tracking-wide"
               style={{
-                color: '#ff3333',
+                color: '#ff0000',
                 fontSize: 'clamp(1rem, 3vw, 2rem)',
               }}
             >
