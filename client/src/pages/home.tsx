@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { UltimaVelaResponse, PrevisaoResponse, HistoricoResponse } from "@shared/schema";
+import type { UltimaVelaResponse, PrevisaoResponse, HistoricoResponse, EstatisticasResponse } from "@shared/schema";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { TrendingUp, TrendingDown, Activity, BarChart3 } from "lucide-react";
 
 export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
@@ -36,6 +37,18 @@ export default function Home() {
     queryKey: ['/api/historico'],
     queryFn: async () => {
       const res = await fetch('/api/historico?limit=50');
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    },
+    refetchInterval: 2000,
+    staleTime: 0,
+  });
+
+  // Buscar estatísticas
+  const { data: statsData } = useQuery<EstatisticasResponse>({
+    queryKey: ['/api/estatisticas'],
+    queryFn: async () => {
+      const res = await fetch('/api/estatisticas');
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
@@ -152,6 +165,99 @@ export default function Home() {
                 >
                   {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}x` : '--'}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Estatísticas Avançadas */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            {/* Tendência */}
+            <div
+              className="bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-4 border"
+              style={{
+                borderColor: '#9d4edd',
+                boxShadow: '0 0 10px rgba(157, 78, 221, 0.2)',
+              }}
+              data-testid="card-tendencia"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-xs text-gray-400 uppercase">Tendência</span>
+                {statsData?.tendencia?.tipo === 'alta' ? (
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                ) : statsData?.tendencia?.tipo === 'baixa' ? (
+                  <TrendingDown className="w-4 h-4 text-red-500" />
+                ) : (
+                  <Activity className="w-4 h-4 text-gray-400" />
+                )}
+              </div>
+              <div className="text-2xl font-bold" style={{ color: '#9d4edd' }}>
+                {statsData?.tendencia?.tipo?.toUpperCase() || '--'}
+              </div>
+              <div className="text-xs font-mono text-gray-500 mt-1">
+                {statsData?.tendencia?.percentual !== undefined ? 
+                  `${statsData.tendencia.percentual > 0 ? '+' : ''}${statsData.tendencia.percentual}%` : 
+                  '--'}
+              </div>
+            </div>
+
+            {/* Volatilidade */}
+            <div
+              className="bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-4 border"
+              style={{
+                borderColor: '#9d4edd',
+                boxShadow: '0 0 10px rgba(157, 78, 221, 0.2)',
+              }}
+              data-testid="card-volatilidade"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-xs text-gray-400 uppercase">Volatilidade</span>
+                <BarChart3 className="w-4 h-4" style={{ color: '#9d4edd' }} />
+              </div>
+              <div className="text-2xl font-bold" style={{ color: '#9d4edd' }}>
+                {statsData?.volatilidade?.nivel?.toUpperCase() || '--'}
+              </div>
+              <div className="text-xs font-mono text-gray-500 mt-1">
+                {statsData?.volatilidade?.valor ? `${statsData.volatilidade.valor}%` : '--'}
+              </div>
+            </div>
+
+            {/* Média Móvel 5 */}
+            <div
+              className="bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-4 border"
+              style={{
+                borderColor: '#9d4edd',
+                boxShadow: '0 0 10px rgba(157, 78, 221, 0.2)',
+              }}
+              data-testid="card-mm5"
+            >
+              <div className="mb-2">
+                <span className="font-mono text-xs text-gray-400 uppercase">Média 5</span>
+              </div>
+              <div className="text-2xl font-bold font-mono" style={{ color: '#9d4edd' }}>
+                {statsData?.mediasMoveis?.media5 ? `${statsData.mediasMoveis.media5.toFixed(2)}x` : '--'}
+              </div>
+              <div className="text-xs font-mono text-gray-500 mt-1">
+                últimas 5 velas
+              </div>
+            </div>
+
+            {/* Média Móvel 10 */}
+            <div
+              className="bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-4 border"
+              style={{
+                borderColor: '#9d4edd',
+                boxShadow: '0 0 10px rgba(157, 78, 221, 0.2)',
+              }}
+              data-testid="card-mm10"
+            >
+              <div className="mb-2">
+                <span className="font-mono text-xs text-gray-400 uppercase">Média 10</span>
+              </div>
+              <div className="text-2xl font-bold font-mono" style={{ color: '#9d4edd' }}>
+                {statsData?.mediasMoveis?.media10 ? `${statsData.mediasMoveis.media10.toFixed(2)}x` : '--'}
+              </div>
+              <div className="text-xs font-mono text-gray-500 mt-1">
+                últimas 10 velas
               </div>
             </div>
           </div>

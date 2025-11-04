@@ -36,3 +36,25 @@ export interface HistoricoResponse {
   velas: Vela[];
   total: number;
 }
+
+// Resposta da API para estatísticas
+export interface EstatisticasResponse {
+  mediasMoveis: {
+    media5: number | null;
+    media10: number | null;
+    media20: number | null;
+  };
+  tendencia: {
+    tipo: 'alta' | 'baixa' | 'estável';
+    percentual: number;
+  };
+  volatilidade: {
+    valor: number;
+    nivel: 'baixa' | 'média' | 'alta';
+  };
+  extremos: {
+    maximo: number;
+    minimo: number;
+    amplitude: number;
+  };
+}

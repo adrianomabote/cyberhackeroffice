@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse } from "@shared/schema";
+import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse } from "@shared/schema";
 import { z } from "zod";
 
 // Função para calcular previsão baseada nas últimas 10 velas
@@ -145,6 +145,104 @@ export async function registerRoutes(app: Express): Promise<Server> {
         velas: [],
         total: 0,
         error: "Erro ao buscar histórico",
+      });
+    }
+  });
+
+  // GET /api/estatisticas - Retorna estatísticas avançadas
+  app.get("/api/estatisticas", async (req, res) => {
+    try {
+      const historico = await storage.getHistorico(20); // Últimas 20 velas para cálculos
+      
+      if (historico.length === 0) {
+        return res.json({
+          mediasMoveis: { media5: null, media10: null, media20: null },
+          tendencia: { tipo: 'estável', percentual: 0 },
+          volatilidade: { valor: 0, nivel: 'baixa' },
+          extremos: { maximo: 0, minimo: 0, amplitude: 0 },
+        } as EstatisticasResponse);
+      }
+
+      const multiplicadores = historico.map(v => v.multiplicador);
+
+      // Calcular médias móveis
+      const calcularMedia = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
+      
+      const media5 = multiplicadores.length >= 5 
+        ? calcularMedia(multiplicadores.slice(-5))
+        : null;
+      const media10 = multiplicadores.length >= 10
+        ? calcularMedia(multiplicadores.slice(-10))
+        : null;
+      const media20 = multiplicadores.length >= 20
+        ? calcularMedia(multiplicadores.slice(-20))
+        : null;
+
+      // Calcular tendência (comparar primeira e segunda metade)
+      let tipoTendencia: 'alta' | 'baixa' | 'estável' = 'estável';
+      let variacao = 0;
+      
+      if (multiplicadores.length >= 2) {
+        const metade = Math.floor(multiplicadores.length / 2);
+        const primeiraMetade = multiplicadores.slice(0, metade);
+        const segundaMetade = multiplicadores.slice(metade);
+        
+        if (primeiraMetade.length > 0 && segundaMetade.length > 0) {
+          const mediaPrimeira = calcularMedia(primeiraMetade);
+          const mediaSegunda = calcularMedia(segundaMetade);
+          variacao = ((mediaSegunda - mediaPrimeira) / mediaPrimeira) * 100;
+          
+          if (variacao > 5) tipoTendencia = 'alta';
+          else if (variacao < -5) tipoTendencia = 'baixa';
+          else tipoTendencia = 'estável';
+        }
+      }
+
+      // Calcular volatilidade (desvio padrão)
+      const media = calcularMedia(multiplicadores);
+      const variancia = multiplicadores.reduce((acc, val) => acc + Math.pow(val - media, 2), 0) / multiplicadores.length;
+      const desvioPadrao = Math.sqrt(variancia);
+      const coeficienteVariacao = (desvioPadrao / media) * 100;
+
+      let nivelVolatilidade: 'baixa' | 'média' | 'alta';
+      if (coeficienteVariacao < 30) nivelVolatilidade = 'baixa';
+      else if (coeficienteVariacao < 50) nivelVolatilidade = 'média';
+      else nivelVolatilidade = 'alta';
+
+      // Calcular extremos
+      const maximo = Math.max(...multiplicadores);
+      const minimo = Math.min(...multiplicadores);
+      const amplitude = maximo - minimo;
+
+      const estatisticas: EstatisticasResponse = {
+        mediasMoveis: {
+          media5: media5 ? Math.round(media5 * 100) / 100 : null,
+          media10: media10 ? Math.round(media10 * 100) / 100 : null,
+          media20: media20 ? Math.round(media20 * 100) / 100 : null,
+        },
+        tendencia: {
+          tipo: tipoTendencia,
+          percentual: Math.round(variacao * 10) / 10,
+        },
+        volatilidade: {
+          valor: Math.round(coeficienteVariacao * 10) / 10,
+          nivel: nivelVolatilidade,
+        },
+        extremos: {
+          maximo: Math.round(maximo * 100) / 100,
+          minimo: Math.round(minimo * 100) / 100,
+          amplitude: Math.round(amplitude * 100) / 100,
+        },
+      };
+
+      res.json(estatisticas);
+    } catch (error) {
+      res.status(500).json({
+        mediasMoveis: { media5: null, media10: null, media20: null },
+        tendencia: { tipo: 'estável', percentual: 0 },
+        volatilidade: { valor: 0, nivel: 'baixa' },
+        extremos: { maximo: 0, minimo: 0, amplitude: 0 },
+        error: "Erro ao calcular estatísticas",
       });
     }
   });
