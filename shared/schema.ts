@@ -30,3 +30,9 @@ export interface PrevisaoResponse {
   multiplicador: number | null;
   confianca?: string;
 }
+
+// Resposta da API para histórico
+export interface HistoricoResponse {
+  velas: Vela[];
+  total: number;
+}

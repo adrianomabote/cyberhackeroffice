@@ -130,6 +130,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/historico - Retorna histórico completo de velas
+  app.get("/api/historico", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const historico = await storage.getHistorico(limit);
+      
+      res.json({
+        velas: historico,
+        total: historico.length,
+      });
+    } catch (error) {
+      res.status(500).json({
+        velas: [],
+        total: 0,
+        error: "Erro ao buscar histórico",
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

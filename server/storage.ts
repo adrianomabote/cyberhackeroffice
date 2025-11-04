@@ -11,6 +11,7 @@ export interface IStorage {
   addVela(vela: InsertVela): Promise<Vela>;
   getUltimaVela(): Promise<Vela | null>;
   getUltimas10Velas(): Promise<Vela[]>;
+  getHistorico(limit?: number): Promise<Vela[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -57,6 +58,10 @@ export class MemStorage implements IStorage {
   async getUltimas10Velas(): Promise<Vela[]> {
     return this.velas.slice(-10);
   }
+
+  async getHistorico(limit: number = 100): Promise<Vela[]> {
+    return this.velas.slice(-limit);
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -101,7 +106,18 @@ export class DbStorage implements IStorage {
       .orderBy(desc(velas.timestamp))
       .limit(10);
 
-    // Retornar em ordem cronológica (mais antiga primeiro)
+    // Retornar em ordem cronológica (mais antiga primeira)
+    return result.reverse();
+  }
+
+  async getHistorico(limit: number = 100): Promise<Vela[]> {
+    const result = await this.db
+      .select()
+      .from(velas)
+      .orderBy(desc(velas.timestamp))
+      .limit(limit);
+
+    // Retornar em ordem cronológica (mais antiga primeira)
     return result.reverse();
   }
 }

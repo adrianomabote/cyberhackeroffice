@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { UltimaVelaResponse, PrevisaoResponse } from "@shared/schema";
+import type { UltimaVelaResponse, PrevisaoResponse, HistoricoResponse } from "@shared/schema";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
@@ -27,6 +28,18 @@ export default function Home() {
       return res.json();
     },
     refetchInterval: 1000,
+    staleTime: 0,
+  });
+
+  // Buscar histórico completo
+  const { data: historicoData } = useQuery<HistoricoResponse>({
+    queryKey: ['/api/historico'],
+    queryFn: async () => {
+      const res = await fetch('/api/historico?limit=50');
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    },
+    refetchInterval: 2000,
     staleTime: 0,
   });
 
@@ -140,6 +153,73 @@ export default function Home() {
                   {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}x` : '--'}
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Gráfico de Histórico */}
+          <div
+            className="mb-8 bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-6 border-2"
+            style={{
+              borderColor: '#9d4edd',
+              boxShadow: '0 0 15px rgba(157, 78, 221, 0.3)',
+            }}
+            data-testid="card-historico"
+          >
+            <h2 className="font-cyber text-xl md:text-2xl font-bold mb-6 text-center" style={{ color: '#9d4edd' }}>
+              HISTÓRICO DE MULTIPLICADORES
+            </h2>
+            {historicoData && historicoData.velas.length > 0 ? (
+              <div className="h-64 md:h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={historicoData.velas.map((vela, index) => ({
+                      index: index + 1,
+                      multiplicador: vela.multiplicador,
+                      time: new Date(vela.timestamp).toLocaleTimeString(),
+                    }))}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(157, 78, 221, 0.1)" />
+                    <XAxis 
+                      dataKey="index" 
+                      stroke="#9d4edd" 
+                      tick={{ fill: '#9d4edd' }}
+                      label={{ value: 'Velas', position: 'insideBottom', offset: -5, fill: '#9d4edd' }}
+                    />
+                    <YAxis 
+                      stroke="#9d4edd" 
+                      tick={{ fill: '#9d4edd' }}
+                      label={{ value: 'Multiplicador', angle: -90, position: 'insideLeft', fill: '#9d4edd' }}
+                      domain={[0, 'auto']}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: '#1a1a1a',
+                        border: '2px solid #9d4edd',
+                        borderRadius: '8px',
+                        boxShadow: '0 0 15px rgba(157, 78, 221, 0.5)',
+                      }}
+                      labelStyle={{ color: '#9d4edd' }}
+                      itemStyle={{ color: '#9d4edd' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="multiplicador" 
+                      stroke="#9d4edd" 
+                      strokeWidth={2}
+                      dot={{ fill: '#9d4edd', r: 3 }}
+                      activeDot={{ r: 6, fill: '#ff0000' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-64 flex items-center justify-center">
+                <p className="text-gray-400 font-mono">Aguardando dados...</p>
+              </div>
+            )}
+            <div className="mt-4 text-center text-sm font-mono text-gray-400">
+              Total de velas: <span className="text-[#9d4edd]">{historicoData?.total || 0}</span>
             </div>
           </div>
 
