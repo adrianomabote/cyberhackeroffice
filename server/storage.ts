@@ -1,5 +1,11 @@
-import { type Vela, type InsertVela } from "@shared/schema";
+import { type Vela, type InsertVela, velas } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { desc } from "drizzle-orm";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+
+neonConfig.webSocketConstructor = ws;
 
 export interface IStorage {
   addVela(vela: InsertVela): Promise<Vela>;
@@ -53,4 +59,52 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DbStorage implements IStorage {
+  private db;
+
+  constructor() {
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    this.db = drizzle(pool);
+  }
+
+  async addVela(insertVela: InsertVela): Promise<Vela> {
+    // Evitar duplicatas consecutivas - verificar última vela
+    const ultimaVela = await this.getUltimaVela();
+    
+    if (ultimaVela && ultimaVela.multiplicador === insertVela.multiplicador) {
+      // Retornar a última vela sem adicionar duplicata
+      return ultimaVela;
+    }
+
+    const [novaVela] = await this.db
+      .insert(velas)
+      .values(insertVela)
+      .returning();
+
+    return novaVela;
+  }
+
+  async getUltimaVela(): Promise<Vela | null> {
+    const result = await this.db
+      .select()
+      .from(velas)
+      .orderBy(desc(velas.timestamp))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async getUltimas10Velas(): Promise<Vela[]> {
+    const result = await this.db
+      .select()
+      .from(velas)
+      .orderBy(desc(velas.timestamp))
+      .limit(10);
+
+    // Retornar em ordem cronológica (mais antiga primeiro)
+    return result.reverse();
+  }
+}
+
+// Usar DbStorage em produção
+export const storage = new DbStorage();
