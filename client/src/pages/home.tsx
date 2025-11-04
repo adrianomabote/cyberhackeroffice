@@ -96,7 +96,7 @@ export default function Home() {
                 <div
                   className="px-4 py-2 rounded-lg border"
                   style={{
-                    borderColor: '#000000',
+                    borderColor: '#ffffff',
                     backgroundColor: '#000000',
                   }}
                 >
@@ -119,7 +119,7 @@ export default function Home() {
                 <div
                   className="px-4 py-2 rounded-lg border"
                   style={{
-                    borderColor: '#000000',
+                    borderColor: '#ffffff',
                     backgroundColor: '#000000',
                   }}
                 >
