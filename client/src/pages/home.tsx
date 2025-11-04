@@ -61,50 +61,50 @@ export default function Home() {
 
       <div className="relative z-20">
         {/* Header CYBER HACKER */}
-        <header className="w-full py-6 px-4 border-b-2 border-[#ff0000]"
-          style={{
-            background: 'linear-gradient(180deg, rgba(10, 10, 10, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%)',
-            boxShadow: '0 0 30px rgba(255, 0, 0, 0.3)',
-          }}
-        >
-          <h1 className="text-center font-display text-4xl md:text-5xl font-bold tracking-widest"
+        <div className="max-w-md mx-auto px-4 pt-6 pb-4">
+          <div
+            className="rounded-2xl border-2 py-4"
             style={{
-              color: '#ff0000',
-              textShadow: '0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8)',
-              WebkitTextStroke: '2px #ff0000',
-              paintOrder: 'stroke fill',
+              borderColor: '#ff0000',
+              backgroundColor: '#000000',
             }}
           >
-            CYBER HACKER
-          </h1>
-        </header>
+            <h1 className="text-center font-display text-2xl font-bold tracking-widest"
+              style={{
+                color: '#ff0000',
+                textShadow: '0 0 10px rgba(255, 0, 0, 0.6)',
+              }}
+            >
+              CYBER HACKER
+            </h1>
+          </div>
+        </div>
 
         {/* Card único com ambos valores */}
-        <div className="max-w-2xl mx-auto px-4 py-6">
+        <div className="max-w-md mx-auto px-4 py-4">
           <div
-            className="relative bg-black/95 backdrop-blur-sm rounded-xl p-5 border-2"
+            className="relative rounded-2xl p-4 border-2"
             style={{
               borderColor: '#9d4edd',
-              boxShadow: '0 0 15px rgba(157, 78, 221, 0.3)',
+              backgroundColor: '#000000',
             }}
             data-testid="card-multipliers"
           >
-            <div className="flex items-center justify-around gap-6">
+            <div className="flex items-center justify-around">
               {/* APÓS: */}
               <div className="flex items-center gap-2">
-                <span className="font-mono text-sm text-gray-400 uppercase">APÓS:</span>
+                <span className="font-mono text-sm text-gray-400">APÓS:</span>
                 <div
-                  className="px-3 py-1.5 rounded-md border"
+                  className="px-3 py-1 rounded-md border"
                   style={{
                     borderColor: '#1a1a1a',
-                    backgroundColor: '#0a0a0a',
+                    backgroundColor: '#000000',
                   }}
                 >
                   <span
-                    className="font-mono text-2xl font-bold"
+                    className="font-mono text-xl font-bold"
                     style={{
                       color: '#9d4edd',
-                      textShadow: '0 0 8px rgba(157, 78, 221, 0.5)',
                     }}
                     data-testid="text-apos-value"
                   >
@@ -115,19 +115,18 @@ export default function Home() {
 
               {/* SACAR: */}
               <div className="flex items-center gap-2">
-                <span className="font-mono text-sm text-gray-400 uppercase">SACAR:</span>
+                <span className="font-mono text-sm text-gray-400">SACAR:</span>
                 <div
-                  className="px-3 py-1.5 rounded-md border"
+                  className="px-3 py-1 rounded-md border"
                   style={{
                     borderColor: '#1a1a1a',
-                    backgroundColor: '#0a0a0a',
+                    backgroundColor: '#000000',
                   }}
                 >
                   <span
-                    className="font-mono text-2xl font-bold"
+                    className="font-mono text-xl font-bold"
                     style={{
                       color: '#9d4edd',
-                      textShadow: '0 0 8px rgba(157, 78, 221, 0.5)',
                     }}
                     data-testid="text-sacar-value"
                   >
