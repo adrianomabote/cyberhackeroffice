@@ -95,7 +95,10 @@ export default function Home() {
             <div className="flex items-center justify-around gap-4">
               {/* APÓS: */}
               <div className="flex items-center gap-2">
-                <span className="font-sans text-gray-300 font-normal" style={{ fontSize: 'clamp(0.75rem, 2vw, 1.125rem)' }}>APÓS:</span>
+                <span className="font-sans font-normal" style={{ 
+                  color: '#ffffff',
+                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                }}>APÓS:</span>
                 <div
                   className="px-3 py-1 rounded border"
                   style={{
@@ -119,7 +122,10 @@ export default function Home() {
 
               {/* SACAR: */}
               <div className="flex items-center gap-2">
-                <span className="font-sans text-gray-300 font-normal" style={{ fontSize: 'clamp(0.75rem, 2vw, 1.125rem)' }}>SACAR:</span>
+                <span className="font-sans font-normal" style={{ 
+                  color: '#ffffff',
+                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                }}>SACAR:</span>
                 <div
                   className="px-3 py-1 rounded border"
                   style={{
