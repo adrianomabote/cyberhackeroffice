@@ -72,7 +72,7 @@ export default function Home() {
           >
             <h1 className="text-center font-display font-bold tracking-wide"
               style={{
-                color: '#cc0000',
+                color: '#ff3333',
                 fontSize: 'clamp(1rem, 3vw, 2rem)',
               }}
             >
@@ -84,10 +84,10 @@ export default function Home() {
         {/* Card único com ambos valores */}
         <div className="w-full px-4 py-3">
           <div
-            className="relative rounded-xl p-4 border w-full"
+            className="relative rounded-xl p-6 border w-full"
             style={{
               borderColor: '#444444',
-              borderWidth: '2px',
+              borderWidth: '1px',
               backgroundColor: 'transparent',
             }}
             data-testid="card-multipliers"
