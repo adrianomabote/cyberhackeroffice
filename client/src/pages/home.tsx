@@ -61,7 +61,7 @@ export default function Home() {
 
       <div className="relative z-20 w-full">
         {/* Header CYBER HACKER */}
-        <div className="w-full px-4 py-4">
+        <div className="w-full px-4 pt-4 pb-2">
           <div
             className="rounded-xl border py-4 w-full"
             style={{
@@ -82,7 +82,7 @@ export default function Home() {
         </div>
 
         {/* Card único com ambos valores */}
-        <div className="w-full px-4 py-3">
+        <div className="w-full px-4 py-2">
           <div
             className="relative rounded-xl p-6 border w-full"
             style={{
@@ -151,7 +151,7 @@ export default function Home() {
         </div>
 
         {/* Iframe Lotto24 */}
-        <div className="w-full px-4 py-4">
+        <div className="w-full px-4 py-2">
           <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor: '#444444', borderWidth: '1px' }}>
             <iframe
               src="https://lotto24.co.mz/"
