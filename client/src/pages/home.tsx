@@ -89,35 +89,51 @@ export default function Home() {
             }}
             data-testid="card-multipliers"
           >
-            <div className="flex items-center justify-around gap-8">
+            <div className="flex items-center justify-center gap-8">
               {/* APÓS: */}
               <div className="flex items-center gap-3">
                 <span className="font-mono text-base text-gray-400 uppercase">APÓS:</span>
-                <span
-                  className="font-mono text-4xl font-bold"
+                <div
+                  className="px-4 py-2 rounded-lg border"
                   style={{
-                    color: '#9d4edd',
-                    textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
+                    borderColor: '#000000',
+                    backgroundColor: '#000000',
                   }}
-                  data-testid="text-apos-value"
                 >
-                  {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '--'}
-                </span>
+                  <span
+                    className="font-mono text-3xl font-bold"
+                    style={{
+                      color: '#9d4edd',
+                      textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
+                    }}
+                    data-testid="text-apos-value"
+                  >
+                    {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '--'}
+                  </span>
+                </div>
               </div>
 
               {/* SACAR: */}
               <div className="flex items-center gap-3">
                 <span className="font-mono text-base text-gray-400 uppercase">SACAR:</span>
-                <span
-                  className="font-mono text-4xl font-bold"
+                <div
+                  className="px-4 py-2 rounded-lg border"
                   style={{
-                    color: '#9d4edd',
-                    textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
+                    borderColor: '#000000',
+                    backgroundColor: '#000000',
                   }}
-                  data-testid="text-sacar-value"
                 >
-                  {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
-                </span>
+                  <span
+                    className="font-mono text-3xl font-bold"
+                    style={{
+                      color: '#9d4edd',
+                      textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
+                    }}
+                    data-testid="text-sacar-value"
+                  >
+                    {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
