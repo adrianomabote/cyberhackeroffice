@@ -80,31 +80,31 @@ export default function Home() {
         </header>
 
         {/* Card único com ambos valores */}
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-4 py-6">
           <div
-            className="relative bg-black/90 backdrop-blur-sm rounded-2xl p-6 border-2"
+            className="relative bg-black/95 backdrop-blur-sm rounded-xl p-5 border-2"
             style={{
               borderColor: '#9d4edd',
-              boxShadow: '0 0 20px rgba(157, 78, 221, 0.4)',
+              boxShadow: '0 0 15px rgba(157, 78, 221, 0.3)',
             }}
             data-testid="card-multipliers"
           >
-            <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center justify-around gap-6">
               {/* APÓS: */}
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-base text-gray-400 uppercase">APÓS:</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-sm text-gray-400 uppercase">APÓS:</span>
                 <div
-                  className="px-4 py-2 rounded-lg border"
+                  className="px-3 py-1.5 rounded-md border"
                   style={{
-                    borderColor: '#ffffff',
-                    backgroundColor: '#000000',
+                    borderColor: '#1a1a1a',
+                    backgroundColor: '#0a0a0a',
                   }}
                 >
                   <span
-                    className="font-mono text-3xl font-bold"
+                    className="font-mono text-2xl font-bold"
                     style={{
                       color: '#9d4edd',
-                      textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
+                      textShadow: '0 0 8px rgba(157, 78, 221, 0.5)',
                     }}
                     data-testid="text-apos-value"
                   >
@@ -114,20 +114,20 @@ export default function Home() {
               </div>
 
               {/* SACAR: */}
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-base text-gray-400 uppercase">SACAR:</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-sm text-gray-400 uppercase">SACAR:</span>
                 <div
-                  className="px-4 py-2 rounded-lg border"
+                  className="px-3 py-1.5 rounded-md border"
                   style={{
-                    borderColor: '#ffffff',
-                    backgroundColor: '#000000',
+                    borderColor: '#1a1a1a',
+                    backgroundColor: '#0a0a0a',
                   }}
                 >
                   <span
-                    className="font-mono text-3xl font-bold"
+                    className="font-mono text-2xl font-bold"
                     style={{
                       color: '#9d4edd',
-                      textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
+                      textShadow: '0 0 8px rgba(157, 78, 221, 0.5)',
                     }}
                     data-testid="text-sacar-value"
                   >
