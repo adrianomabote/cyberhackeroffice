@@ -142,51 +142,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* Iframe Container */}
-          <div
-            className="relative rounded-lg overflow-hidden border"
-            style={{
-              borderColor: 'rgba(157, 78, 221, 0.3)',
-              boxShadow: '0 0 20px rgba(157, 78, 221, 0.2)',
-            }}
-          >
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src="https://www.txunabet.co.mz/"
-                className="absolute inset-0 w-full h-full"
-                title="Aviator Game"
-                data-testid="iframe-aviator"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-              />
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div className="mt-8 p-6 bg-[#1a1a1a]/60 backdrop-blur-sm rounded-lg border border-[#9d4edd]/20">
-            <h2 className="font-cyber text-xl md:text-2xl font-bold mb-4" style={{ color: '#9d4edd' }}>
-              Como usar:
-            </h2>
-            <ol className="space-y-3 text-gray-300 font-mono text-sm md:text-base">
-              <li className="flex items-start">
-                <span className="text-[#9d4edd] mr-3 font-bold">1.</span>
-                <span>Abra o console do navegador (F12 ou Ctrl+Shift+J)</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#9d4edd] mr-3 font-bold">2.</span>
-                <span>Cole o script aviator-script.js disponível no projeto</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#9d4edd] mr-3 font-bold">3.</span>
-                <span>Configure a variável API_URL se necessário</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-[#9d4edd] mr-3 font-bold">4.</span>
-                <span>Os multiplicadores serão capturados e analisados automaticamente</span>
-              </li>
-            </ol>
-          </div>
         </div>
       </div>
     </div>
