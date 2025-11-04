@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse } from "@shared/schema";
 import { z } from "zod";
 
-// Função para calcular previsão baseada nas últimas 10 velas
+// Função avançada usando Regressão Linear + Média Exponencial + Detecção de Padrões
 function calcularPrevisao(velas: Array<{ multiplicador: number }>): number | null {
   if (velas.length === 0) {
     return null;
@@ -15,35 +15,65 @@ function calcularPrevisao(velas: Array<{ multiplicador: number }>): number | nul
     return 1.5;
   }
 
-  // Análise simples: calcular média e tendência
-  const multiplicadores = velas.map(v => v.multiplicador);
-  const soma = multiplicadores.reduce((acc, val) => acc + val, 0);
-  const media = soma / multiplicadores.length;
+  // Pegar últimas 20 velas (ou todas se houver menos)
+  const ultimas = velas.slice(-20);
+  const multiplicadores = ultimas.map(v => v.multiplicador);
+  const n = multiplicadores.length;
 
-  // Calcular tendência (últimas 5 vs primeiras 5)
-  const metade = Math.floor(multiplicadores.length / 2);
-  const primeiraMetade = multiplicadores.slice(0, metade);
-  const segundaMetade = multiplicadores.slice(metade);
-
-  const mediaPrimeira = primeiraMetade.reduce((a, b) => a + b, 0) / primeiraMetade.length;
-  const mediaSegunda = segundaMetade.reduce((a, b) => a + b, 0) / segundaMetade.length;
-
-  // Se a tendência está subindo, sugerir um valor um pouco acima da média
-  // Se está descendo, sugerir um valor mais conservador
-  let previsao: number;
-  if (mediaSegunda > mediaPrimeira) {
-    // Tendência de alta - sugerir média + 20%
-    previsao = media * 1.2;
-  } else {
-    // Tendência de baixa ou estável - sugerir média - 10%
-    previsao = media * 0.9;
+  // 1. Regressão Linear Simples (y = ax + b)
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (let i = 0; i < n; i++) {
+    const x = i;
+    const y = multiplicadores[i];
+    sumX += x;
+    sumY += y;
+    sumXY += x * y;
+    sumX2 += x * x;
   }
 
-  // Limitar entre 1.2x e 10x para ser realista
-  previsao = Math.max(1.2, Math.min(10, previsao));
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+  const previsaoLinear = slope * n + intercept;
 
-  // Arredondar para 2 casas decimais
-  return Math.round(previsao * 100) / 100;
+  // 2. Média Móvel Exponencial (EMA) com α = 0.3
+  const alpha = 0.3;
+  let ema = multiplicadores[0];
+  for (let i = 1; i < n; i++) {
+    ema = alpha * multiplicadores[i] + (1 - alpha) * ema;
+  }
+
+  // 3. Detecção de Volatilidade
+  const media = multiplicadores.reduce((sum, m) => sum + m, 0) / n;
+  const variancia = multiplicadores.reduce((sum, m) => sum + Math.pow(m - media, 2), 0) / n;
+  const desvioPadrao = Math.sqrt(variancia);
+  const coeficienteVariacao = desvioPadrao / media;
+
+  // 4. Ponderação baseada em volatilidade
+  let peso_linear = 0.4;
+  let peso_ema = 0.6;
+  if (coeficienteVariacao > 0.5) {
+    peso_linear = 0.3;
+    peso_ema = 0.7;
+  } else if (coeficienteVariacao < 0.2) {
+    peso_linear = 0.6;
+    peso_ema = 0.4;
+  }
+
+  // 5. Combinação ponderada
+  let previsao = peso_linear * previsaoLinear + peso_ema * ema;
+
+  // 6. Ajuste baseado em padrões recentes
+  if (n >= 5) {
+    const ultimas5 = multiplicadores.slice(-5);
+    const baixosRecentes = ultimas5.filter(m => m < 2).length;
+    const altosRecentes = ultimas5.filter(m => m > 3).length;
+    
+    if (baixosRecentes >= 3) previsao *= 1.1;
+    if (altosRecentes >= 3) previsao *= 0.9;
+  }
+
+  // 7. Limitar e arredondar
+  return Math.round(Math.max(1.2, Math.min(10, previsao)) * 100) / 100;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -251,14 +281,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? calcularMedia(multiplicadores.slice(-20))
         : null;
 
-      // Calcular tendência (comparar primeira e segunda metade)
+      // Calcular tendência (usar APENAS últimas 10 velas para capturar comportamento recente)
       let tipoTendencia: 'alta' | 'baixa' | 'estável' = 'estável';
       let variacao = 0;
       
       if (multiplicadores.length >= 2) {
-        const metade = Math.floor(multiplicadores.length / 2);
-        const primeiraMetade = multiplicadores.slice(0, metade);
-        const segundaMetade = multiplicadores.slice(metade);
+        // Usar só últimas 10 velas para tendência (não todas as 20)
+        const velasParaTendencia = multiplicadores.slice(-10);
+        const metade = Math.floor(velasParaTendencia.length / 2);
+        const primeiraMetade = velasParaTendencia.slice(0, metade);
+        const segundaMetade = velasParaTendencia.slice(metade);
         
         if (primeiraMetade.length > 0 && segundaMetade.length > 0) {
           const mediaPrimeira = calcularMedia(primeiraMetade);
