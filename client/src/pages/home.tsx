@@ -79,66 +79,45 @@ export default function Home() {
           </h1>
         </header>
 
-        {/* Multiplier Cards */}
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* APÓS: Card */}
-            <div
-              className={`relative bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-6 border-2 transition-all duration-300 ${
-                pulseApos ? 'scale-105' : 'scale-100'
-              }`}
-              style={{
-                borderColor: '#9d4edd',
-                boxShadow: pulseApos
-                  ? '0 0 30px rgba(157, 78, 221, 0.6), 0 0 60px rgba(157, 78, 221, 0.3)'
-                  : '0 0 15px rgba(157, 78, 221, 0.3)',
-              }}
-              data-testid="card-apos"
-            >
-              <div className="text-center">
-                <p className="font-mono text-sm md:text-base text-gray-400 mb-4 tracking-wider uppercase">
-                  APÓS:
-                </p>
-                <div
-                  className="font-mono text-5xl md:text-6xl font-bold tracking-tight"
+        {/* Card único com ambos valores */}
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <div
+            className="relative bg-black/90 backdrop-blur-sm rounded-2xl p-6 border-2"
+            style={{
+              borderColor: '#9d4edd',
+              boxShadow: '0 0 20px rgba(157, 78, 221, 0.4)',
+            }}
+            data-testid="card-multipliers"
+          >
+            <div className="flex items-center justify-around gap-8">
+              {/* APÓS: */}
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-base text-gray-400 uppercase">APÓS:</span>
+                <span
+                  className="font-mono text-4xl font-bold"
                   style={{
                     color: '#9d4edd',
-                    textShadow: '0 0 10px rgba(157, 78, 221, 0.5)',
+                    textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
                   }}
                   data-testid="text-apos-value"
                 >
                   {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '--'}
-                </div>
+                </span>
               </div>
-            </div>
 
-            {/* SACAR: Card */}
-            <div
-              className={`relative bg-[#1a1a1a]/80 backdrop-blur-sm rounded-lg p-6 border-2 transition-all duration-300 ${
-                pulseSacar ? 'scale-105' : 'scale-100'
-              }`}
-              style={{
-                borderColor: '#9d4edd',
-                boxShadow: pulseSacar
-                  ? '0 0 30px rgba(157, 78, 221, 0.6), 0 0 60px rgba(157, 78, 221, 0.3)'
-                  : '0 0 15px rgba(157, 78, 221, 0.3)',
-              }}
-              data-testid="card-sacar"
-            >
-              <div className="text-center">
-                <p className="font-mono text-sm md:text-base text-gray-400 mb-4 tracking-wider uppercase">
-                  SACAR:
-                </p>
-                <div
-                  className="font-mono text-5xl md:text-6xl font-bold tracking-tight"
+              {/* SACAR: */}
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-base text-gray-400 uppercase">SACAR:</span>
+                <span
+                  className="font-mono text-4xl font-bold"
                   style={{
                     color: '#9d4edd',
-                    textShadow: '0 0 10px rgba(157, 78, 221, 0.5)',
+                    textShadow: '0 0 10px rgba(157, 78, 221, 0.6)',
                   }}
                   data-testid="text-sacar-value"
                 >
                   {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
-                </div>
+                </span>
               </div>
             </div>
           </div>
