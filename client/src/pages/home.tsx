@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import type { UltimaVelaResponse, PrevisaoResponse, HistoricoResponse, EstatisticasResponse } from "@shared/schema";
+import { useEffect, useState, useRef } from "react";
+import type { UltimaVelaResponse, PrevisaoResponse, HistoricoResponse, EstatisticasResponse, PadroesResponse } from "@shared/schema";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { TrendingUp, TrendingDown, Activity, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, Activity, BarChart3, AlertTriangle, Info, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
+  const { toast } = useToast();
+  const padroesNotificadosRef = useRef<Set<string>>(new Set());
 
   // Buscar última vela (DEPOIS DE:)
   const { data: aposData } = useQuery<UltimaVelaResponse>({
@@ -56,6 +59,18 @@ export default function Home() {
     staleTime: 0,
   });
 
+  // Buscar padrões detectados
+  const { data: padroesData } = useQuery<PadroesResponse>({
+    queryKey: ['/api/padroes'],
+    queryFn: async () => {
+      const res = await fetch('/api/padroes');
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    },
+    refetchInterval: 3000,
+    staleTime: 0,
+  });
+
   // Efeito de pulso quando valores mudam
   useEffect(() => {
     setPulseApos(true);
@@ -68,6 +83,35 @@ export default function Home() {
     const timer = setTimeout(() => setPulseSacar(false), 300);
     return () => clearTimeout(timer);
   }, [sacarData?.multiplicador]);
+
+  // Notificar quando padrões forem detectados
+  useEffect(() => {
+    if (padroesData?.padroes && padroesData.padroes.length > 0) {
+      padroesData.padroes.forEach(padrao => {
+        const padraoKey = `${padrao.tipo}-${padrao.mensagem}`;
+        
+        if (!padroesNotificadosRef.current.has(padraoKey)) {
+          padroesNotificadosRef.current.add(padraoKey);
+
+          const IconComponent = 
+            padrao.severidade === 'warning' ? AlertTriangle :
+            padrao.severidade === 'success' ? CheckCircle :
+            Info;
+
+          toast({
+            title: padrao.tipo.replace(/_/g, ' ').toUpperCase(),
+            description: padrao.mensagem,
+            variant: padrao.severidade === 'warning' ? 'destructive' : 'default',
+            duration: 5000,
+          });
+
+          setTimeout(() => {
+            padroesNotificadosRef.current.delete(padraoKey);
+          }, 10000);
+        }
+      });
+    }
+  }, [padroesData, toast]);
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">

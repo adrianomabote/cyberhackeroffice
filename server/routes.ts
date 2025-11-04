@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse } from "@shared/schema";
+import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse } from "@shared/schema";
 import { z } from "zod";
 
 // Função para calcular previsão baseada nas últimas 10 velas
@@ -145,6 +145,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
         velas: [],
         total: 0,
         error: "Erro ao buscar histórico",
+      });
+    }
+  });
+
+  // GET /api/padroes - Detecta padrões favoráveis nas últimas velas
+  app.get("/api/padroes", async (req, res) => {
+    try {
+      const historico = await storage.getHistorico(15);
+      const padroes: PadroesResponse['padroes'] = [];
+
+      if (historico.length < 5) {
+        return res.json({ padroes: [] });
+      }
+
+      const multiplicadores = historico.map(v => v.multiplicador);
+      const ultimas5 = multiplicadores.slice(-5);
+      const ultimas10 = multiplicadores.slice(-10);
+
+      // Padrão 1: Sequência de multiplicadores baixos (<2x)
+      const baixosConsecutivos = ultimas5.filter(m => m < 2).length;
+      if (baixosConsecutivos >= 3) {
+        padroes.push({
+          tipo: 'sequencia_baixa',
+          mensagem: `${baixosConsecutivos} multiplicadores baixos (<2x) nas últimas 5 velas`,
+          severidade: 'warning',
+        });
+      }
+
+      // Padrão 2: Alta volatilidade (amplitude > 3x nas últimas 5 velas)
+      const maxRecente = Math.max(...ultimas5);
+      const minRecente = Math.min(...ultimas5);
+      const amplitudeRecente = maxRecente - minRecente;
+      if (amplitudeRecente > 3) {
+        padroes.push({
+          tipo: 'alta_volatilidade',
+          mensagem: `Alta volatilidade detectada: amplitude de ${amplitudeRecente.toFixed(2)}x`,
+          severidade: 'info',
+        });
+      }
+
+      // Padrão 3: Tendência forte (variação > 15%)
+      if (ultimas10.length === 10) {
+        const metade = 5;
+        const primeiraMetade = ultimas10.slice(0, metade);
+        const segundaMetade = ultimas10.slice(metade);
+        const media1 = primeiraMetade.reduce((a, b) => a + b, 0) / metade;
+        const media2 = segundaMetade.reduce((a, b) => a + b, 0) / metade;
+        const variacao = ((media2 - media1) / media1) * 100;
+
+        if (Math.abs(variacao) > 15) {
+          padroes.push({
+            tipo: 'tendencia_forte',
+            mensagem: `Tendência ${variacao > 0 ? 'de alta' : 'de baixa'} forte: ${Math.abs(variacao).toFixed(1)}%`,
+            severidade: variacao > 0 ? 'success' : 'warning',
+          });
+        }
+      }
+
+      // Padrão 4: Oportunidade após sequência de baixos
+      const ultima = multiplicadores[multiplicadores.length - 1];
+      if (baixosConsecutivos >= 2 && ultima < 2.5) {
+        padroes.push({
+          tipo: 'oportunidade',
+          mensagem: 'Possível oportunidade: padrão de recuperação após sequência baixa',
+          severidade: 'success',
+        });
+      }
+
+      res.json({ padroes });
+    } catch (error) {
+      res.status(500).json({
+        padroes: [],
+        error: "Erro ao detectar padrões",
       });
     }
   });

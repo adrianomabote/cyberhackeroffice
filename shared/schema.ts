@@ -58,3 +58,12 @@ export interface EstatisticasResponse {
     amplitude: number;
   };
 }
+
+// Resposta da API para padrões detectados
+export interface PadroesResponse {
+  padroes: Array<{
+    tipo: 'sequencia_baixa' | 'alta_volatilidade' | 'tendencia_forte' | 'oportunidade';
+    mensagem: string;
+    severidade: 'info' | 'warning' | 'success';
+  }>;
+}
