@@ -91,6 +91,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
+  // GET /api - Lista todos os endpoints disponíveis
+  app.get("/api", (req, res) => {
+    res.json({
+      nome: "CYBER HACKER - Aviator Analysis API",
+      versao: "1.0.0",
+      endpoints: [
+        {
+          metodo: "GET",
+          rota: "/api",
+          descricao: "Lista todos os endpoints disponíveis"
+        },
+        {
+          metodo: "POST",
+          rota: "/api/velas",
+          descricao: "Recebe multiplicadores do Aviator",
+          body: {
+            multiplicador: "number (obrigatório)"
+          }
+        },
+        {
+          metodo: "GET",
+          rota: "/api/velas",
+          descricao: "Retorna histórico de todas as velas (últimas 100)",
+          query: {
+            limit: "number (opcional, padrão: 100)"
+          }
+        },
+        {
+          metodo: "GET",
+          rota: "/api/apos",
+          descricao: "Retorna última vela registrada"
+        },
+        {
+          metodo: "GET",
+          rota: "/api/sacar",
+          descricao: "Retorna previsão ML da próxima vela"
+        },
+        {
+          metodo: "GET",
+          rota: "/api/historico",
+          descricao: "Retorna histórico de velas",
+          query: {
+            limit: "number (opcional, padrão: 100)"
+          }
+        },
+        {
+          metodo: "GET",
+          rota: "/api/estatisticas",
+          descricao: "Retorna estatísticas avançadas (médias móveis, tendência, volatilidade)"
+        },
+        {
+          metodo: "GET",
+          rota: "/api/padroes",
+          descricao: "Detecta padrões favoráveis nas últimas velas"
+        }
+      ]
+    });
+  });
+
+  // GET /api/velas - Retorna histórico de todas as velas
+  app.get("/api/velas", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const historico = await storage.getHistorico(limit);
+      
+      res.json({
+        success: true,
+        total: historico.length,
+        velas: historico,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        velas: [],
+        total: 0,
+        error: "Erro ao buscar velas",
+      });
+    }
+  });
+
   // POST /api/velas - Recebe multiplicadores do Aviator
   app.post("/api/velas", async (req, res) => {
     try {
