@@ -150,16 +150,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // GET /api/velas/cyber - Retorna histórico de todas as velas
+  // GET /api/velas/cyber - Retorna histórico de todas as velas em ordem cronológica
   app.get("/api/velas/cyber", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
       const historico = await storage.getHistorico(limit);
       
+      // Inverter para mostrar da mais recente para a mais antiga (ordem de fila)
+      const velasEmFila = [...historico].reverse();
+      
+      // Adicionar posição/índice para facilitar análise
+      const velasComPosicao = velasEmFila.map((vela, index) => ({
+        posicao: index + 1,
+        ...vela,
+      }));
+      
       res.json({
         success: true,
-        total: historico.length,
-        velas: historico,
+        total: velasComPosicao.length,
+        ordem: "mais_recente_primeiro",
+        velas: velasComPosicao,
       });
     } catch (error) {
       res.status(500).json({
