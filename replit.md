@@ -7,16 +7,16 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 ### Frontend (`client/`)
 - **Página Principal** (`client/src/pages/home.tsx`): 
-  - Interface cyberpunk com multiplicadores em tempo real
-  - 2 cards principais: "DEPOIS DE" e "TIRAR NO"
-  - 4 cards de estatísticas: Tendência, Volatilidade, Média 5, Média 10
-  - Gráfico histórico com Recharts (últimas 50 velas)
-  - Sistema de toasts para notificações de padrões
-- **Design System**: Cores cyber hacker (preto, vermelho #ff0000, roxo #9d4edd)
-- **Polling**: 
-  - /api/apos e /api/sacar: 1s
-  - /api/historico e /api/estatisticas: 2s
-  - /api/padroes: 3s
+  - Interface cyberpunk minimalista - 100% conforme foto de referência
+  - Header: "CYBER HACKER" em vermelho (#ff0000) com glow effect
+  - 2 cards principais lado a lado:
+    - **APÓS:** - Última vela capturada (roxo #9d4edd)
+    - **SACAR:** - Previsão ML em tempo real (roxo #9d4edd)
+  - Fundo preto (#000000) forçado no body
+  - Efeito de pulso visual quando valores atualizam
+- **Design System**: Cores cyber hacker (preto #000000, vermelho #ff0000, roxo #9d4edd)
+- **Polling Ativo**: 
+  - /api/apos e /api/sacar: 1s (atualização em tempo real)
 
 ### Backend (`server/`)
 - **API Routes** (`server/routes.ts`): 
