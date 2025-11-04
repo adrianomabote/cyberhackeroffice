@@ -16,16 +16,18 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
   - Efeito de pulso visual quando valores atualizam
 - **Design System**: Cores cyber hacker (preto #000000, vermelho #ff0000, roxo #9d4edd)
 - **Polling Ativo**: 
-  - /api/apos e /api/sacar: 1s (atualização em tempo real)
+  - /api/apos/cyber e /api/sacar/cyber: 1s (atualização em tempo real)
 
 ### Backend (`server/`)
 - **API Routes** (`server/routes.ts`): 
-  - POST /api/velas - Recebe multiplicadores
-  - GET /api/apos - Retorna última vela
-  - GET /api/sacar - Previsão com algoritmo ML avançado
-  - GET /api/historico - Últimas 50+ velas para gráfico
-  - GET /api/estatisticas - Médias móveis, tendência, volatilidade, extremos
-  - GET /api/padroes - Detecta 4 tipos de padrões favoráveis
+  - GET /api/cyber - Lista todos os endpoints disponíveis
+  - POST /api/velas/cyber - Recebe multiplicadores
+  - GET /api/velas/cyber - Retorna histórico de velas
+  - GET /api/apos/cyber - Retorna última vela
+  - GET /api/sacar/cyber - Previsão com algoritmo ML avançado
+  - GET /api/historico/cyber - Últimas 50+ velas para gráfico
+  - GET /api/estatisticas/cyber - Médias móveis, tendência, volatilidade, extremos
+  - GET /api/padroes/cyber - Detecta 4 tipos de padrões favoráveis
 - **Storage** (`server/storage.ts`): 
   - PostgreSQL com Drizzle ORM
   - DbStorage class com proteção contra duplicatas
@@ -101,7 +103,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 1. **Usuário acessa** → Interface cyberpunk carrega
 2. **Script no console** → Captura multiplicadores a cada 1s
-3. **POST /api/velas** → Backend armazena no PostgreSQL
+3. **POST /api/velas/cyber** → Backend armazena no PostgreSQL
 4. **Frontend polling** → Atualiza cards, gráfico e estatísticas
 5. **Detecção de padrões** → Sistema monitora e notifica via toasts
 6. **Algoritmo ML** → Calcula previsão usando regressão + EMA + padrões

@@ -8,9 +8,9 @@ export default function Home() {
 
   // Buscar última vela (APÓS:)
   const { data: aposData } = useQuery<UltimaVelaResponse>({
-    queryKey: ['/api/apos'],
+    queryKey: ['/api/apos/cyber'],
     queryFn: async () => {
-      const res = await fetch('/api/apos');
+      const res = await fetch('/api/apos/cyber');
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },
@@ -20,9 +20,9 @@ export default function Home() {
 
   // Buscar previsão (SACAR:)
   const { data: sacarData } = useQuery<PrevisaoResponse>({
-    queryKey: ['/api/sacar'],
+    queryKey: ['/api/sacar/cyber'],
     queryFn: async () => {
-      const res = await fetch('/api/sacar');
+      const res = await fetch('/api/sacar/cyber');
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
     },

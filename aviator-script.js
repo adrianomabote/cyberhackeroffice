@@ -93,7 +93,7 @@
    */
   async function enviarMultiplicador(multiplicador) {
     try {
-      const response = await fetch(`${API_URL}/api/velas`, {
+      const response = await fetch(`${API_URL}/api/velas/cyber`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

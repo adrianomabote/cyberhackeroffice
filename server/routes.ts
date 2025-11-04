@@ -91,20 +91,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   });
 
-  // GET /api - Lista todos os endpoints disponíveis
-  app.get("/api", (req, res) => {
+  // GET /api/cyber - Lista todos os endpoints disponíveis
+  app.get("/api/cyber", (req, res) => {
     res.json({
       nome: "CYBER HACKER - Aviator Analysis API",
       versao: "1.0.0",
       endpoints: [
         {
           metodo: "GET",
-          rota: "/api",
+          rota: "/api/cyber",
           descricao: "Lista todos os endpoints disponíveis"
         },
         {
           metodo: "POST",
-          rota: "/api/velas",
+          rota: "/api/velas/cyber",
           descricao: "Recebe multiplicadores do Aviator",
           body: {
             multiplicador: "number (obrigatório)"
@@ -112,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         {
           metodo: "GET",
-          rota: "/api/velas",
+          rota: "/api/velas/cyber",
           descricao: "Retorna histórico de todas as velas (últimas 100)",
           query: {
             limit: "number (opcional, padrão: 100)"
@@ -120,17 +120,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         {
           metodo: "GET",
-          rota: "/api/apos",
+          rota: "/api/apos/cyber",
           descricao: "Retorna última vela registrada"
         },
         {
           metodo: "GET",
-          rota: "/api/sacar",
+          rota: "/api/sacar/cyber",
           descricao: "Retorna previsão ML da próxima vela"
         },
         {
           metodo: "GET",
-          rota: "/api/historico",
+          rota: "/api/historico/cyber",
           descricao: "Retorna histórico de velas",
           query: {
             limit: "number (opcional, padrão: 100)"
@@ -138,20 +138,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         {
           metodo: "GET",
-          rota: "/api/estatisticas",
+          rota: "/api/estatisticas/cyber",
           descricao: "Retorna estatísticas avançadas (médias móveis, tendência, volatilidade)"
         },
         {
           metodo: "GET",
-          rota: "/api/padroes",
+          rota: "/api/padroes/cyber",
           descricao: "Detecta padrões favoráveis nas últimas velas"
         }
       ]
     });
   });
 
-  // GET /api/velas - Retorna histórico de todas as velas
-  app.get("/api/velas", async (req, res) => {
+  // GET /api/velas/cyber - Retorna histórico de todas as velas
+  app.get("/api/velas/cyber", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
       const historico = await storage.getHistorico(limit);
@@ -171,8 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/velas - Recebe multiplicadores do Aviator
-  app.post("/api/velas", async (req, res) => {
+  // POST /api/velas/cyber - Recebe multiplicadores do Aviator
+  app.post("/api/velas/cyber", async (req, res) => {
     try {
       const validatedData = insertVelaSchema.parse(req.body);
       const vela = await storage.addVela(validatedData);
@@ -201,8 +201,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/apos - Retorna última vela registrada
-  app.get("/api/apos", async (req, res) => {
+  // GET /api/apos/cyber - Retorna última vela registrada
+  app.get("/api/apos/cyber", async (req, res) => {
     try {
       const ultimaVela = await storage.getUltimaVela();
       
@@ -220,8 +220,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/sacar - Retorna previsão da próxima vela baseada nas últimas 10
-  app.get("/api/sacar", async (req, res) => {
+  // GET /api/sacar/cyber - Retorna previsão da próxima vela baseada nas últimas 10
+  app.get("/api/sacar/cyber", async (req, res) => {
     try {
       const ultimas10 = await storage.getUltimas10Velas();
       const previsao = calcularPrevisao(ultimas10);
@@ -240,8 +240,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/historico - Retorna histórico completo de velas
-  app.get("/api/historico", async (req, res) => {
+  // GET /api/historico/cyber - Retorna histórico completo de velas
+  app.get("/api/historico/cyber", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
       const historico = await storage.getHistorico(limit);
@@ -259,8 +259,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/padroes - Detecta padrões favoráveis nas últimas velas
-  app.get("/api/padroes", async (req, res) => {
+  // GET /api/padroes/cyber - Detecta padrões favoráveis nas últimas velas
+  app.get("/api/padroes/cyber", async (req, res) => {
     try {
       const historico = await storage.getHistorico(15);
       const padroes: PadroesResponse['padroes'] = [];
@@ -332,8 +332,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/estatisticas - Retorna estatísticas avançadas
-  app.get("/api/estatisticas", async (req, res) => {
+  // GET /api/estatisticas/cyber - Retorna estatísticas avançadas
+  app.get("/api/estatisticas/cyber", async (req, res) => {
     try {
       const historico = await storage.getHistorico(20); // Últimas 20 velas para cálculos
       
