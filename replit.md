@@ -1,26 +1,39 @@
 # Sistema de Análise Aviator - CYBER HACKER
 
 ## Visão Geral
-Sistema completo de análise e previsão em tempo real do jogo Aviator com interface cyberpunk. Inclui frontend React, backend Node.js com API RESTful e script de captura automática para console do navegador.
+Sistema completo de análise e previsão em tempo real do jogo Aviator com interface cyberpunk. Inclui frontend React, backend Node.js com API RESTful, PostgreSQL para persistência, algoritmo ML avançado, sistema de notificações e script de captura automática.
 
 ## Estrutura do Projeto
 
 ### Frontend (`client/`)
-- **Página Principal** (`client/src/pages/home.tsx`): Interface com design cyberpunk mostrando multiplicadores em tempo real
+- **Página Principal** (`client/src/pages/home.tsx`): 
+  - Interface cyberpunk com multiplicadores em tempo real
+  - 2 cards principais: "DEPOIS DE" e "TIRAR NO"
+  - 4 cards de estatísticas: Tendência, Volatilidade, Média 5, Média 10
+  - Gráfico histórico com Recharts (últimas 50 velas)
+  - Sistema de toasts para notificações de padrões
 - **Design System**: Cores cyber hacker (preto, vermelho #ff0000, roxo #9d4edd)
-- **Componentes**: Cards de multiplicadores com efeitos neon glow, iframe do jogo
-- **Atualização**: Polling a cada 1 segundo para obter dados da API
+- **Polling**: 
+  - /api/apos e /api/sacar: 1s
+  - /api/historico e /api/estatisticas: 2s
+  - /api/padroes: 3s
 
 ### Backend (`server/`)
 - **API Routes** (`server/routes.ts`): 
   - POST /api/vela - Recebe multiplicadores
   - GET /api/apos - Retorna última vela
-  - GET /api/sacar - Retorna previsão baseada em análise
-- **Storage** (`server/storage.ts`): In-memory storage com proteção contra duplicatas
-- **CORS**: Habilitado para permitir chamadas cross-origin
+  - GET /api/sacar - Previsão com algoritmo ML avançado
+  - GET /api/historico - Últimas 50+ velas para gráfico
+  - GET /api/estatisticas - Médias móveis, tendência, volatilidade, extremos
+  - GET /api/padroes - Detecta 4 tipos de padrões favoráveis
+- **Storage** (`server/storage.ts`): 
+  - PostgreSQL com Drizzle ORM
+  - DbStorage class com proteção contra duplicatas
+  - Tabela 'velas' (id, multiplicador, timestamp)
+- **CORS**: Habilitado para chamadas cross-origin
 
 ### Script de Captura
-- **aviator-script.js**: Script standalone para colar no console do Aviator
+- **aviator-script.js**: Script standalone para console do navegador
 - **Funcionalidades**: 
   - Captura automática a cada 1 segundo
   - API_URL configurável
@@ -28,41 +41,91 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
   - Comandos de controle (stop/restart)
 
 ### Schema (`shared/schema.ts`)
-- **Vela**: Modelo de dados para multiplicadores
-- **Tipos**: InsertVela, Vela, UltimaVelaResponse, PrevisaoResponse
-- **Validação**: Zod schemas para validação de entrada
+- **Modelos**: Vela, HistoricoResponse, EstatisticasResponse, PadroesResponse
+- **Tipos**: InsertVela, UltimaVelaResponse, PrevisaoResponse
+- **Validação**: Zod schemas para todas as entradas
 
-## Sistema de Previsão
-Analisa últimas 10 velas para calcular próximo multiplicador:
-1. Calcula média dos multiplicadores
-2. Detecta tendência (alta/baixa)
-3. Ajusta previsão baseado na tendência
-4. Limita valores entre 1.2x e 10x
+## Algoritmo ML de Previsão Avançado
+
+### Técnicas Implementadas (calcularPrevisao):
+1. **Regressão Linear** (y = ax + b)
+   - Calcula slope e intercept para detectar tendência linear
+   - Fórmulas estatísticas: slope = (n×ΣXY - ΣX×ΣY) / (n×ΣX² - (ΣX)²)
+
+2. **Média Móvel Exponencial (EMA)**
+   - α = 0.3 (fator de suavização)
+   - EMA[i] = α×valor[i] + (1-α)×EMA[i-1]
+   - Maior peso para valores recentes
+
+3. **Detecção de Volatilidade**
+   - Calcula coeficiente de variação (CV = desvio_padrão / média)
+   - Ajusta pesos dinamicamente baseado em volatilidade
+
+4. **Ponderação Adaptativa**
+   - Alta volatilidade (CV > 0.5): 30% linear + 70% EMA
+   - Baixa volatilidade (CV < 0.2): 60% linear + 40% EMA
+   - Volatilidade média: 40% linear + 60% EMA
+
+5. **Ajustes por Padrões Recentes**
+   - ≥3 velas baixas (<2x): +10% (espera recuperação)
+   - ≥3 velas altas (>3x): -10% (espera correção)
+
+6. **Limitação**: 1.2x a 10x, arredondado para 2 casas
+
+## Sistema de Estatísticas
+
+### GET /api/estatisticas
+- **Médias Móveis**: MA5, MA10, MA20
+- **Tendência**: Tipo (alta/baixa/estável) + percentual
+  - Usa últimas 10 velas para capturar comportamento recente
+  - Alta: variação > 5%
+  - Baixa: variação < -5%
+- **Volatilidade**: Valor + nível (baixa/média/alta)
+- **Extremos**: Máximo, mínimo, amplitude
+
+## Sistema de Notificações
+
+### GET /api/padroes - 4 Detectores:
+1. **Sequência Baixa**: ≥3 multiplicadores <2x nas últimas 5 velas (warning)
+2. **Alta Volatilidade**: Amplitude >3x nas últimas 5 velas (info)
+3. **Tendência Forte**: Variação >15% entre metades das últimas 10 velas (success/warning)
+4. **Oportunidade**: ≥2 baixos E última <2.5x (success)
+
+### Frontend:
+- Toasts automáticos via useToast
+- Deduplicação com timeout de 10s
+- Duration: 5 segundos
+- Ícones: AlertTriangle, CheckCircle, Info
 
 ## Como Funciona
 
-1. **Usuário acessa a interface** → Vê cabeçalho CYBER HACKER e dois cards de multiplicadores
-2. **Script de captura rodando no console** → Captura multiplicadores do jogo a cada segundo
-3. **Script envia para API** → POST /api/vela com multiplicador
-4. **Backend armazena** → Mantém últimas 100 velas em memória
-5. **Frontend consulta** → GET /api/apos e /api/sacar a cada segundo
-6. **Interface atualiza** → Mostra "DEPOIS DE:" (última vela) e "TIRAR NO:" (previsão)
+1. **Usuário acessa** → Interface cyberpunk carrega
+2. **Script no console** → Captura multiplicadores a cada 1s
+3. **POST /api/vela** → Backend armazena no PostgreSQL
+4. **Frontend polling** → Atualiza cards, gráfico e estatísticas
+5. **Detecção de padrões** → Sistema monitora e notifica via toasts
+6. **Algoritmo ML** → Calcula previsão usando regressão + EMA + padrões
 
 ## Tecnologias
 - React + TypeScript + Tailwind CSS
 - Express.js + Node.js
+- PostgreSQL + Drizzle ORM
 - TanStack Query (React Query)
-- In-memory storage (MemStorage)
+- Recharts para gráficos
+- Shadcn UI (Toast, Cards)
 - Fonts: Orbitron (display), Rajdhani (cyber), Roboto Mono (code)
 
 ## Porta
-Servidor roda na porta 5000 conforme requisito do usuário.
+Servidor roda na porta 5000.
 
-## Estado Atual
-✅ Schema definido
-✅ Frontend implementado com design cyberpunk
-✅ Backend API completo com 3 endpoints
-✅ Sistema de previsão implementado
-✅ Script de captura automática criado
+## Estado Atual - COMPLETO
+✅ PostgreSQL com Drizzle ORM (persistência)
+✅ Frontend cyberpunk com 6 cards + gráfico
+✅ Backend com 6 endpoints RESTful
+✅ Algoritmo ML avançado (regressão + EMA + volatilidade)
+✅ Sistema de estatísticas (médias móveis, tendência, volatilidade)
+✅ Sistema de notificações (4 detectores de padrões)
+✅ Script de captura automática
+✅ Testes E2E validados
+✅ Guards contra crashes (optional chaining, arrays vazios)
 ✅ CORS habilitado
-✅ Documentação completa (README.md)
