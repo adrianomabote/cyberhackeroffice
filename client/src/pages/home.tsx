@@ -61,18 +61,18 @@ export default function Home() {
 
       <div className="relative z-20">
         {/* Header CYBER HACKER */}
-        <div className="max-w-md mx-auto px-4 pt-6 pb-4">
+        <div className="max-w-lg mx-auto px-3 pt-4 pb-3">
           <div
-            className="rounded-2xl border-2 py-4"
+            className="rounded-xl border py-3"
             style={{
               borderColor: '#ff0000',
-              backgroundColor: '#000000',
+              borderWidth: '1px',
+              backgroundColor: 'transparent',
             }}
           >
-            <h1 className="text-center font-display text-2xl font-bold tracking-widest"
+            <h1 className="text-center font-display text-xl font-bold tracking-wide"
               style={{
                 color: '#ff0000',
-                textShadow: '0 0 10px rgba(255, 0, 0, 0.6)',
               }}
             >
               CYBER HACKER
@@ -81,28 +81,30 @@ export default function Home() {
         </div>
 
         {/* Card único com ambos valores */}
-        <div className="max-w-md mx-auto px-4 py-4">
+        <div className="max-w-lg mx-auto px-3 py-2">
           <div
-            className="relative rounded-2xl p-4 border-2"
+            className="relative rounded-xl p-3 border"
             style={{
-              borderColor: '#9d4edd',
-              backgroundColor: '#000000',
+              borderColor: '#444444',
+              borderWidth: '1px',
+              backgroundColor: 'transparent',
             }}
             data-testid="card-multipliers"
           >
-            <div className="flex items-center justify-around">
+            <div className="flex items-center justify-around gap-4">
               {/* APÓS: */}
               <div className="flex items-center gap-2">
-                <span className="font-mono text-sm text-gray-400">APÓS:</span>
+                <span className="font-sans text-xs text-gray-300 font-normal">APÓS:</span>
                 <div
-                  className="px-3 py-1 rounded-md border"
+                  className="px-2.5 py-0.5 rounded border"
                   style={{
-                    borderColor: '#1a1a1a',
+                    borderColor: '#333333',
+                    borderWidth: '1px',
                     backgroundColor: '#000000',
                   }}
                 >
                   <span
-                    className="font-mono text-xl font-bold"
+                    className="font-sans text-base font-semibold"
                     style={{
                       color: '#9d4edd',
                     }}
@@ -115,16 +117,17 @@ export default function Home() {
 
               {/* SACAR: */}
               <div className="flex items-center gap-2">
-                <span className="font-mono text-sm text-gray-400">SACAR:</span>
+                <span className="font-sans text-xs text-gray-300 font-normal">SACAR:</span>
                 <div
-                  className="px-3 py-1 rounded-md border"
+                  className="px-2.5 py-0.5 rounded border"
                   style={{
-                    borderColor: '#1a1a1a',
+                    borderColor: '#333333',
+                    borderWidth: '1px',
                     backgroundColor: '#000000',
                   }}
                 >
                   <span
-                    className="font-mono text-xl font-bold"
+                    className="font-sans text-base font-semibold"
                     style={{
                       color: '#9d4edd',
                     }}
