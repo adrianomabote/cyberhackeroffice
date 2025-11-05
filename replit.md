@@ -174,59 +174,20 @@ Servidor roda na porta 5000.
 
 ## Sistema de Proteção de Código
 
-### Camadas de Segurança Implementadas:
+### Proteções Implementadas (SEM BLOQUEIO DE USUÁRIOS):
 
-#### **Bloqueios Básicos:**
-1. **Desabilitar clique direito** - Previne "Inspecionar elemento" + BLOQUEIA PERMANENTE
+1. **Desabilitar clique direito** - Previne "Inspecionar elemento"
 2. **Desabilitar seleção de texto** - Impede copiar conteúdo
-3. **Bloqueio de DevTools** - Desabilita F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C + BLOQUEIA PERMANENTE
-4. **Bloqueio de View Source** - Desabilita Ctrl+U + BLOQUEIA PERMANENTE
+3. **Bloqueio de teclas DevTools** - Desabilita F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+4. **Bloqueio de View Source** - Desabilita Ctrl+U
 5. **Bloqueio de Save/Print** - Desabilita Ctrl+S, Ctrl+P
 6. **Bloqueio de Copy/Cut** - Desabilita Ctrl+C, Ctrl+X, Ctrl+A
+7. **CSS anti-seleção** - Força user-select: none em todos elementos
+8. **Meta tags de proteção** - noindex, no-cache, pragma
+9. **Proteção de imagens** - Impede drag de imagens
+10. **Ofuscação em produção** - Código minificado e ofuscado no build
 
-#### **Detecções Avançadas (BLOQUEIO PERMANENTE):**
-7. **Debugger Trap** - Detecta se debugger está ativo (pausa no código)
-8. **Timing Attack** - Detecta se código está sendo desacelerado (debugging)
-9. **Console Access Detection** - Detecta tentativa de acessar console
-10. **DevTools Dimension Check** - Detecta DevTools aberto por tamanho da janela
-11. **Firebug Detection** - Detecta ferramenta Firebug
-12. **Chrome DevTools Detection** - Detecta Chrome DevTools especificamente
-13. **Function Tampering Detection** - Detecta modificação de código (JSON, etc)
-
-#### **Sistema de Bloqueio Permanente:**
-- **localStorage tracking** - Marca dispositivo como bloqueado
-- **Timestamp de bloqueio** - Registra quando foi bloqueado
-- **Motivo do bloqueio** - Armazena qual técnica foi detectada
-- **Tela vermelha permanente** - "ACESSO BLOQUEADO PERMANENTEMENTE"
-- **ID único gerado** - Identifica tentativa de acesso
-- **Impossível desbloquear** - Mesmo limpando cache, detecta novamente
-
-#### **Proteções Adicionais:**
-14. **CSS anti-seleção** - Força user-select: none em todos elementos
-15. **Meta tags de proteção** - noindex, no-cache, pragma
-16. **Ofuscação em produção** - Código minificado e ofuscado no build
-17. **Desabilita Console** - Bloqueia console.log e métodos relacionados
-18. **Proteção de imagens** - Impede drag de imagens
-
-### Como Funciona o Bloqueio:
-
-**Quando detecta:**
-- F12, Ctrl+Shift+I, Ctrl+U, etc → **BLOQUEIO PERMANENTE**
-- Debugger ativo → **BLOQUEIO PERMANENTE**
-- DevTools aberto → **BLOQUEIO PERMANENTE**
-- Timing anormal (proxy/debug) → **BLOQUEIO PERMANENTE**
-- Modificação de código → **BLOQUEIO PERMANENTE**
-
-**Tela exibida:**
-```
-🚫 ACESSO BLOQUEADO PERMANENTEMENTE 🚫
-Uso de ferramentas de hacking detectado
-Bloqueado em: [data/hora]
-Este dispositivo foi marcado como suspeito
-ID: [código único]
-```
-
-**Nota**: Usuários bloqueados NÃO conseguem mais acessar, mesmo limpando cookies ou recarregando. O sistema detecta novamente nas verificações periódicas.
+**Nota**: Sistema ajustado para NÃO bloquear usuários permanentemente. Apenas dificulta acesso ao código sem banir ninguém.
 
 ## Estado Atual - COMPLETO
 ✅ PostgreSQL com Drizzle ORM (persistência)
