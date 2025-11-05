@@ -132,10 +132,10 @@ export default function Landing() {
       </section>
 
       {/* Por que escolher o Robô Cyber Hacker */}
-      <section className="py-16 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
+      <section className="py-12 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto">
           <h3 
-            className="text-4xl font-bold text-center mb-12 text-red-500"
+            className="text-3xl font-bold text-center mb-8 text-red-500"
             style={{ textShadow: '0 0 20px #ff0000' }}
             data-testid="text-why-title"
           >
@@ -143,29 +143,29 @@ export default function Landing() {
           </h3>
           <div className="max-w-4xl mx-auto">
             <Card className="bg-black border-2 border-red-600">
-              <CardContent className="p-8">
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                    <p className="text-lg text-white">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-base text-white">
                       <span className="font-bold text-red-500">Mais de 10.000 moçambicanos</span> já estão faturando todos os dias usando o Robô Cyber Hacker
                     </p>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                    <p className="text-lg text-white">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-base text-white">
                       Sistema de <span className="font-bold text-red-500">Inteligência Artificial</span> que analisa o Aviator em tempo real
                     </p>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                    <p className="text-lg text-white">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-base text-white">
                       <span className="font-bold text-red-500">100% de acerto</span> - o robô mostra exatamente onde o Aviator vai cair
                     </p>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                    <p className="text-lg text-white">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-base text-white">
                       Suporte <span className="font-bold text-red-500">24/7</span> para todos os usuários
                     </p>
                   </div>
@@ -187,8 +187,8 @@ export default function Landing() {
             Perguntas Frequentes
           </h3>
           <Accordion type="single" collapsible className="space-y-4">
-            <AccordionItem value="item-1" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+            <AccordionItem value="item-1" className="bg-black border-2 border-red-600 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
                 Como funciona o robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
@@ -198,8 +198,8 @@ export default function Landing() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+            <AccordionItem value="item-2" className="bg-black border-2 border-red-600 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
                 O Robô é confiável?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
@@ -208,8 +208,8 @@ export default function Landing() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+            <AccordionItem value="item-3" className="bg-black border-2 border-red-600 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
                 Quanto custa o acesso ao robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
@@ -219,8 +219,8 @@ export default function Landing() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-4" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+            <AccordionItem value="item-4" className="bg-black border-2 border-red-600 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
                 Como usar o robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 space-y-4">
@@ -247,8 +247,8 @@ export default function Landing() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-5" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+            <AccordionItem value="item-5" className="bg-black border-2 border-red-600 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
                 Como instalo o script de captura?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
@@ -257,23 +257,24 @@ export default function Landing() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-6" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
-                Preciso deixar o navegador aberto?
+            <AccordionItem value="item-6" className="bg-black border-2 border-red-600 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
+                O sistema é compatível com qual casa de apostas?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-lg">
-                Sim, o script captura os dados em tempo real enquanto você joga. Mantenha a aba do Aviator aberta 
-                para que o sistema funcione corretamente.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-7" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
-                O sistema é compatível com qual plataforma?
-              </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-lg">
-                O Robô Cyber Hacker funciona em qualquer plataforma que rode o Aviator. 
-                Basta ter um navegador moderno (Chrome, Firefox, Edge).
+              <AccordionContent className="text-gray-300 text-base">
+                <p className="mb-4">
+                  O sistema é compatível com uma casa de apostas. Para ter conta nessa casa de apostas, 
+                  basta clicar no botão abaixo:
+                </p>
+                <a 
+                  href="https://tracking.olabet.co.mz/C.ashx?btag=a_314b_7c_&affid=309&siteid=314&adid=7&c=" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button className="bg-red-600 text-white hover:bg-red-700 font-semibold">
+                    Acessar a Plataforma
+                  </Button>
+                </a>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
