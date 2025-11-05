@@ -17,7 +17,7 @@ export default function Landing() {
             <img 
               src={hackerImage}
               alt="Hacker" 
-              className="w-12 h-12 rounded-lg object-cover border border-cyan-500/30"
+              className="w-8 h-8 rounded object-cover border border-cyan-500/30"
               data-testid="img-hacker"
             />
             <h1 
