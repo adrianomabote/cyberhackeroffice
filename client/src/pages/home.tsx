@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { UltimaVelaResponse, PrevisaoResponse } from "@shared/schema";
+import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus } from "@shared/schema";
 
 export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
+
+  // Verificar status de manutenção
+  const { data: manutencaoData } = useQuery<ManutencaoStatus>({
+    queryKey: ['/api/manutencao/cyber'],
+    refetchInterval: 5000, // Verifica a cada 5 segundos
+    staleTime: 0,
+  });
 
   // Buscar última vela (APÓS:) - sempre dados frescos sem cache
   const { data: aposData } = useQuery<UltimaVelaResponse>({
@@ -62,6 +69,105 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [sacarData?.multiplicador]);
 
+  // Se sistema em manutenção, mostrar tela de manutenção
+  if (manutencaoData?.ativo) {
+    return (
+      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+        {/* Background effects */}
+        <div className="fixed inset-0 pointer-events-none z-10 opacity-5"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px)',
+          }}
+        />
+        <div className="fixed inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(157, 78, 221, 0.05) 0%, rgba(0, 0, 0, 1) 70%)',
+          }}
+        />
+
+        <div className="relative z-20 w-full max-w-3xl mx-auto p-8">
+          {/* Header MANUTENÇÃO */}
+          <div
+            className="rounded-xl border py-8 mb-6"
+            style={{
+              borderColor: '#ff0000',
+              borderWidth: '2px',
+              backgroundColor: 'transparent',
+            }}
+          >
+            <h1 className="text-center font-display font-bold tracking-wide mb-4"
+              style={{
+                color: '#ff0000',
+                fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                textShadow: '0 0 30px rgba(255, 0, 0, 0.7)',
+              }}
+            >
+              MANUTENÇÃO
+            </h1>
+            <p className="text-center font-sans font-normal"
+              style={{
+                color: '#ffffff',
+                fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+              }}
+            >
+              Sistema temporariamente indisponível
+            </p>
+          </div>
+
+          {/* Card com informações */}
+          <div
+            className="rounded-xl border p-8 mb-6"
+            style={{
+              borderColor: '#444444',
+              borderWidth: '1px',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            <div className="text-center space-y-6">
+              <div>
+                <p className="font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '1rem' }}>
+                  Horário de Retorno
+                </p>
+                <p className="font-mono font-bold"
+                  style={{
+                    color: '#9d4edd',
+                    fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+                  }}
+                  data-testid="text-mensagem-manutencao"
+                >
+                  {manutencaoData.mensagem}
+                </p>
+              </div>
+
+              <div className="border-t pt-6" style={{ borderColor: '#333333' }}>
+                <p className="font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '1rem' }}>
+                  Motivo
+                </p>
+                <p className="font-sans font-normal"
+                  style={{
+                    color: '#ffffff',
+                    fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
+                  }}
+                  data-testid="text-motivo-manutencao"
+                >
+                  {manutencaoData.motivo}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Aviso */}
+          <div className="text-center">
+            <p className="font-sans font-normal" style={{ color: '#666666', fontSize: '0.875rem' }}>
+              Atualizando a cada 5 segundos...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Tela normal
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Scanline effect overlay */}
