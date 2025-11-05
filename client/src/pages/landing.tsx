@@ -9,71 +9,69 @@ export default function Landing() {
   useProtection();
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/95 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-white bg-black backdrop-blur">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <img 
-              src={hackerImage} 
+              src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png"
               alt="CyberHacker" 
-              className="w-12 h-12 rounded-lg object-cover border-2 border-emerald-500/50"
+              className="w-8 h-8 rounded object-cover"
               data-testid="img-logo"
             />
             <h1 
-              className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+              className="text-xl font-bold text-white"
               data-testid="text-logo"
             >
               CyberHacker
             </h1>
-          </div>
-
-          <div className="flex gap-3">
-            <Link href="/login">
-              <Button 
-                variant="outline" 
-                className="border-gray-700 text-gray-300"
-                data-testid="button-login"
-              >
-                Entrar
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button 
-                className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold"
-                data-testid="button-signup"
-              >
-                Registre-se
-              </Button>
-            </Link>
+            <div className="flex gap-3 ml-4">
+              <Link href="/login">
+                <Button 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-black"
+                  data-testid="button-login"
+                >
+                  Entrar
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button 
+                  className="bg-white text-black hover:bg-gray-200 font-semibold"
+                  data-testid="button-signup"
+                >
+                  Registre-se
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent to-cyan-500/10"></div>
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-            <Brain className="w-4 h-4 text-emerald-400" />
-            <span className="text-emerald-400 text-sm font-semibold" data-testid="text-hero-badge">
+          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 border border-white">
+            <Brain className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-semibold" data-testid="text-hero-badge">
               Inteligência Artificial Avançada
             </span>
           </div>
           <h2 
-            className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent"
+            className="text-5xl md:text-7xl font-bold mb-6 text-white"
             data-testid="text-hero-title"
           >
             Domine o Aviator
           </h2>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
-            Sistema de análise em tempo real com <span className="text-emerald-400 font-semibold">IA avançada</span> para maximizar seus ganhos no jogo Aviator
+          <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
+            Sistema de análise em tempo real com <span className="font-semibold">IA avançada</span> para maximizar seus ganhos no jogo Aviator
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black text-lg px-8 py-6 font-bold"
+                className="bg-white text-black text-lg px-8 py-6 font-bold hover:bg-gray-200"
                 data-testid="button-start"
               >
                 Começar Agora
@@ -82,7 +80,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-emerald-500/50 text-emerald-400 text-lg px-8 py-6"
+              className="border-white text-white text-lg px-8 py-6 hover:bg-white hover:text-black"
               data-testid="button-demo"
             >
               Ver Demonstração
@@ -92,25 +90,25 @@ export default function Landing() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 px-4 bg-gray-900/50">
+      <section className="py-12 px-4 bg-black border-y border-white">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 hover-elevate">
+            <Card className="bg-black border-white hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-emerald-400 mb-2" data-testid="text-stat-1">98.5%</div>
-                <p className="text-gray-400">Precisão do Algoritmo</p>
+                <div className="text-4xl font-bold text-white mb-2" data-testid="text-stat-1">98.5%</div>
+                <p className="text-white">Precisão do Algoritmo</p>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 hover-elevate">
+            <Card className="bg-black border-white hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-cyan-400 mb-2" data-testid="text-stat-2">1s</div>
-                <p className="text-gray-400">Atualização em Tempo Real</p>
+                <div className="text-4xl font-bold text-white mb-2" data-testid="text-stat-2">1s</div>
+                <p className="text-white">Atualização em Tempo Real</p>
               </CardContent>
             </Card>
-            <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700 hover-elevate">
+            <Card className="bg-black border-white hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-blue-400 mb-2" data-testid="text-stat-3">24/7</div>
-                <p className="text-gray-400">Disponibilidade Total</p>
+                <div className="text-4xl font-bold text-white mb-2" data-testid="text-stat-3">24/7</div>
+                <p className="text-white">Disponibilidade Total</p>
               </CardContent>
             </Card>
           </div>
@@ -379,8 +377,8 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-gray-800 bg-gray-950">
-        <div className="container mx-auto text-center text-gray-500">
+      <footer className="py-8 px-4 border-t border-white bg-black">
+        <div className="container mx-auto text-center text-white">
           <p data-testid="text-footer">© 2025 CyberHacker - Todos os direitos reservados</p>
         </div>
       </footer>
