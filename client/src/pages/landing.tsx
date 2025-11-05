@@ -1,4 +1,3 @@
-
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,27 +9,27 @@ import robotImage from '@assets/file_00000000de3471fbba06676b1bf33e8f_1762368543
 
 export default function Landing() {
   useProtection();
-  
+
   const scrollToVideos = () => {
     const videosSection = document.getElementById('videos-section');
     if (videosSection) {
       videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black backdrop-blur border-b border-white/20">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img 
+            <img
               src={robotImage}
-              alt="Robô CyberHacker" 
+              alt="Robô CyberHacker"
               className="w-10 h-10 rounded-lg object-cover"
               data-testid="img-robot"
             />
-            <h1 
+            <h1
               className="text-base font-bold text-white"
               data-testid="text-logo"
             >
@@ -39,7 +38,7 @@ export default function Landing() {
           </div>
           <div className="flex gap-3 ml-auto flex-shrink-0" style={{ marginLeft: '3rem' }}>
             <Link href="/login" className="flex-shrink-0">
-              <Button 
+              <Button
                 className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"
                 data-testid="button-login"
               >
@@ -47,7 +46,7 @@ export default function Landing() {
               </Button>
             </Link>
             <Link href="/signup" className="flex-shrink-0">
-              <Button 
+              <Button
                 className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap"
                 data-testid="button-signup"
               >
@@ -67,7 +66,7 @@ export default function Landing() {
               Inteligência Artificial Avançada
             </span>
           </div>
-          <h2 
+          <h2
             className="text-5xl md:text-7xl font-bold mb-6 text-white"
             data-testid="text-hero-title"
           >
@@ -78,16 +77,16 @@ export default function Landing() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="bg-red-800 text-white text-lg px-8 py-3 font-bold hover:bg-red-900 h-auto min-h-0"
                 data-testid="button-start"
               >
                 Começar Agora
               </Button>
             </Link>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="ghost"
               className="bg-gray-700 text-white text-lg px-8 py-3 hover:bg-gray-800 border-0 h-auto min-h-0"
               data-testid="button-demo"
@@ -107,7 +106,7 @@ export default function Landing() {
       {/* O que é */}
       <section className="py-4 px-4">
         <div className="container mx-auto">
-          <h3 
+          <h3
             className="text-4xl font-bold text-center mb-12 text-white"
             data-testid="text-about-title"
           >
@@ -117,16 +116,16 @@ export default function Landing() {
             <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-800">
               <CardContent className="p-8">
                 <p className="text-lg text-gray-300 leading-relaxed mb-4" data-testid="text-about-description">
-                  O <span className="text-red-700 font-bold">Robô Cyber Hacker</span> é um sistema revolucionário de análise preditiva 
-                  desenvolvido especificamente para o jogo <span className="text-red-700 font-bold">Aviator</span>. 
-                  Utilizando algoritmos de <span className="text-red-700 font-semibold">machine learning</span> e análise de padrões em tempo real, 
+                  O <span className="text-red-700 font-bold">Robô Cyber Hacker</span> é um sistema revolucionário de análise preditiva
+                  desenvolvido especificamente para o jogo <span className="text-red-700 font-bold">Aviator</span>.
+                  Utilizando algoritmos de <span className="text-red-700 font-semibold">machine learning</span> e análise de padrões em tempo real,
                   nosso robô identifica as melhores oportunidades de entrada e os momentos ideais para sacar seus ganhos.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed" data-testid="text-about-features">
-                  Ele analisa o Aviator em tempo real e mostra onde o Aviator vai cair com 
-                  <span className="text-red-700 font-semibold"> 100% de acerto</span>. 
-                  Com uma interface intuitiva e atualização a cada segundo, você recebe sinais precisos sobre 
-                  <span className="text-red-700 font-semibold"> QUANDO entrar</span> e 
+                  Ele analisa o Aviator em tempo real e mostra onde o Aviator vai cair com
+                  <span className="text-red-700 font-semibold"> 100% de acerto</span>.
+                  Com uma interface intuitiva e atualização a cada segundo, você recebe sinais precisos sobre
+                  <span className="text-red-700 font-semibold"> QUANDO entrar</span> e
                   <span className="text-red-700 font-semibold"> ONDE sacar</span>.
                 </p>
               </CardContent>
@@ -143,7 +142,7 @@ export default function Landing() {
       {/* Por que escolher o Robô Cyber Hacker */}
       <section className="py-6 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto">
-          <h3 
+          <h3
             className="text-3xl font-bold text-center mb-8 text-white"
             data-testid="text-why-title"
           >
@@ -192,7 +191,7 @@ export default function Landing() {
       {/* Perguntas Frequentes */}
       <section className="py-6 px-4">
         <div className="container mx-auto max-w-4xl">
-          <h3 
+          <h3
             className="text-4xl font-bold text-center mb-12 text-white"
             data-testid="text-faq-title"
           >
@@ -204,8 +203,8 @@ export default function Landing() {
                 Como funciona o robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
-                O Robô Cyber Hacker usa um sistema de Inteligência Artificial avançado que analisa o Aviator em tempo real. 
-                Nosso algoritmo processa milhares de dados por segundo para identificar padrões e prever com precisão onde o multiplicador vai cair, 
+                O Robô Cyber Hacker usa um sistema de Inteligência Artificial avançado que analisa o Aviator em tempo real.
+                Nosso algoritmo processa milhares de dados por segundo para identificar padrões e prever com precisão onde o multiplicador vai cair,
                 garantindo que você receba sinais precisos no momento certo.
               </AccordionContent>
             </AccordionItem>
@@ -215,7 +214,7 @@ export default function Landing() {
                 O Robô é confiável?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
-                Sim! O robô mostra onde o Aviator vai cair com <span className="font-bold text-red-700">100% de acerto</span>, 
+                Sim! O robô mostra onde o Aviator vai cair com <span className="font-bold text-red-700">100% de acerto</span>,
                 garantindo que você sai lucrando. Mais de 10.000 moçambicanos já confiam no nosso sistema e faturam todos os dias.
               </AccordionContent>
             </AccordionItem>
@@ -225,8 +224,8 @@ export default function Landing() {
                 Quanto custa o acesso ao robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
-                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-700">450MT por 1 dia</span>. 
-                Ou seja, se você pagar agora, terá acesso completo até amanhã na mesma hora que pagou. 
+                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-700">450MT por 1 dia</span>.
+                Ou seja, se você pagar agora, terá acesso completo até amanhã na mesma hora que pagou.
                 É um investimento que se paga rapidamente com os lucros que você vai obter!
               </AccordionContent>
             </AccordionItem>
@@ -237,12 +236,12 @@ export default function Landing() {
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-base">
                 <p className="mb-4">
-                  O sistema é compatível com uma casa de apostas. Para ter conta nessa casa de apostas, 
+                  O sistema é compatível com uma casa de apostas. Para ter conta nessa casa de apostas,
                   basta clicar no botão abaixo:
                 </p>
-                <a 
-                  href="https://tracking.olabet.co.mz/C.ashx?btag=a_314b_7c_&affid=309&siteid=314&adid=7&c=" 
-                  target="_blank" 
+                <a
+                  href="https://tracking.olabet.co.mz/C.ashx?btag=a_314b_7c_&affid=309&siteid=314&adid=7&c="
+                  target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Button className="bg-red-800 text-white hover:bg-red-900 font-semibold">
@@ -263,7 +262,7 @@ export default function Landing() {
       {/* Vídeos */}
       <section id="videos-section" className="py-6 px-4 bg-gray-900/50">
         <div className="container mx-auto">
-          <h3 
+          <h3
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
             data-testid="text-videos-title"
           >
@@ -309,7 +308,7 @@ export default function Landing() {
       {/* CTA Final */}
       <section className="py-12 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto text-center">
-          <h3 
+          <h3
             className="text-5xl font-bold mb-6 text-red-700"
             data-testid="text-cta-title"
           >
@@ -319,8 +318,8 @@ export default function Landing() {
             Junte-se a centenas de jogadores que já estão maximizando seus ganhos no Aviator com IA
           </p>
           <Link href="/signup">
-            <Button 
-              size="default" 
+            <Button
+              size="default"
               className="bg-red-800 text-white text-base px-6 py-2 font-bold hover:bg-red-900"
               data-testid="button-cta-signup"
             >

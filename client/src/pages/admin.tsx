@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useProtection } from "@/hooks/use-protection";
 import type { ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Admin() {
+  useProtection();
   const [mensagem, setMensagem] = useState("");
   const [valorApos, setValorApos] = useState("");
   const [valorSacar, setValorSacar] = useState("");

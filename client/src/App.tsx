@@ -22,7 +22,7 @@ function Router() {
       <Route path="/signup" component={Subscription} />
       <Route path="/subscription" component={Subscription} />
       <Route path="/app" component={Home} />
-      <Route path="/admin" component={Admin} />
+      <Route path="/admin/cyber" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );

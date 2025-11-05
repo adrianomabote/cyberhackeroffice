@@ -1,4 +1,3 @@
-
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +34,7 @@ export default function Subscription() {
             Acesso completo ao Robô Cyber Hacker
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           {/* Preço */}
           <div className="text-center py-6 border-2 rounded-lg" style={{ borderColor: '#ff0000' }}>

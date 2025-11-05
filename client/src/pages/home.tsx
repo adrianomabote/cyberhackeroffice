@@ -70,12 +70,28 @@ export default function Home() {
 
   // Usar sinais manuais se estiverem ativos, senão usar automáticos
   const usarSinaisManual = sinaisManualData?.ativo === true;
-  const valorAposExibir = usarSinaisManual ? sinaisManualData.apos : aposData?.multiplicador;
-  const valorSacarExibir = usarSinaisManual ? sinaisManualData.sacar : sacarData?.multiplicador;
   
   // Se receber -1 (três pontinhos), não mostrar valores
   const recebeuTresPontinhos = aposData?.multiplicador === -1;
-  const deveMostrarValores = !recebeuTresPontinhos && (usarSinaisManual || (isHoraDeEntrar && mostrandoEntrada));
+  
+  // Determinar valores a exibir baseado na prioridade
+  let valorAposExibir = null;
+  let valorSacarExibir = null;
+  let deveMostrarValores = false;
+  
+  if (!recebeuTresPontinhos) {
+    if (usarSinaisManual) {
+      // Prioridade 1: Sinais manuais
+      valorAposExibir = sinaisManualData?.apos ?? null;
+      valorSacarExibir = sinaisManualData?.sacar ?? null;
+      deveMostrarValores = true;
+    } else if (isHoraDeEntrar && mostrandoEntrada) {
+      // Prioridade 2: Sistema automático
+      valorAposExibir = aposData?.multiplicador ?? null;
+      valorSacarExibir = sacarData?.multiplicador ?? null;
+      deveMostrarValores = true;
+    }
+  }
 
   // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
