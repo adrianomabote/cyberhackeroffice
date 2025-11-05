@@ -30,6 +30,16 @@ export default function Home() {
     staleTime: 0,
   });
 
+  // Função para retornar cor baseada no multiplicador
+  const getMultiplicadorColor = (valor: number): string => {
+    if (valor >= 10.0) return '#ff69b4'; // Rosa (10.00x+)
+    if (valor >= 2.0) return '#9d4edd';  // Roxo (2.00x - 9.99x)
+    return '#00bfff';                     // Azul (1.00x - 1.99x)
+  };
+
+  // Verificar se é hora de entrar
+  const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
+
   // Efeito de pulso quando valores mudam
   useEffect(() => {
     setPulseApos(true);
@@ -92,74 +102,81 @@ export default function Home() {
             }}
             data-testid="card-multipliers"
           >
-            <div className="flex items-center justify-around gap-4">
-              {/* APÓS: */}
-              <div className="flex items-center gap-2">
-                <span className="font-sans font-normal" style={{ 
-                  color: '#ffffff',
-                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
-                }}>APÓS:</span>
-                <div
-                  className="px-3 py-1 rounded border"
+            {/* Quando NÃO é hora de entrar - mostrar três pontinhos */}
+            {!isHoraDeEntrar && (
+              <div className="flex items-center justify-center">
+                <span
+                  className="font-sans font-bold"
                   style={{
-                    borderColor: '#333333',
-                    borderWidth: '1px',
-                    backgroundColor: '#000000',
+                    color: '#9d4edd',
+                    fontSize: 'clamp(2rem, 5vw, 4rem)',
+                    letterSpacing: '0.5rem',
                   }}
+                  data-testid="text-waiting"
                 >
-                  <span
-                    className="font-sans font-semibold"
-                    style={{
-                      color: '#9d4edd',
-                      fontSize: 'clamp(1rem, 3vw, 2.25rem)',
-                    }}
-                    data-testid="text-apos-value"
-                  >
-                    {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '--'}
-                  </span>
-                </div>
+                  ...
+                </span>
               </div>
+            )}
 
-              {/* SACAR: */}
-              <div className="flex items-center gap-2">
-                <span className="font-sans font-normal" style={{ 
-                  color: '#ffffff',
-                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
-                }}>SACAR:</span>
-                <div
-                  className="px-3 py-1 rounded border"
-                  style={{
-                    borderColor: sacarData?.sinal === 'ENTRAR' ? '#00ff00' : '#333333',
-                    borderWidth: sacarData?.sinal === 'ENTRAR' ? '2px' : '1px',
-                    backgroundColor: '#000000',
-                  }}
-                >
-                  <div className="flex flex-col items-center gap-1">
+            {/* Quando É hora de entrar - mostrar APÓS e SACAR */}
+            {isHoraDeEntrar && (
+              <div className="flex items-center justify-around gap-4">
+                {/* APÓS: */}
+                <div className="flex items-center gap-2">
+                  <span className="font-sans font-normal" style={{ 
+                    color: '#ffffff',
+                    fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                  }}>APÓS:</span>
+                  <div
+                    className="px-3 py-1 rounded border"
+                    style={{
+                      borderColor: '#333333',
+                      borderWidth: '1px',
+                      backgroundColor: '#000000',
+                    }}
+                  >
                     <span
                       className="font-sans font-semibold"
                       style={{
-                        color: sacarData?.sinal === 'ENTRAR' ? '#00ff00' : '#9d4edd',
+                        color: aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#9d4edd',
+                        fontSize: 'clamp(1rem, 3vw, 2.25rem)',
+                      }}
+                      data-testid="text-apos-value"
+                    >
+                      {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '--'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* SACAR: */}
+                <div className="flex items-center gap-2">
+                  <span className="font-sans font-normal" style={{ 
+                    color: '#ffffff',
+                    fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                  }}>SACAR:</span>
+                  <div
+                    className="px-3 py-1 rounded border"
+                    style={{
+                      borderColor: '#333333',
+                      borderWidth: '1px',
+                      backgroundColor: '#000000',
+                    }}
+                  >
+                    <span
+                      className="font-sans font-semibold"
+                      style={{
+                        color: sacarData?.multiplicador ? getMultiplicadorColor(sacarData.multiplicador) : '#9d4edd',
                         fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                       }}
                       data-testid="text-sacar-value"
                     >
                       {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
                     </span>
-                    {sacarData?.sinal === 'ENTRAR' && (
-                      <span
-                        className="font-sans font-bold"
-                        style={{
-                          color: '#00ff00',
-                          fontSize: 'clamp(0.6rem, 1.5vw, 0.9rem)',
-                        }}
-                      >
-                        ENTRAR AGORA!
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
