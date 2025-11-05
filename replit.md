@@ -9,10 +9,12 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 - **Página Principal** (`client/src/pages/home.tsx`): 
   - Interface cyberpunk minimalista - 100% conforme foto de referência
   - Header: "CYBER HACKER" em vermelho (#ff0000) com glow effect
-  - Card inteligente:
+  - Card inteligente com sistema de cooldown:
     - **Quando NÃO é hora de entrar**: APÓS: ... e SACAR: ... (pontinhos cinzas)
     - **Quando É hora de entrar**: APÓS mostra última vela da API + SACAR mostra multiplicador recomendado
     - Ambos aparecem **ao mesmo tempo** apenas quando detecta oportunidade
+    - **Sistema de reset**: Após mostrar entrada por 10 segundos, volta aos pontinhos e aguarda NOVA oportunidade
+    - Só mostra novamente quando detectar entrada com valores diferentes
   - Cores dinâmicas por multiplicador (conforme foto de referência):
     - 1.00x - 1.99x: Azul cyan (#00bfff)
     - 2.00x - 9.99x: Roxo (#9d4edd)
@@ -152,8 +154,9 @@ Servidor roda na porta 5000.
 ### Tela de Manutenção
 - **Ativação**: Quando `manutencao.ativo === true`
 - **Display**: Mostra mensagem de retorno e motivo fixo
-- **Atualização**: Polling automático
+- **Atualização**: Polling automático a cada 5 segundos
 - **Design**: Cyberpunk matching com resto do app
+- **Texto removido**: "Atualizando a cada 5 segundos" foi removido da interface
 
 ### API Endpoints
 - GET /api/manutencao/cyber - Verifica status

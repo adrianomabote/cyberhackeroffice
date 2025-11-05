@@ -5,6 +5,11 @@ import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus } from "@sh
 export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
+  const [ultimaEntradaMostrada, setUltimaEntradaMostrada] = useState<{
+    multiplicadorApos: number;
+    multiplicadorSacar: number;
+  } | null>(null);
+  const [mostrandoEntrada, setMostrandoEntrada] = useState(false);
 
   // Verificar status de manutenção
   const { data: manutencaoData } = useQuery<ManutencaoStatus>({
@@ -55,6 +60,32 @@ export default function Home() {
 
   // Verificar se é hora de entrar
   const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
+
+  // Lógica de cooldown: mostrar entrada, depois resetar
+  useEffect(() => {
+    if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
+      // Verificar se é uma entrada NOVA (diferente da última mostrada)
+      const isNovaEntrada = !ultimaEntradaMostrada || 
+        ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador ||
+        ultimaEntradaMostrada.multiplicadorSacar !== sacarData.multiplicador;
+
+      if (isNovaEntrada && !mostrandoEntrada) {
+        // Mostrar entrada
+        setMostrandoEntrada(true);
+        
+        // Após 10 segundos, resetar e aguardar próxima
+        const timer = setTimeout(() => {
+          setUltimaEntradaMostrada({
+            multiplicadorApos: aposData.multiplicador!,
+            multiplicadorSacar: sacarData.multiplicador!,
+          });
+          setMostrandoEntrada(false);
+        }, 10000); // 10 segundos mostrando a entrada
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador, ultimaEntradaMostrada, mostrandoEntrada]);
 
   // Efeito de pulso quando valores mudam
   useEffect(() => {
@@ -156,12 +187,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Aviso */}
-          <div className="text-center">
-            <p className="font-sans font-normal" style={{ color: '#666666', fontSize: '0.875rem' }}>
-              Atualizando a cada 5 segundos...
-            </p>
-          </div>
         </div>
       </div>
     );
@@ -218,7 +243,7 @@ export default function Home() {
             data-testid="card-multipliers"
           >
             <div className="flex items-center justify-around gap-4">
-              {/* APÓS: mostra apenas quando é hora de entrar */}
+              {/* APÓS: mostra apenas quando é hora de entrar E está mostrandoEntrada */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
@@ -235,17 +260,17 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: isHoraDeEntrar && aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
+                      color: mostrandoEntrada && aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-apos-value"
                   >
-                    {isHoraDeEntrar && aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
 
-              {/* SACAR: mostra apenas quando é hora de entrar */}
+              {/* SACAR: mostra apenas quando é hora de entrar E está mostrandoEntrada */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
@@ -262,12 +287,12 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: isHoraDeEntrar && sacarData?.multiplicador ? getMultiplicadorColor(sacarData.multiplicador) : '#888888',
+                      color: mostrandoEntrada && sacarData?.multiplicador ? getMultiplicadorColor(sacarData.multiplicador) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-sacar-value"
                   >
-                    {isHoraDeEntrar && sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
