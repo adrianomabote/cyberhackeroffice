@@ -16,25 +16,39 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - Armazenamento: sessionStorage (mostra apenas uma vez por sessão)
 
 2. **Landing Page** (`client/src/pages/landing.tsx`):
-   - **Header sticky**: Logo esquerda + Botões "ENTRAR" e "CRIAR CONTA" direita
-   - **Hero Section**: Título impactante + CTA "COMEÇAR AGORA"
+   - **Design**: Cyberpunk profissional com paleta verde neon/cyan/azul/roxo/rosa
+   - **Header sticky**: 
+     - Imagem hacker profissional (esquerda)
+     - Logo "Cyber Hacker" gradiente emerald-to-cyan (centro-esquerda)
+     - Botões "ENTRAR" e "REGISTRE-SE" (direita)
+   - **Hero Section**: 
+     - Badge com ícone Brain (IA Avançada)
+     - Título "Domine o Aviator" gradiente emerald/cyan/blue
+     - Subtítulo com destaque em verde para "IA avançada"
+     - CTAs "Começar Agora" e "Ver Demonstração"
+   - **Stats**: 3 cards (98.5% Precisão, 1s Atualização, 24/7 Disponibilidade)
    - **Seção "O que é"**: Explicação do robô e algoritmo ML
    - **Benefícios**: 6 cards com vantagens (Análise Real-Time, ML, Sinais, Padrões, Confiança, Interface)
    - **Como Funciona**: 4 passos (Captura → Análise → Sinais → Decisões)
    - **Vídeos Demonstrativos**: 2 placeholders para vídeos (Como Usar + Resultados)
-   - **CTA Final**: "PRONTO PARA COMEÇAR?"
+   - **CTA Final**: "PRONTO PARA COMEÇAR?" + botão "Criar Conta Grátis"
    - **Footer**: Copyright
+   - **Asset**: attached_assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg
 
 3. **Login** (`client/src/pages/login.tsx`):
+   - Design matching landing (gradientes emerald/cyan)
+   - Header com imagem hacker + logo "Cyber Hacker"
+   - Botão voltar (ghost) para landing page
    - Formulário de login (email + senha)
-   - Botão voltar para landing page
    - Link para criar conta
    - Redireciona para `/app` após login (TODO: autenticação real)
 
 4. **Cadastro** (`client/src/pages/signup.tsx`):
+   - Design matching landing (gradientes emerald/cyan)
+   - Header com imagem hacker + logo "Cyber Hacker"
+   - Botão voltar (ghost) para landing page
    - Formulário de cadastro (nome + email + senha + confirmar senha)
    - Validação de senhas
-   - Botão voltar para landing page
    - Link para login
    - Redireciona para `/app` após cadastro (TODO: registro real)
 
@@ -56,7 +70,9 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
     - 10.00x+: Rosa vibrante (#ff1493)
   - Fundo preto (#000000) forçado no body
   - Efeito de pulso visual quando valores atualizam
-- **Design System**: Cores cyber hacker (preto #000000, vermelho #ff0000, roxo #9d4edd)
+- **Design System**: 
+  - Dashboard: Cores cyber hacker (preto #000000, vermelho #ff0000, roxo #9d4edd)
+  - Landing/Login/Signup: Verde neon (#00ff88), cyan (#00bfff), emerald (#10b981), gradientes modernos
 - **Polling Ativo**: 
   - /api/apos/cyber e /api/sacar/cyber: 1s (atualização em tempo real)
 
