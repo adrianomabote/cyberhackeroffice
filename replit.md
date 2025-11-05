@@ -3,6 +3,13 @@
 ## Visão Geral
 Sistema completo de análise e previsão em tempo real do jogo Aviator com interface cyberpunk profissional. Inclui landing page, sistema de login/cadastro, frontend React com sinais em tempo real, backend Node.js com API RESTful, PostgreSQL para persistência, algoritmo ML avançado, sistema de notificações e script de captura automática.
 
+### Meta Tags de Compartilhamento Social
+- **Título**: "CyberHacker - Robô de Análise Aviator com IA"
+- **Descrição**: "O robô mostra onde o Aviator vai cair com 100% de acerto usando IA avançada. Mais de 10.000 moçambicanos já faturam todos os dias!"
+- **Imagem**: Robô CyberHacker vermelho (attached_assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png)
+- **Open Graph**: Configurado para Facebook, WhatsApp, etc
+- **Twitter Cards**: Configurado para Twitter/X
+
 ## Estrutura do Projeto
 
 ### Frontend (`client/`)
@@ -18,8 +25,8 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 2. **Landing Page** (`client/src/pages/landing.tsx`):
    - **Design**: Tema vermelho escuro profissional (red-700/800/900) sem efeitos de brilho
    - **Header sticky**: 
-     - Imagem hacker profissional (esquerda)
-     - Logo "CyberHacker" (sem espaço) gradiente emerald-to-cyan, fonte normal (centro-esquerda)
+     - Imagem do robô CyberHacker (esquerda) - attached_assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png
+     - Logo "CyberHacker" (sem espaço), fonte Inter padrão (centro-esquerda)
      - Botões "ENTRAR" e "REGISTRE-SE" (direita)
    - **Hero Section**: 
      - Badge com ícone Brain (IA Avançada)
@@ -33,7 +40,9 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Vídeos Demonstrativos**: 2 placeholders para vídeos (Como Usar + Resultados)
    - **CTA Final**: "PRONTO PARA COMEÇAR?" + botão "Criar Conta Grátis"
    - **Footer**: Copyright
-   - **Asset**: attached_assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg
+   - **Assets**: 
+     - Robô header: attached_assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png
+     - Hacker anterior: attached_assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg (não mais em uso)
 
 3. **Login** (`client/src/pages/login.tsx`):
    - Design matching landing (tema vermelho escuro)
