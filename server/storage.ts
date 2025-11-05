@@ -1,4 +1,4 @@
-import { type Vela, type InsertVela, velas } from "@shared/schema";
+import { type Vela, type InsertVela, velas, type ManutencaoStatus } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { desc } from "drizzle-orm";
@@ -12,15 +12,23 @@ export interface IStorage {
   getUltimaVela(): Promise<Vela | null>;
   getUltimas10Velas(): Promise<Vela[]>;
   getHistorico(limit?: number): Promise<Vela[]>;
+  getManutencaoStatus(): Promise<ManutencaoStatus>;
+  setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus>;
 }
 
 export class MemStorage implements IStorage {
   private velas: Vela[];
   private ultimoMultiplicador: number | null;
+  private manutencao: ManutencaoStatus;
 
   constructor() {
     this.velas = [];
     this.ultimoMultiplicador = null;
+    this.manutencao = {
+      ativo: false,
+      mensagem: "",
+      motivo: "",
+    };
   }
 
   async addVela(insertVela: InsertVela): Promise<Vela> {
@@ -62,14 +70,29 @@ export class MemStorage implements IStorage {
   async getHistorico(limit: number = 100): Promise<Vela[]> {
     return this.velas.slice(-limit);
   }
+
+  async getManutencaoStatus(): Promise<ManutencaoStatus> {
+    return this.manutencao;
+  }
+
+  async setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus> {
+    this.manutencao = status;
+    return this.manutencao;
+  }
 }
 
 export class DbStorage implements IStorage {
   private db;
+  private manutencao: ManutencaoStatus;
 
   constructor() {
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
     this.db = drizzle(pool);
+    this.manutencao = {
+      ativo: false,
+      mensagem: "",
+      motivo: "",
+    };
   }
 
   async addVela(insertVela: InsertVela): Promise<Vela> {
@@ -119,6 +142,16 @@ export class DbStorage implements IStorage {
 
     // Retornar em ordem cronológica (mais antiga primeira)
     return result.reverse();
+  }
+
+  async getManutencaoStatus(): Promise<ManutencaoStatus> {
+    return this.manutencao;
+  }
+
+  async setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus> {
+    this.manutencao = status;
+    console.log('[MANUTENÇÃO] Status atualizado:', status);
+    return this.manutencao;
   }
 }
 
