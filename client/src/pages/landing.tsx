@@ -48,7 +48,7 @@ export default function Landing() {
             </Link>
             <Link href="/signup">
               <Button 
-                className="bg-red-600 text-white hover:bg-red-700 font-semibold"
+                className="bg-red-800 text-white hover:bg-red-900 font-semibold"
                 data-testid="button-signup"
               >
                 Registre-se
@@ -61,9 +61,9 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative py-10 px-4 overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-red-600/20 border-2 border-red-600">
-            <Brain className="w-4 h-4 text-red-500" />
-            <span className="text-red-500 text-sm font-semibold" data-testid="text-hero-badge">
+          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-red-900/30 border-2 border-red-800">
+            <Brain className="w-4 h-4 text-red-700" />
+            <span className="text-red-700 text-sm font-semibold" data-testid="text-hero-badge">
               Inteligência Artificial Avançada
             </span>
           </div>
@@ -74,13 +74,13 @@ export default function Landing() {
             Domine o Aviator
           </h2>
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
-            O robô mostra onde o Aviator vai cair com <span className="font-semibold text-red-500">100% de acerto</span> usando IA avançada em tempo real
+            O robô mostra onde o Aviator vai cair com <span className="font-semibold text-red-700">100% de acerto</span> usando IA avançada em tempo real
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-red-600 text-white text-lg px-8 py-4 font-bold hover:bg-red-700"
+                className="bg-red-800 text-white text-lg px-8 py-4 font-bold hover:bg-red-900"
                 data-testid="button-start"
               >
                 Começar Agora
@@ -88,8 +88,7 @@ export default function Landing() {
             </Link>
             <Button 
               size="lg" 
-              variant="outline"
-              className="border-red-600 text-red-500 text-lg px-8 py-6 hover:bg-red-600 hover:text-white"
+              className="bg-gray-700 text-white text-lg px-8 py-6 hover:bg-gray-800"
               data-testid="button-demo"
               onClick={scrollToVideos}
             >
@@ -108,27 +107,26 @@ export default function Landing() {
       <section className="py-4 px-4">
         <div className="container mx-auto">
           <h3 
-            className="text-4xl font-bold text-center mb-12 text-red-500"
-            style={{ textShadow: '0 0 20px #ff0000' }}
+            className="text-4xl font-bold text-center mb-12 text-red-700"
             data-testid="text-about-title"
           >
             O Que É o Robô Cyber Hacker?
           </h3>
           <div className="max-w-4xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-600">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-800">
               <CardContent className="p-8">
                 <p className="text-lg text-gray-300 leading-relaxed mb-4" data-testid="text-about-description">
-                  O <span className="text-red-500 font-bold">Robô Cyber Hacker</span> é um sistema revolucionário de análise preditiva 
-                  desenvolvido especificamente para o jogo <span className="text-red-400 font-bold">Aviator</span>. 
-                  Utilizando algoritmos de <span className="text-red-300 font-semibold">machine learning</span> e análise de padrões em tempo real, 
+                  O <span className="text-red-700 font-bold">Robô Cyber Hacker</span> é um sistema revolucionário de análise preditiva 
+                  desenvolvido especificamente para o jogo <span className="text-red-700 font-bold">Aviator</span>. 
+                  Utilizando algoritmos de <span className="text-red-700 font-semibold">machine learning</span> e análise de padrões em tempo real, 
                   nosso robô identifica as melhores oportunidades de entrada e os momentos ideais para sacar seus ganhos.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed" data-testid="text-about-features">
                   Ele analisa o Aviator em tempo real e mostra onde o Aviator vai cair com 
-                  <span className="text-red-500 font-semibold"> 100% de acerto</span>. 
+                  <span className="text-red-700 font-semibold"> 100% de acerto</span>. 
                   Com uma interface intuitiva e atualização a cada segundo, você recebe sinais precisos sobre 
-                  <span className="text-red-500 font-semibold"> QUANDO entrar</span> e 
-                  <span className="text-red-400 font-semibold"> ONDE sacar</span>.
+                  <span className="text-red-700 font-semibold"> QUANDO entrar</span> e 
+                  <span className="text-red-700 font-semibold"> ONDE sacar</span>.
                 </p>
               </CardContent>
             </Card>
@@ -145,38 +143,37 @@ export default function Landing() {
       <section className="py-6 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto">
           <h3 
-            className="text-3xl font-bold text-center mb-8 text-red-500"
-            style={{ textShadow: '0 0 20px #ff0000' }}
+            className="text-3xl font-bold text-center mb-8 text-red-700"
             data-testid="text-why-title"
           >
             Por que escolher o Robô Cyber Hacker?
           </h3>
           <div className="max-w-4xl mx-auto">
-            <Card className="bg-black border-2 border-red-600">
+            <Card className="bg-black border-2 border-red-800">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-red-700 mt-1 flex-shrink-0" />
                     <p className="text-base text-white">
-                      <span className="font-bold text-red-500">Mais de 10.000 moçambicanos</span> já estão faturando todos os dias usando o Robô Cyber Hacker
+                      <span className="font-bold text-red-700">Mais de 10.000 moçambicanos</span> já estão faturando todos os dias usando o Robô Cyber Hacker
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-red-700 mt-1 flex-shrink-0" />
                     <p className="text-base text-white">
-                      Sistema de <span className="font-bold text-red-500">Inteligência Artificial</span> que analisa o Aviator em tempo real
+                      Sistema de <span className="font-bold text-red-700">Inteligência Artificial</span> que analisa o Aviator em tempo real
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-red-700 mt-1 flex-shrink-0" />
                     <p className="text-base text-white">
-                      <span className="font-bold text-red-500">100% de acerto</span> - o robô mostra exatamente onde o Aviator vai cair
+                      <span className="font-bold text-red-700">100% de acerto</span> - o robô mostra exatamente onde o Aviator vai cair
                     </p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-red-700 mt-1 flex-shrink-0" />
                     <p className="text-base text-white">
-                      Suporte <span className="font-bold text-red-500">24/7</span> para todos os usuários
+                      Suporte <span className="font-bold text-red-700">24/7</span> para todos os usuários
                     </p>
                   </div>
                 </div>
@@ -195,15 +192,14 @@ export default function Landing() {
       <section className="py-6 px-4">
         <div className="container mx-auto max-w-4xl">
           <h3 
-            className="text-4xl font-bold text-center mb-12 text-red-500"
-            style={{ textShadow: '0 0 20px #ff0000' }}
+            className="text-4xl font-bold text-center mb-12 text-red-700"
             data-testid="text-faq-title"
           >
             Perguntas Mais Frequentes
           </h3>
           <Accordion type="single" collapsible className="space-y-4">
-            <AccordionItem value="item-1" className="bg-black border-2 border-red-600 rounded-lg px-4">
-              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
+            <AccordionItem value="item-1" className="bg-black border-2 border-red-800 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-700 hover:no-underline py-3">
                 Como funciona o robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
@@ -213,29 +209,29 @@ export default function Landing() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="bg-black border-2 border-red-600 rounded-lg px-4">
-              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
+            <AccordionItem value="item-2" className="bg-black border-2 border-red-800 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-700 hover:no-underline py-3">
                 O Robô é confiável?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
-                Sim! O robô mostra onde o Aviator vai cair com <span className="font-bold text-red-500">100% de acerto</span>, 
+                Sim! O robô mostra onde o Aviator vai cair com <span className="font-bold text-red-700">100% de acerto</span>, 
                 garantindo que você sai lucrando. Mais de 10.000 moçambicanos já confiam no nosso sistema e faturam todos os dias.
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="bg-black border-2 border-red-600 rounded-lg px-4">
-              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
+            <AccordionItem value="item-3" className="bg-black border-2 border-red-800 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-700 hover:no-underline py-3">
                 Quanto custa o acesso ao robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
-                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-500">450MT por 1 dia</span>. 
+                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-700">450MT por 1 dia</span>. 
                 Ou seja, se você pagar agora, terá acesso completo até amanhã na mesma hora que pagou. 
                 É um investimento que se paga rapidamente com os lucros que você vai obter!
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-4" className="bg-black border-2 border-red-600 rounded-lg px-4">
-              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
+            <AccordionItem value="item-4" className="bg-black border-2 border-red-800 rounded-lg px-4">
+              <AccordionTrigger className="text-base text-white hover:text-red-700 hover:no-underline py-3">
                 O sistema é compatível com qual casa de apostas?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-base">
@@ -248,7 +244,7 @@ export default function Landing() {
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  <Button className="bg-red-600 text-white hover:bg-red-700 font-semibold">
+                  <Button className="bg-red-800 text-white hover:bg-red-900 font-semibold">
                     Acessar a Plataforma
                   </Button>
                 </a>
@@ -313,8 +309,7 @@ export default function Landing() {
       <section className="py-12 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto text-center">
           <h3 
-            className="text-5xl font-bold mb-6 text-red-500"
-            style={{ textShadow: '0 0 30px #ff0000' }}
+            className="text-5xl font-bold mb-6 text-red-700"
             data-testid="text-cta-title"
           >
             Pronto Para Começar?
@@ -325,8 +320,7 @@ export default function Landing() {
           <Link href="/signup">
             <Button 
               size="lg" 
-              className="bg-red-600 text-white text-lg px-12 py-6 font-bold hover:bg-red-700"
-              style={{ boxShadow: '0 0 20px rgba(255, 0, 0, 0.5)' }}
+              className="bg-red-800 text-white text-lg px-12 py-6 font-bold hover:bg-red-900"
               data-testid="button-cta-signup"
             >
               Criar Conta Grátis
@@ -336,7 +330,7 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t-2 border-red-600 bg-black">
+      <footer className="py-8 px-4 border-t-2 border-red-800 bg-black">
         <div className="container mx-auto text-center text-white">
           <p data-testid="text-footer">© 2025 Robô Cyber Hacker - Todos os direitos reservados</p>
         </div>
