@@ -100,7 +100,7 @@ export default function Landing() {
       </section>
 
       {/* O que é */}
-      <section className="py-4 px-4">
+      <section className="py-2 px-4">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
