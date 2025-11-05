@@ -13,7 +13,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
     - **Quando NÃO é hora de entrar**: APÓS: ... e SACAR: ... (pontinhos cinzas)
     - **Quando É hora de entrar**: APÓS mostra última vela da API + SACAR mostra multiplicador recomendado
     - Ambos aparecem **ao mesmo tempo** apenas quando detecta oportunidade
-    - **Sistema de reset**: Após mostrar entrada por 10 segundos, volta aos pontinhos e aguarda NOVA oportunidade
+    - **Sistema de reset**: Mostra entrada até receber NOVA vela da API, então volta aos pontinhos e aguarda próxima oportunidade
     - Só mostra novamente quando detectar entrada com valores diferentes
   - Cores dinâmicas por multiplicador (conforme foto de referência):
     - 1.00x - 1.99x: Azul cyan (#00bfff)

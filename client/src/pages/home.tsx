@@ -61,7 +61,7 @@ export default function Home() {
   // Verificar se é hora de entrar
   const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
 
-  // Lógica de cooldown: mostrar entrada, depois resetar
+  // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
     if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
       // Verificar se é uma entrada NOVA (diferente da última mostrada)
@@ -69,23 +69,29 @@ export default function Home() {
         ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador ||
         ultimaEntradaMostrada.multiplicadorSacar !== sacarData.multiplicador;
 
-      if (isNovaEntrada && !mostrandoEntrada) {
-        // Mostrar entrada
+      if (isNovaEntrada) {
+        // Mostrar entrada e salvar valores
         setMostrandoEntrada(true);
-        
-        // Após 10 segundos, resetar e aguardar próxima
-        const timer = setTimeout(() => {
-          setUltimaEntradaMostrada({
-            multiplicadorApos: aposData.multiplicador!,
-            multiplicadorSacar: sacarData.multiplicador!,
-          });
-          setMostrandoEntrada(false);
-        }, 10000); // 10 segundos mostrando a entrada
+        setUltimaEntradaMostrada({
+          multiplicadorApos: aposData.multiplicador,
+          multiplicadorSacar: sacarData.multiplicador,
+        });
+      }
+    } else if (mostrandoEntrada) {
+      // Se não é mais hora de entrar OU recebeu nova vela, resetar
+      setMostrandoEntrada(false);
+    }
+  }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador]);
 
-        return () => clearTimeout(timer);
+  // Resetar quando nova vela chegar (multiplicador de APÓS mudou)
+  useEffect(() => {
+    if (mostrandoEntrada && aposData?.multiplicador) {
+      if (ultimaEntradaMostrada && ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador) {
+        // Nova vela chegou, resetar
+        setMostrandoEntrada(false);
       }
     }
-  }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador, ultimaEntradaMostrada, mostrandoEntrada]);
+  }, [aposData?.multiplicador, mostrandoEntrada, ultimaEntradaMostrada]);
 
   // Efeito de pulso quando valores mudam
   useEffect(() => {
