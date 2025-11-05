@@ -102,81 +102,61 @@ export default function Home() {
             }}
             data-testid="card-multipliers"
           >
-            {/* Quando NÃO é hora de entrar - mostrar três pontinhos */}
-            {!isHoraDeEntrar && (
-              <div className="flex items-center justify-center">
-                <span
-                  className="font-sans font-bold"
+            <div className="flex items-center justify-around gap-4">
+              {/* APÓS: */}
+              <div className="flex items-center gap-2">
+                <span className="font-sans font-normal" style={{ 
+                  color: '#ffffff',
+                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                }}>APÓS:</span>
+                <div
+                  className="px-3 py-1 rounded border"
                   style={{
-                    color: '#888888',
-                    fontSize: 'clamp(2rem, 5vw, 4rem)',
-                    letterSpacing: '0.5rem',
+                    borderColor: '#333333',
+                    borderWidth: '1px',
+                    backgroundColor: '#000000',
                   }}
-                  data-testid="text-waiting"
                 >
-                  ...
-                </span>
-              </div>
-            )}
-
-            {/* Quando É hora de entrar - mostrar APÓS e SACAR */}
-            {isHoraDeEntrar && (
-              <div className="flex items-center justify-around gap-4">
-                {/* APÓS: */}
-                <div className="flex items-center gap-2">
-                  <span className="font-sans font-normal" style={{ 
-                    color: '#ffffff',
-                    fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
-                  }}>APÓS:</span>
-                  <div
-                    className="px-3 py-1 rounded border"
+                  <span
+                    className="font-sans font-semibold"
                     style={{
-                      borderColor: '#333333',
-                      borderWidth: '1px',
-                      backgroundColor: '#000000',
+                      color: isHoraDeEntrar && aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
+                      fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
+                    data-testid="text-apos-value"
                   >
-                    <span
-                      className="font-sans font-semibold"
-                      style={{
-                        color: aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#9d4edd',
-                        fontSize: 'clamp(1rem, 3vw, 2.25rem)',
-                      }}
-                      data-testid="text-apos-value"
-                    >
-                      {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '--'}
-                    </span>
-                  </div>
-                </div>
-
-                {/* SACAR: */}
-                <div className="flex items-center gap-2">
-                  <span className="font-sans font-normal" style={{ 
-                    color: '#ffffff',
-                    fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
-                  }}>SACAR:</span>
-                  <div
-                    className="px-3 py-1 rounded border"
-                    style={{
-                      borderColor: '#333333',
-                      borderWidth: '1px',
-                      backgroundColor: '#000000',
-                    }}
-                  >
-                    <span
-                      className="font-sans font-semibold"
-                      style={{
-                        color: sacarData?.multiplicador ? getMultiplicadorColor(sacarData.multiplicador) : '#9d4edd',
-                        fontSize: 'clamp(1rem, 3vw, 2.25rem)',
-                      }}
-                      data-testid="text-sacar-value"
-                    >
-                      {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
-                    </span>
-                  </div>
+                    {isHoraDeEntrar && aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
+                  </span>
                 </div>
               </div>
-            )}
+
+              {/* SACAR: */}
+              <div className="flex items-center gap-2">
+                <span className="font-sans font-normal" style={{ 
+                  color: '#ffffff',
+                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                }}>SACAR:</span>
+                <div
+                  className="px-3 py-1 rounded border"
+                  style={{
+                    borderColor: '#333333',
+                    borderWidth: '1px',
+                    backgroundColor: '#000000',
+                  }}
+                >
+                  <span
+                    className="font-sans font-semibold"
+                    style={{
+                      color: isHoraDeEntrar && sacarData?.multiplicador ? getMultiplicadorColor(sacarData.multiplicador) : '#888888',
+                      fontSize: 'clamp(1rem, 3vw, 2.25rem)',
+                    }}
+                    data-testid="text-sacar-value"
+                  >
+                    {isHoraDeEntrar && sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '...'}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
