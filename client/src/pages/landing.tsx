@@ -11,7 +11,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-white bg-black backdrop-blur">
+      <header className="sticky top-0 z-50 border-b-2 border-white bg-black backdrop-blur">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
