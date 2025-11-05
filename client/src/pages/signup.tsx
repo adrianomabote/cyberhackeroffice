@@ -56,7 +56,7 @@ export default function Signup() {
                 style={{ textShadow: '0 0 10px #ff0000' }}
                 data-testid="text-title"
               >
-                CyberHacker
+                Robô Cyber Hacker
               </h1>
             </div>
           </div>

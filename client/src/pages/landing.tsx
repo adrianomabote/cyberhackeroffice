@@ -24,7 +24,7 @@ export default function Landing() {
               className="text-base font-bold text-white"
               data-testid="text-logo"
             >
-              CyberHacker
+              Robô Cyber Hacker
             </h1>
           </div>
           <div className="flex gap-3 ml-auto">
@@ -96,13 +96,13 @@ export default function Landing() {
             style={{ textShadow: '0 0 20px #ff0000' }}
             data-testid="text-about-title"
           >
-            O Que É o CyberHacker?
+            O Que É o Robô Cyber Hacker?
           </h3>
           <div className="max-w-4xl mx-auto">
             <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-600">
               <CardContent className="p-8">
                 <p className="text-lg text-gray-300 leading-relaxed mb-4" data-testid="text-about-description">
-                  O <span className="text-red-500 font-bold">CyberHacker</span> é um sistema revolucionário de análise preditiva 
+                  O <span className="text-red-500 font-bold">Robô Cyber Hacker</span> é um sistema revolucionário de análise preditiva 
                   desenvolvido especificamente para o jogo <span className="text-red-400 font-bold">Aviator</span>. 
                   Utilizando algoritmos de <span className="text-red-300 font-semibold">machine learning</span> e análise de padrões em tempo real, 
                   nosso robô identifica as melhores oportunidades de entrada e os momentos ideais para sacar seus ganhos.
@@ -127,7 +127,7 @@ export default function Landing() {
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
             data-testid="text-benefits-title"
           >
-            Por Que Escolher o CyberHacker?
+            Por Que Escolher o Robô Cyber Hacker?
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 hover-elevate" data-testid="card-benefit-1">
@@ -356,7 +356,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t-2 border-red-600 bg-black">
         <div className="container mx-auto text-center text-white">
-          <p data-testid="text-footer">© 2025 CyberHacker - Todos os direitos reservados</p>
+          <p data-testid="text-footer">© 2025 Robô Cyber Hacker - Todos os direitos reservados</p>
         </div>
       </footer>
     </div>
