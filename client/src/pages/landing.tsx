@@ -59,7 +59,7 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
+      <section className="relative py-10 px-4 overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-red-600/20 border-2 border-red-600">
             <Brain className="w-4 h-4 text-red-500" />
@@ -76,7 +76,7 @@ export default function Landing() {
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
             O robô mostra onde o Aviator vai cair com <span className="font-semibold text-red-500">100% de acerto</span> usando IA avançada em tempo real
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
               <Button 
                 size="lg" 
