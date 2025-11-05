@@ -23,7 +23,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-black border-2 relative z-10" style={{ borderColor: '#ff0000' }}>
+      <Card className="w-full max-w-md bg-black border relative z-10" style={{ borderColor: '#333333' }}>
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-3 mb-4">
             <Link href="/">
@@ -35,24 +35,6 @@ export default function Login() {
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Button>
             </Link>
-            <div className="flex items-center gap-2">
-              <img 
-                src={hackerImage} 
-                alt="CyberHacker" 
-                className="w-10 h-10 rounded-lg object-cover border-2" 
-                style={{ borderColor: '#ff0000' }}
-              />
-              <h1 
-                className="text-lg font-bold"
-                style={{ 
-                  color: '#ff0000',
-                  textShadow: '0 0 20px rgba(255, 0, 0, 0.5)'
-                }}
-                data-testid="text-title"
-              >
-                ROBÔ CYBER HACKER
-              </h1>
-            </div>
           </div>
           <CardTitle className="text-2xl text-white" data-testid="text-login-title">Entrar</CardTitle>
           <CardDescription className="text-gray-400" data-testid="text-login-subtitle">
