@@ -51,9 +51,9 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative py-20 px-4 overflow-hidden">
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/10 border border-white">
-            <Brain className="w-4 h-4 text-white" />
-            <span className="text-white text-sm font-semibold" data-testid="text-hero-badge">
+          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-red-600/20 border-2 border-red-600">
+            <Brain className="w-4 h-4 text-red-500" />
+            <span className="text-red-500 text-sm font-semibold" data-testid="text-hero-badge">
               Inteligência Artificial Avançada
             </span>
           </div>
@@ -64,13 +64,13 @@ export default function Landing() {
             Domine o Aviator
           </h2>
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
-            Sistema de análise em tempo real com <span className="font-semibold">IA avançada</span> para maximizar seus ganhos no jogo Aviator
+            Sistema de análise em tempo real com <span className="font-semibold text-red-500">IA avançada</span> para maximizar seus ganhos no jogo Aviator
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-white text-black text-lg px-8 py-6 font-bold hover:bg-gray-200"
+                className="bg-red-600 text-white text-lg px-8 py-6 font-bold hover:bg-red-700"
                 data-testid="button-start"
               >
                 Começar Agora
@@ -79,7 +79,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-white text-white text-lg px-8 py-6 hover:bg-white hover:text-black"
+              className="border-red-600 text-red-500 text-lg px-8 py-6 hover:bg-red-600 hover:text-white"
               data-testid="button-demo"
             >
               Ver Demonstração
@@ -89,24 +89,24 @@ export default function Landing() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 px-4 bg-black border-y border-white">
+      <section className="py-12 px-4 bg-black border-y-2 border-red-600">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="bg-black border-white hover-elevate">
+            <Card className="bg-black border-2 border-red-600 hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-white mb-2" data-testid="text-stat-1">98.5%</div>
+                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-1">98.5%</div>
                 <p className="text-white">Precisão do Algoritmo</p>
               </CardContent>
             </Card>
-            <Card className="bg-black border-white hover-elevate">
+            <Card className="bg-black border-2 border-red-600 hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-white mb-2" data-testid="text-stat-2">1s</div>
+                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-2">1s</div>
                 <p className="text-white">Atualização em Tempo Real</p>
               </CardContent>
             </Card>
-            <Card className="bg-black border-white hover-elevate">
+            <Card className="bg-black border-2 border-red-600 hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-white mb-2" data-testid="text-stat-3">24/7</div>
+                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-3">24/7</div>
                 <p className="text-white">Disponibilidade Total</p>
               </CardContent>
             </Card>
@@ -118,24 +118,25 @@ export default function Landing() {
       <section className="py-16 px-4">
         <div className="container mx-auto">
           <h3 
-            className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+            className="text-4xl font-bold text-center mb-12 text-red-500"
+            style={{ textShadow: '0 0 20px #ff0000' }}
             data-testid="text-about-title"
           >
             O Que É o CyberHacker?
           </h3>
           <div className="max-w-4xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-600">
               <CardContent className="p-8">
                 <p className="text-lg text-gray-300 leading-relaxed mb-4" data-testid="text-about-description">
-                  O <span className="text-emerald-400 font-bold">CyberHacker</span> é um sistema revolucionário de análise preditiva 
-                  desenvolvido especificamente para o jogo <span className="text-cyan-400 font-bold">Aviator</span>. 
-                  Utilizando algoritmos de <span className="text-blue-400 font-semibold">machine learning</span> e análise de padrões em tempo real, 
+                  O <span className="text-red-500 font-bold">CyberHacker</span> é um sistema revolucionário de análise preditiva 
+                  desenvolvido especificamente para o jogo <span className="text-red-400 font-bold">Aviator</span>. 
+                  Utilizando algoritmos de <span className="text-red-300 font-semibold">machine learning</span> e análise de padrões em tempo real, 
                   nosso robô identifica as melhores oportunidades de entrada e os momentos ideais para sacar seus ganhos.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed" data-testid="text-about-features">
                   Com uma interface intuitiva e atualização a cada segundo, você recebe sinais precisos sobre 
-                  <span className="text-emerald-400 font-semibold"> QUANDO entrar</span> e 
-                  <span className="text-cyan-400 font-semibold"> ONDE sacar</span>, baseado em análise de mais de 20 velas, 
+                  <span className="text-red-500 font-semibold"> QUANDO entrar</span> e 
+                  <span className="text-red-400 font-semibold"> ONDE sacar</span>, baseado em análise de mais de 20 velas, 
                   médias móveis, volatilidade e detecção de 5 padrões favoráveis diferentes.
                 </p>
               </CardContent>
@@ -352,10 +353,11 @@ export default function Landing() {
       </section>
 
       {/* CTA Final */}
-      <section className="py-20 px-4 bg-gradient-to-b from-transparent via-emerald-900/10 to-transparent">
+      <section className="py-20 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto text-center">
           <h3 
-            className="text-5xl font-bold mb-6 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent"
+            className="text-5xl font-bold mb-6 text-red-500"
+            style={{ textShadow: '0 0 30px #ff0000' }}
             data-testid="text-cta-title"
           >
             Pronto Para Começar?
@@ -366,7 +368,8 @@ export default function Landing() {
           <Link href="/signup">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black text-lg px-12 py-6 font-bold"
+              className="bg-red-600 text-white text-lg px-12 py-6 font-bold hover:bg-red-700"
+              style={{ boxShadow: '0 0 20px rgba(255, 0, 0, 0.5)' }}
               data-testid="button-cta-signup"
             >
               Criar Conta Grátis
@@ -376,7 +379,7 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-white bg-black">
+      <footer className="py-8 px-4 border-t-2 border-red-600 bg-black">
         <div className="container mx-auto text-center text-white">
           <p data-testid="text-footer">© 2025 CyberHacker - Todos os direitos reservados</p>
         </div>

@@ -24,7 +24,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5"></div>
-      
+
       <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-3 mb-4">
@@ -67,7 +67,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+                className="bg-gray-800 border-gray-700 text-white focus:border-red-600 focus:ring-red-600"
                 data-testid="input-email"
               />
             </div>
@@ -80,7 +80,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+                className="bg-gray-800 border-gray-700 text-white focus:border-red-600 focus:ring-red-600"
                 data-testid="input-password"
               />
             </div>
@@ -88,14 +88,14 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold"
+              className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold"
               data-testid="button-submit"
             >
               Entrar
             </Button>
             <p className="text-sm text-gray-400 text-center" data-testid="text-signup-link">
               Não tem uma conta?{' '}
-              <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 underline font-semibold">
+              <Link href="/signup" className="text-red-400 hover:text-red-300 underline font-semibold">
                 Registre-se
               </Link>
             </p>
