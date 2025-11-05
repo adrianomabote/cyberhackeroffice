@@ -22,10 +22,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5"></div>
-
-      <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 relative z-10">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-black border-red-600/50 relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-3 mb-4">
             <Link href="/">
@@ -41,13 +39,13 @@ export default function Login() {
               <img 
                 src={hackerImage} 
                 alt="CyberHacker" 
-                className="w-10 h-10 rounded-lg object-cover border-2 border-emerald-500/50"
+                className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
               />
               <h1 
-                className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+                className="text-lg font-bold text-white"
                 data-testid="text-title"
               >
-                CyberHacker
+                ROBÔ CYBER HACKER
               </h1>
             </div>
           </div>
