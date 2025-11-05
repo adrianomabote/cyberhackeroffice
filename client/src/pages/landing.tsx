@@ -34,7 +34,7 @@ export default function Landing() {
               className="text-base font-bold text-red-600"
               data-testid="text-logo"
             >
-              ROBÔ CYBER HACKER
+              CyberHacker
             </h1>
           </div>
           <div className="flex gap-3 ml-auto">
@@ -321,7 +321,7 @@ export default function Landing() {
           <Link href="/signup">
             <Button 
               size="default" 
-              className="bg-red-800 text-white text-base px-8 py-3 font-bold hover:bg-red-900"
+              className="bg-red-800 text-white text-base px-6 py-2 font-bold hover:bg-red-900"
               data-testid="button-cta-signup"
             >
               Começar Agora
