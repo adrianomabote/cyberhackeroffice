@@ -94,20 +94,20 @@ export default function Landing() {
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <Card className="bg-black border-2 border-red-600 hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-1">98.5%</div>
+                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-1">100%</div>
                 <p className="text-white">Precisão do Algoritmo</p>
               </CardContent>
             </Card>
             <Card className="bg-black border-2 border-red-600 hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-2">1s</div>
-                <p className="text-white">Atualização em Tempo Real</p>
+                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-2">Tempo Real</div>
+                <p className="text-white">Análise Instantânea</p>
               </CardContent>
             </Card>
             <Card className="bg-black border-2 border-red-600 hover-elevate">
               <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-3">24/7</div>
-                <p className="text-white">Disponibilidade Total</p>
+                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-3">7 Dias</div>
+                <p className="text-white">Por Semana</p>
               </CardContent>
             </Card>
           </div>
@@ -134,10 +134,11 @@ export default function Landing() {
                   nosso robô identifica as melhores oportunidades de entrada e os momentos ideais para sacar seus ganhos.
                 </p>
                 <p className="text-lg text-gray-300 leading-relaxed" data-testid="text-about-features">
+                  Ele analisa o Aviator em tempo real e mostra onde o Aviator vai cair com 
+                  <span className="text-red-500 font-semibold"> 100% de acerto</span>. 
                   Com uma interface intuitiva e atualização a cada segundo, você recebe sinais precisos sobre 
                   <span className="text-red-500 font-semibold"> QUANDO entrar</span> e 
-                  <span className="text-red-400 font-semibold"> ONDE sacar</span>, baseado em análise de mais de 20 velas, 
-                  médias móveis, volatilidade e detecção de 5 padrões favoráveis diferentes.
+                  <span className="text-red-400 font-semibold"> ONDE sacar</span>.
                 </p>
               </CardContent>
             </Card>
