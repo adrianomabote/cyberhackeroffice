@@ -31,8 +31,7 @@ export default function Login() {
             <Link href="/">
               <Button 
                 variant="ghost" 
-                size="icon" 
-                className="hover:bg-gray-800"
+                size="icon"
                 data-testid="button-back"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -90,7 +89,7 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold"
+              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold"
               data-testid="button-submit"
             >
               Entrar

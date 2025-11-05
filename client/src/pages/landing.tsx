@@ -33,7 +33,7 @@ export default function Landing() {
             <Link href="/login">
               <Button 
                 variant="outline" 
-                className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white hover:border-emerald-500"
+                className="border-gray-700 text-gray-300"
                 data-testid="button-login"
               >
                 Entrar
@@ -41,7 +41,7 @@ export default function Landing() {
             </Link>
             <Link href="/signup">
               <Button 
-                className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold"
+                className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold"
                 data-testid="button-signup"
               >
                 Registre-se
@@ -55,9 +55,10 @@ export default function Landing() {
       <section className="relative py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent to-cyan-500/10"></div>
         <div className="container mx-auto text-center relative z-10">
-          <div className="inline-block mb-4 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+          <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+            <Brain className="w-4 h-4 text-emerald-400" />
             <span className="text-emerald-400 text-sm font-semibold" data-testid="text-hero-badge">
-              🤖 Inteligência Artificial Avançada
+              Inteligência Artificial Avançada
             </span>
           </div>
           <h2 
@@ -74,7 +75,7 @@ export default function Landing() {
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black text-lg px-8 py-6 font-bold"
+                className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black text-lg px-8 py-6 font-bold"
                 data-testid="button-start"
               >
                 Começar Agora
@@ -83,7 +84,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="outline"
-              className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 text-lg px-8 py-6"
+              className="border-emerald-500/50 text-emerald-400 text-lg px-8 py-6"
               data-testid="button-demo"
             >
               Ver Demonstração
@@ -375,7 +376,7 @@ export default function Landing() {
           <Link href="/signup">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black text-lg px-12 py-6 font-bold"
+              className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-black text-lg px-12 py-6 font-bold"
               data-testid="button-cta-signup"
             >
               Criar Conta Grátis
