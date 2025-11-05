@@ -88,32 +88,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 px-4 bg-black border-y-2 border-red-600">
-        <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <Card className="bg-black border-2 border-red-600 hover-elevate">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-1">100%</div>
-                <p className="text-white">Precisão do Algoritmo</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-black border-2 border-red-600 hover-elevate">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-2">Tempo Real</div>
-                <p className="text-white">Análise Instantânea</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-black border-2 border-red-600 hover-elevate">
-              <CardContent className="p-6 text-center">
-                <div className="text-4xl font-bold text-red-500 mb-2" data-testid="text-stat-3">7 Dias</div>
-                <p className="text-white">Por Semana</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* O que é */}
       <section className="py-16 px-4">
         <div className="container mx-auto">
@@ -251,7 +225,7 @@ export default function Landing() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-300 ml-16" data-testid="text-step-1">
+                <p className="text-white ml-16 text-lg" data-testid="text-step-1">
                   Nosso script (fornecido após cadastro) captura automaticamente cada multiplicador do jogo Aviator 
                   e envia para nossos servidores em tempo real, sem intervenção manual.
                 </p>
@@ -268,7 +242,7 @@ export default function Landing() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-300 ml-16" data-testid="text-step-2">
+                <p className="text-white ml-16 text-lg" data-testid="text-step-2">
                   O algoritmo de IA analisa as últimas 20 velas, calcula médias móveis (MA5, MA10, MA20), 
                   detecta tendências, mede volatilidade e identifica 5 padrões favoráveis diferentes automaticamente.
                 </p>
@@ -285,7 +259,7 @@ export default function Landing() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-300 ml-16" data-testid="text-step-3">
+                <p className="text-white ml-16 text-lg" data-testid="text-step-3">
                   Quando o sistema detecta uma oportunidade (pontuação ≥6), exibe o sinal: "APÓS: [última vela]" e 
                   "SACAR: [multiplicador recomendado]" com cores dinâmicas baseadas no nível de confiança.
                 </p>
@@ -302,7 +276,7 @@ export default function Landing() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-300 ml-16" data-testid="text-step-4">
+                <p className="text-white ml-16 text-lg" data-testid="text-step-4">
                   Siga os sinais do robô ou use as estatísticas avançadas (gráfico, tendências, padrões) para 
                   tomar suas próprias decisões informadas com base em dados reais.
                 </p>
