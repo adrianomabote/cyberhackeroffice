@@ -1,4 +1,4 @@
-import { type Vela, type InsertVela, velas, type ManutencaoStatus } from "@shared/schema";
+import { type Vela, type InsertVela, velas, type ManutencaoStatus, type SinaisManual } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { desc } from "drizzle-orm";
@@ -14,12 +14,15 @@ export interface IStorage {
   getHistorico(limit?: number): Promise<Vela[]>;
   getManutencaoStatus(): Promise<ManutencaoStatus>;
   setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus>;
+  getSinaisManual(): Promise<SinaisManual>;
+  setSinaisManual(sinais: SinaisManual): Promise<SinaisManual>;
 }
 
 export class MemStorage implements IStorage {
   private velas: Vela[];
   private ultimoMultiplicador: number | null;
   private manutencao: ManutencaoStatus;
+  private sinaisManual: SinaisManual;
 
   constructor() {
     this.velas = [];
@@ -28,6 +31,11 @@ export class MemStorage implements IStorage {
       ativo: false,
       mensagem: "",
       motivo: "",
+    };
+    this.sinaisManual = {
+      ativo: false,
+      apos: null,
+      sacar: null,
     };
   }
 
@@ -79,11 +87,21 @@ export class MemStorage implements IStorage {
     this.manutencao = status;
     return this.manutencao;
   }
+
+  async getSinaisManual(): Promise<SinaisManual> {
+    return this.sinaisManual;
+  }
+
+  async setSinaisManual(sinais: SinaisManual): Promise<SinaisManual> {
+    this.sinaisManual = sinais;
+    return this.sinaisManual;
+  }
 }
 
 export class DbStorage implements IStorage {
   private db;
   private manutencao: ManutencaoStatus;
+  private sinaisManual: SinaisManual;
 
   constructor() {
     const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -92,6 +110,11 @@ export class DbStorage implements IStorage {
       ativo: false,
       mensagem: "",
       motivo: "",
+    };
+    this.sinaisManual = {
+      ativo: false,
+      apos: null,
+      sacar: null,
     };
   }
 
@@ -152,6 +175,16 @@ export class DbStorage implements IStorage {
     this.manutencao = status;
     console.log('[MANUTENÇÃO] Status atualizado:', status);
     return this.manutencao;
+  }
+
+  async getSinaisManual(): Promise<SinaisManual> {
+    return this.sinaisManual;
+  }
+
+  async setSinaisManual(sinais: SinaisManual): Promise<SinaisManual> {
+    this.sinaisManual = sinais;
+    console.log('[SINAIS MANUAL] Atualizados:', sinais);
+    return this.sinaisManual;
   }
 }
 

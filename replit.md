@@ -10,6 +10,9 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
   - Interface cyberpunk minimalista - 100% conforme foto de referência
   - Header: "CYBER HACKER" em vermelho (#ff0000) com glow effect
   - Card inteligente com sistema de cooldown:
+    - **Prioridade de exibição**:
+      1. Sinais manuais (se ativos) - Ignora sistema automático
+      2. Sistema automático - Detecta oportunidades via algoritmo ML
     - **Quando NÃO é hora de entrar**: APÓS: ... e SACAR: ... (pontinhos cinzas)
     - **Quando É hora de entrar**: APÓS mostra última vela da API + SACAR mostra multiplicador recomendado
     - Ambos aparecem **ao mesmo tempo** apenas quando detecta oportunidade
@@ -146,9 +149,14 @@ Servidor roda na porta 5000.
 ### Página Admin (`/admin/cyber`)
 - **Acesso**: Via URL `/admin/cyber`
 - **Funcionalidades**:
-  - Ativar manutenção: Define mensagem de retorno (ex: "VOLTE ÀS 15:30")
-  - Motivo fixo: "O ROBÔ ESTÁ ATUALIZANDO. ENTRE NO HORÁRIO INDICADO PARA CONTINUAR USANDO O SISTEMA."
-  - Desativar manutenção: Retorna sistema ao normal
+  - **Manutenção Manual**:
+    - Ativar manutenção: Define mensagem de retorno (ex: "VOLTE ÀS 15:30")
+    - Motivo fixo: "O ROBÔ ESTÁ ATUALIZANDO. ENTRE NO HORÁRIO INDICADO PARA CONTINUAR USANDO O SISTEMA."
+    - Desativar manutenção: Retorna sistema ao normal
+  - **Sinais Manuais**:
+    - Ativar sinais: Define multiplicadores manualmente para APÓS e SACAR
+    - Desativar sinais: Volta a usar sistema automático
+    - Status visível: Mostra se está ativo e valores definidos
 - **Armazenamento**: In-memory (temporário)
 
 ### Tela de Manutenção
@@ -159,17 +167,20 @@ Servidor roda na porta 5000.
 - **Texto removido**: "Atualizando a cada 5 segundos" foi removido da interface
 
 ### API Endpoints
-- GET /api/manutencao/cyber - Verifica status
+- GET /api/manutencao/cyber - Verifica status de manutenção
 - POST /api/manutencao/cyber - Ativa/desativa com { ativo, mensagem, motivo }
+- GET /api/sinais-manual/cyber - Retorna sinais manuais
+- POST /api/sinais-manual/cyber - Define sinais com { ativo, apos, sacar }
 
 ## Estado Atual - COMPLETO
 ✅ PostgreSQL com Drizzle ORM (persistência)
 ✅ Frontend cyberpunk com 6 cards + gráfico
-✅ Backend com 8 endpoints RESTful
+✅ Backend com 10 endpoints RESTful
 ✅ Algoritmo ML avançado (regressão + EMA + volatilidade)
 ✅ Sistema de estatísticas (médias móveis, tendência, volatilidade)
 ✅ Sistema de notificações (4 detectores de padrões)
 ✅ Sistema de manutenção manual (página admin + tela de manutenção)
+✅ Sistema de sinais manuais (envio manual de APÓS e SACAR)
 ✅ Script de captura automática
 ✅ Testes E2E validados
 ✅ Guards contra crashes (optional chaining, arrays vazios)

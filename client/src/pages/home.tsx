@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus } from "@shared/schema";
+import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
@@ -15,6 +15,13 @@ export default function Home() {
   const { data: manutencaoData } = useQuery<ManutencaoStatus>({
     queryKey: ['/api/manutencao/cyber'],
     refetchInterval: 5000, // Verifica a cada 5 segundos
+    staleTime: 0,
+  });
+
+  // Buscar sinais manuais
+  const { data: sinaisManualData } = useQuery<SinaisManual>({
+    queryKey: ['/api/sinais-manual/cyber'],
+    refetchInterval: 1000,
     staleTime: 0,
   });
 
@@ -60,6 +67,12 @@ export default function Home() {
 
   // Verificar se é hora de entrar
   const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
+
+  // Usar sinais manuais se estiverem ativos, senão usar automáticos
+  const usarSinaisManual = sinaisManualData?.ativo === true;
+  const valorAposExibir = usarSinaisManual ? sinaisManualData.apos : aposData?.multiplicador;
+  const valorSacarExibir = usarSinaisManual ? sinaisManualData.sacar : sacarData?.multiplicador;
+  const deveMostrarValores = usarSinaisManual || (isHoraDeEntrar && mostrandoEntrada);
 
   // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
@@ -266,12 +279,12 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: mostrandoEntrada && aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
+                      color: deveMostrarValores && valorAposExibir ? getMultiplicadorColor(valorAposExibir) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-apos-value"
                   >
-                    {mostrandoEntrada && aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
+                    {deveMostrarValores && valorAposExibir ? `${valorAposExibir.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
@@ -293,12 +306,12 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: mostrandoEntrada && sacarData?.multiplicador ? getMultiplicadorColor(sacarData.multiplicador) : '#888888',
+                      color: deveMostrarValores && valorSacarExibir ? getMultiplicadorColor(valorSacarExibir) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-sacar-value"
                   >
-                    {mostrandoEntrada && sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '...'}
+                    {deveMostrarValores && valorSacarExibir ? `${valorSacarExibir.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>

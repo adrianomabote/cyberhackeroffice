@@ -96,3 +96,18 @@ export const manutencaoSchema = z.object({
 );
 
 export type ManutencaoInput = z.infer<typeof manutencaoSchema>;
+
+// Sinais manuais do admin
+export interface SinaisManual {
+  ativo: boolean; // Se os sinais manuais estão ativos
+  apos: number | null; // Multiplicador manual para APÓS
+  sacar: number | null; // Multiplicador manual para SACAR
+}
+
+export const sinaisManualSchema = z.object({
+  ativo: z.boolean(),
+  apos: z.number().min(1).nullable(),
+  sacar: z.number().min(1).nullable(),
+});
+
+export type SinaisManualInput = z.infer<typeof sinaisManualSchema>;

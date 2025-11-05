@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { ManutencaoStatus } from "@shared/schema";
+import type { ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Admin() {
   const [mensagem, setMensagem] = useState("");
+  const [valorApos, setValorApos] = useState("");
+  const [valorSacar, setValorSacar] = useState("");
   const motivo = "O ROBÔ ESTÁ ATUALIZANDO. ENTRE NO HORÁRIO INDICADO PARA CONTINUAR USANDO O SISTEMA.";
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -13,6 +15,12 @@ export default function Admin() {
   // Buscar status atual de manutenção
   const { data: statusData } = useQuery<ManutencaoStatus>({
     queryKey: ['/api/manutencao/cyber'],
+    refetchInterval: 2000,
+  });
+
+  // Buscar sinais manuais
+  const { data: sinaisData } = useQuery<SinaisManual>({
+    queryKey: ['/api/sinais-manual/cyber'],
     refetchInterval: 2000,
   });
 
@@ -82,6 +90,89 @@ export default function Admin() {
 
   const handleDesativar = () => {
     desativarManutencao.mutate();
+  };
+
+  const ativarSinaisManual = useMutation({
+    mutationFn: async (data: SinaisManual) => {
+      const res = await apiRequest("POST", "/api/sinais-manual/cyber", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sinais-manual/cyber"] });
+      toast({
+        title: "✅ Sinais Manuais Ativados",
+        description: "Valores APÓS e SACAR definidos manualmente",
+      });
+      setValorApos("");
+      setValorSacar("");
+    },
+    onError: () => {
+      toast({
+        title: "❌ Erro",
+        description: "Não foi possível ativar sinais manuais",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const desativarSinaisManual = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/sinais-manual/cyber", {
+        ativo: false,
+        apos: null,
+        sacar: null,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/sinais-manual/cyber"] });
+      toast({
+        title: "✅ Sinais Manuais Desativados",
+        description: "Sistema volta a usar valores automáticos",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "❌ Erro",
+        description: "Não foi possível desativar sinais manuais",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAtivarSinais = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const apos = parseFloat(valorApos);
+    const sacar = parseFloat(valorSacar);
+    
+    if (isNaN(apos) || apos < 1) {
+      toast({
+        title: "⚠️ Valor inválido",
+        description: "APÓS deve ser um número maior ou igual a 1",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (isNaN(sacar) || sacar < 1) {
+      toast({
+        title: "⚠️ Valor inválido",
+        description: "SACAR deve ser um número maior ou igual a 1",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    ativarSinaisManual.mutate({
+      ativo: true,
+      apos,
+      sacar,
+    });
+  };
+
+  const handleDesativarSinais = () => {
+    desativarSinaisManual.mutate();
   };
 
   return (
@@ -218,7 +309,7 @@ export default function Admin() {
 
         {/* Botão Desativar */}
         <div
-          className="rounded-xl border p-8"
+          className="rounded-xl border p-8 mb-6"
           style={{
             borderColor: '#444444',
             borderWidth: '1px',
@@ -241,6 +332,133 @@ export default function Admin() {
             data-testid="button-desativar"
           >
             {desativarManutencao.isPending ? "DESATIVANDO..." : "DESATIVAR MANUTENÇÃO"}
+          </button>
+        </div>
+
+        {/* Sinais Manuais */}
+        <div
+          className="rounded-xl border p-8 mb-6"
+          style={{
+            borderColor: '#444444',
+            borderWidth: '1px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <h2 className="font-sans font-bold mb-6" style={{ color: '#ffffff', fontSize: '1.5rem' }}>
+            Sinais Manuais
+          </h2>
+
+          {/* Status dos sinais manuais */}
+          <div className="mb-6 p-4 rounded border" style={{ borderColor: '#333333', backgroundColor: '#000000' }}>
+            <p className="font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '0.875rem' }}>
+              Status
+            </p>
+            <p 
+              className="font-mono font-bold"
+              style={{
+                color: sinaisData?.ativo ? '#00ff00' : '#888888',
+                fontSize: '1.25rem',
+              }}
+              data-testid="text-sinais-status"
+            >
+              {sinaisData?.ativo ? 'ATIVO' : 'INATIVO'}
+            </p>
+            {sinaisData?.ativo && (
+              <p className="font-sans mt-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
+                APÓS: {sinaisData.apos?.toFixed(2)}X | SACAR: {sinaisData.sacar?.toFixed(2)}X
+              </p>
+            )}
+          </div>
+
+          <form onSubmit={handleAtivarSinais} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block font-sans font-normal mb-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
+                  APÓS (multiplicador)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  value={valorApos}
+                  onChange={(e) => setValorApos(e.target.value)}
+                  placeholder="2.45"
+                  className="w-full px-4 py-3 rounded border font-mono"
+                  style={{
+                    backgroundColor: '#000000',
+                    borderColor: '#333333',
+                    color: '#ffffff',
+                    fontSize: '1.25rem',
+                  }}
+                  data-testid="input-apos"
+                />
+              </div>
+
+              <div>
+                <label className="block font-sans font-normal mb-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
+                  SACAR (multiplicador)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  value={valorSacar}
+                  onChange={(e) => setValorSacar(e.target.value)}
+                  placeholder="3.00"
+                  className="w-full px-4 py-3 rounded border font-mono"
+                  style={{
+                    backgroundColor: '#000000',
+                    borderColor: '#333333',
+                    color: '#ffffff',
+                    fontSize: '1.25rem',
+                  }}
+                  data-testid="input-sacar"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={ativarSinaisManual.isPending}
+              className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+              style={{
+                backgroundColor: '#00ff00',
+                color: '#000000',
+                fontSize: '1.25rem',
+                border: 'none',
+              }}
+              data-testid="button-ativar-sinais"
+            >
+              {ativarSinaisManual.isPending ? "ATIVANDO..." : "ATIVAR SINAIS MANUAIS"}
+            </button>
+          </form>
+        </div>
+
+        {/* Desativar Sinais Manuais */}
+        <div
+          className="rounded-xl border p-8"
+          style={{
+            borderColor: '#444444',
+            borderWidth: '1px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <h2 className="font-sans font-bold mb-4" style={{ color: '#ffffff', fontSize: '1.5rem' }}>
+            Desativar Sinais Manuais
+          </h2>
+          <button
+            onClick={handleDesativarSinais}
+            disabled={desativarSinaisManual.isPending}
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+            style={{
+              backgroundColor: '#ff6600',
+              color: '#ffffff',
+              fontSize: '1.25rem',
+              border: 'none',
+            }}
+            data-testid="button-desativar-sinais"
+          >
+            {desativarSinaisManual.isPending ? "DESATIVANDO..." : "DESATIVAR SINAIS MANUAIS"}
           </button>
         </div>
       </div>

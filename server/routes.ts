@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVelaSchema, manutencaoSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus } from "@shared/schema";
+import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "@shared/schema";
 import { z } from "zod";
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -544,6 +544,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: "Erro ao atualizar status de manutenção",
+      });
+    }
+  });
+
+  // GET /api/sinais-manual/cyber - Retorna sinais manuais
+  app.get("/api/sinais-manual/cyber", async (req, res) => {
+    try {
+      const sinais = await storage.getSinaisManual();
+      res.json(sinais);
+    } catch (error) {
+      console.error('[SINAIS MANUAL] Erro ao buscar:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao buscar sinais manuais",
+      });
+    }
+  });
+
+  // POST /api/sinais-manual/cyber - Define sinais manuais
+  app.post("/api/sinais-manual/cyber", async (req, res) => {
+    try {
+      const validatedData = sinaisManualSchema.parse(req.body);
+      const sinais = await storage.setSinaisManual(validatedData);
+      
+      console.log('[SINAIS MANUAL] Definidos:', {
+        ativo: sinais.ativo,
+        apos: sinais.apos,
+        sacar: sinais.sacar,
+      });
+      
+      res.json({
+        success: true,
+        data: sinais,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+          details: error.errors,
+        });
+      }
+      
+      console.error('[SINAIS MANUAL] Erro ao definir:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao definir sinais manuais",
       });
     }
   });
