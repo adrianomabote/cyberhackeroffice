@@ -144,7 +144,8 @@ Servidor roda na porta 5000.
 ### Página Admin (`/admin`)
 - **Acesso**: Via URL `/admin`
 - **Funcionalidades**:
-  - Ativar manutenção: Define mensagem (ex: "VOLTE ÀS 15:30") e motivo (ex: "O robô está atualizando")
+  - Ativar manutenção: Define mensagem de retorno (ex: "VOLTE ÀS 15:30")
+  - Motivo fixo: Sempre mostra "O robô está atualizando"
   - Desativar manutenção: Retorna sistema ao normal
 - **Armazenamento**: In-memory (temporário)
 

@@ -1,22 +1,25 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ManutencaoStatus } from "@shared/schema";
 
 export default function Admin() {
   const [mensagem, setMensagem] = useState("");
-  const [motivo, setMotivo] = useState("");
+  const motivo = "O robô está atualizando";
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Buscar status atual de manutenção
+  const { data: statusData } = useQuery<ManutencaoStatus>({
+    queryKey: ['/api/manutencao/cyber'],
+    refetchInterval: 2000,
+  });
+
   const ativarManutencao = useMutation({
     mutationFn: async (data: ManutencaoStatus) => {
-      return apiRequest("/api/manutencao/cyber", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await apiRequest("POST", "/api/manutencao/cyber", data);
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/manutencao/cyber"] });
@@ -38,15 +41,12 @@ export default function Admin() {
 
   const desativarManutencao = useMutation({
     mutationFn: async () => {
-      return apiRequest("/api/manutencao/cyber", {
-        method: "POST",
-        body: JSON.stringify({
-          ativo: false,
-          mensagem: "",
-          motivo: "",
-        }),
-        headers: { "Content-Type": "application/json" },
+      const res = await apiRequest("POST", "/api/manutencao/cyber", {
+        ativo: false,
+        mensagem: "",
+        motivo: "O robô está atualizando",
       });
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/manutencao/cyber"] });
@@ -66,10 +66,10 @@ export default function Admin() {
 
   const handleAtivar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mensagem.trim() || !motivo.trim()) {
+    if (!mensagem.trim()) {
       toast({
-        title: "⚠️ Campos obrigatórios",
-        description: "Preencha a mensagem e o motivo",
+        title: "⚠️ Campo obrigatório",
+        description: "Preencha a mensagem de retorno",
         variant: "destructive",
       });
       return;
@@ -77,7 +77,7 @@ export default function Admin() {
     ativarManutencao.mutate({
       ativo: true,
       mensagem: mensagem.trim(),
-      motivo: motivo.trim(),
+      motivo: motivo,
     });
   };
 
@@ -120,6 +120,35 @@ export default function Admin() {
           </h1>
         </div>
 
+        {/* Status Atual */}
+        <div
+          className="rounded-xl border p-6 mb-8 text-center"
+          style={{
+            borderColor: '#444444',
+            borderWidth: '1px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <p className="font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '0.875rem' }}>
+            Status do Sistema
+          </p>
+          <p 
+            className="font-mono font-bold"
+            style={{
+              color: statusData?.ativo ? '#ff0000' : '#00ff00',
+              fontSize: '1.5rem',
+            }}
+            data-testid="text-status"
+          >
+            {statusData?.ativo ? 'ATIVO' : 'INATIVO'}
+          </p>
+          {statusData?.ativo && statusData.mensagem && (
+            <p className="font-sans mt-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
+              {statusData.mensagem} - {statusData.motivo}
+            </p>
+          )}
+        </div>
+
         {/* Formulário Ativar Manutenção */}
         <div
           className="rounded-xl border p-8 mb-6"
@@ -136,7 +165,7 @@ export default function Admin() {
           <form onSubmit={handleAtivar} className="space-y-6">
             <div>
               <label className="block font-sans font-normal mb-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
-                Mensagem (ex: VOLTE ÀS 15:30)
+                Mensagem de Retorno
               </label>
               <input
                 type="text"
@@ -155,23 +184,20 @@ export default function Admin() {
             </div>
 
             <div>
-              <label className="block font-sans font-normal mb-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
-                Motivo
+              <label className="block font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '0.875rem' }}>
+                Motivo (fixo)
               </label>
-              <input
-                type="text"
-                value={motivo}
-                onChange={(e) => setMotivo(e.target.value)}
-                placeholder="O robô está atualizando"
+              <div
                 className="w-full px-4 py-3 rounded border font-mono"
                 style={{
-                  backgroundColor: '#000000',
+                  backgroundColor: '#111111',
                   borderColor: '#333333',
-                  color: '#ffffff',
-                  fontSize: '1.25rem',
+                  color: '#666666',
+                  fontSize: '1rem',
                 }}
-                data-testid="input-motivo"
-              />
+              >
+                {motivo}
+              </div>
             </div>
 
             <button
