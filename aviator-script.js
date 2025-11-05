@@ -7,7 +7,7 @@
  * 3. Cole este script completo no console
  * 4. Pressione Enter para executar
  * 5. O script começará a capturar multiplicadores automaticamente
- * 
+ *   
  * Para parar o script: Execute stopAviatorCapture() no console
  */
 
