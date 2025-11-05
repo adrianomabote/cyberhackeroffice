@@ -13,7 +13,10 @@ export const velas = pgTable("velas", {
 export const insertVelaSchema = createInsertSchema(velas).pick({
   multiplicador: true,
 }).extend({
-  multiplicador: z.number().positive().min(1),
+  multiplicador: z.number().refine(
+    (val) => val === -1 || val >= 1,
+    { message: "Multiplicador deve ser -1 (três pontinhos) ou >= 1" }
+  ),
 });
 
 export type InsertVela = z.infer<typeof insertVelaSchema>;

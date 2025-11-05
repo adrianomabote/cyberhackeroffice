@@ -436,7 +436,7 @@ export default function Admin() {
 
         {/* Desativar Sinais Manuais */}
         <div
-          className="rounded-xl border p-8"
+          className="rounded-xl border p-8 mb-6"
           style={{
             borderColor: '#444444',
             borderWidth: '1px',
@@ -459,6 +459,56 @@ export default function Admin() {
             data-testid="button-desativar-sinais"
           >
             {desativarSinaisManual.isPending ? "DESATIVANDO..." : "DESATIVAR SINAIS MANUAIS"}
+          </button>
+        </div>
+
+        {/* Enviar Três Pontinhos Manualmente */}
+        <div
+          className="rounded-xl border p-8"
+          style={{
+            borderColor: '#444444',
+            borderWidth: '1px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <h2 className="font-sans font-bold mb-4" style={{ color: '#ffffff', fontSize: '1.5rem' }}>
+            Enviar Três Pontinhos Manualmente
+          </h2>
+          <p className="font-sans mb-4" style={{ color: '#888888', fontSize: '0.875rem' }}>
+            Enviar sinal de "⁙" (três pontinhos) para ocultar os valores no sistema
+          </p>
+          <button
+            onClick={async () => {
+              try {
+                const res = await apiRequest("POST", "/api/velas/cyber", {
+                  multiplicador: -1,
+                });
+                if (res.ok) {
+                  toast({
+                    title: "✅ Três Pontinhos Enviado",
+                    description: "Sinal de espera enviado com sucesso",
+                  });
+                } else {
+                  throw new Error("Erro ao enviar");
+                }
+              } catch (error) {
+                toast({
+                  title: "❌ Erro",
+                  description: "Não foi possível enviar os três pontinhos",
+                  variant: "destructive",
+                });
+              }
+            }}
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+            style={{
+              backgroundColor: '#00bfff',
+              color: '#000000',
+              fontSize: '1.25rem',
+              border: 'none',
+            }}
+            data-testid="button-enviar-pontinhos"
+          >
+            ENVIAR ⁙
           </button>
         </div>
       </div>

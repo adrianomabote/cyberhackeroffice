@@ -225,6 +225,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/velas/cyber - Recebe multiplicadores do Aviator
   app.post("/api/velas/cyber", async (req, res) => {
     try {
+      // Permitir -1 como sinal especial para três pontinhos
+      const multiplicador = req.body.multiplicador;
+      
+      if (multiplicador === -1) {
+        // Três pontinhos enviado manualmente
+        const vela = await storage.addVela({ multiplicador: -1 });
+        return res.json({
+          success: true,
+          data: {
+            id: vela.id,
+            multiplicador: vela.multiplicador,
+            timestamp: vela.timestamp,
+          },
+          message: "Três pontinhos enviado"
+        });
+      }
+      
       const validatedData = insertVelaSchema.parse(req.body);
       const vela = await storage.addVela(validatedData);
       

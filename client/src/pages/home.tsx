@@ -72,7 +72,10 @@ export default function Home() {
   const usarSinaisManual = sinaisManualData?.ativo === true;
   const valorAposExibir = usarSinaisManual ? sinaisManualData.apos : aposData?.multiplicador;
   const valorSacarExibir = usarSinaisManual ? sinaisManualData.sacar : sacarData?.multiplicador;
-  const deveMostrarValores = usarSinaisManual || (isHoraDeEntrar && mostrandoEntrada);
+  
+  // Se receber -1 (três pontinhos), não mostrar valores
+  const recebeuTresPontinhos = aposData?.multiplicador === -1;
+  const deveMostrarValores = !recebeuTresPontinhos && (usarSinaisManual || (isHoraDeEntrar && mostrandoEntrada));
 
   // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
