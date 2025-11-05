@@ -17,16 +17,15 @@ export default function Splash() {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center overflow-hidden">
       <div className="text-center">
-        <div className="mb-8 animate-pulse">
+        <div className="mb-8">
           <h1
-            className="text-6xl md:text-8xl font-bold tracking-wider"
+            className="text-2xl md:text-3xl font-bold tracking-wider"
             style={{
-              color: '#ff0000',
-              textShadow: '0 0 30px #ff0000, 0 0 60px #ff0000, 0 0 90px #ff0000'
+              color: '#ff0000'
             }}
             data-testid="text-splash-title"
           >
-            ROBÔ CYBERHACKER
+            ROBÔ CYBER HACKER
           </h1>
         </div>
 
