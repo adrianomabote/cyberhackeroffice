@@ -324,7 +324,7 @@ export default function Landing() {
               className="bg-red-800 text-white text-lg px-12 py-6 font-bold hover:bg-red-900"
               data-testid="button-cta-signup"
             >
-              Criar Conta Grátis
+              Registre-se Agora
             </Button>
           </Link>
         </div>
