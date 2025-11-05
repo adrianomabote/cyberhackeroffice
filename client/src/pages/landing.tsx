@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
 import { useState } from 'react';
-import hackerImage from '@assets/IMG-20251105-WA0172_1762361840807.jpg';
+import robotImage from '@assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png';
 
 export default function Landing() {
   useProtection();
@@ -25,10 +25,10 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
-              src={hackerImage}
-              alt="Hacker" 
-              className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
-              data-testid="img-hacker"
+              src={robotImage}
+              alt="Robô CyberHacker" 
+              className="w-10 h-10 rounded-lg object-cover"
+              data-testid="img-robot"
             />
             <h1 
               className="text-base font-bold text-white"
