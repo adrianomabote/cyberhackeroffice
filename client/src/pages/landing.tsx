@@ -80,7 +80,7 @@ export default function Landing() {
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-red-800 text-white text-lg px-8 py-4 font-bold hover:bg-red-900"
+                className="bg-red-800 text-white text-lg px-8 py-3 font-bold hover:bg-red-900 h-auto min-h-0"
                 data-testid="button-start"
               >
                 Começar Agora
@@ -89,7 +89,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               variant="ghost"
-              className="bg-gray-700 text-white text-lg px-8 py-4 hover:bg-gray-800 border-0"
+              className="bg-gray-700 text-white text-lg px-8 py-3 hover:bg-gray-800 border-0 h-auto min-h-0"
               data-testid="button-demo"
               onClick={scrollToVideos}
             >
