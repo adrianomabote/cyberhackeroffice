@@ -103,7 +103,7 @@ export default function Home() {
             data-testid="card-multipliers"
           >
             <div className="flex items-center justify-around gap-4">
-              {/* APÓS: sempre mostra o último multiplicador da API */}
+              {/* APÓS: mostra apenas quando é hora de entrar */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
@@ -120,17 +120,17 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
+                      color: isHoraDeEntrar && aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-apos-value"
                   >
-                    {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
+                    {isHoraDeEntrar && aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
 
-              {/* SACAR: mostra recomendação apenas quando é hora de entrar */}
+              {/* SACAR: mostra apenas quando é hora de entrar */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
