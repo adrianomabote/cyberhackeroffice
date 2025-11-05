@@ -23,7 +23,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-black border-red-600/50 relative z-10">
+      <Card className="w-full max-w-md bg-black border-white/5 relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-3 mb-4">
             <Link href="/">
@@ -86,7 +86,7 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-gray-600 text-white hover:bg-gray-700 font-semibold"
+              className="w-full bg-red-600 text-white hover:bg-red-700 font-semibold"
               data-testid="button-submit"
             >
               Entrar
