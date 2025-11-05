@@ -40,7 +40,7 @@ export default function Landing() {
           <div className="flex gap-3 ml-16">
             <Link href="/login">
               <Button 
-                className="bg-white text-black hover:bg-gray-200 font-semibold"
+                className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"
                 data-testid="button-login"
               >
                 Entrar
@@ -48,7 +48,7 @@ export default function Landing() {
             </Link>
             <Link href="/signup">
               <Button 
-                className="bg-red-800 text-white hover:bg-red-900 font-semibold"
+                className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap"
                 data-testid="button-signup"
               >
                 Registre-se
@@ -174,7 +174,7 @@ export default function Landing() {
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-red-700 mt-1 flex-shrink-0" />
                     <p className="text-base text-white">
-                      Suporte <span className="font-bold text-red-700">24/7</span> para todos os usuários
+                      Suporte <span className="font-bold text-red-700">24/24</span> para todos os usuários
                     </p>
                   </div>
                 </div>

@@ -62,7 +62,7 @@ export default function Subscription() {
             <div className="flex items-start gap-3">
               <Check className="w-5 h-5 text-red-700 mt-0.5 flex-shrink-0" />
               <p className="text-white">
-                Suporte <span className="font-bold text-red-700">24/7</span>
+                Suporte <span className="font-bold text-red-700">24/24</span>
               </p>
             </div>
             <div className="flex items-start gap-3">
