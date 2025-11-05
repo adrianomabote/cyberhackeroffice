@@ -100,12 +100,12 @@ export default function Landing() {
       </section>
 
       {/* Separador */}
-      <div className="container mx-auto px-4">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      <div className="container mx-auto px-4 py-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-500/50 to-transparent"></div>
       </div>
 
       {/* O que é */}
-      <section className="py-2 px-4">
+      <section className="py-4 px-4">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
@@ -137,12 +137,12 @@ export default function Landing() {
       </section>
 
       {/* Separador */}
-      <div className="container mx-auto px-4">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      <div className="container mx-auto px-4 py-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-500/50 to-transparent"></div>
       </div>
 
       {/* Por que escolher o Robô Cyber Hacker */}
-      <section className="py-8 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
+      <section className="py-6 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto">
           <h3 
             className="text-3xl font-bold text-center mb-8 text-red-500"
@@ -187,12 +187,12 @@ export default function Landing() {
       </section>
 
       {/* Separador */}
-      <div className="container mx-auto px-4">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      <div className="container mx-auto px-4 py-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-500/50 to-transparent"></div>
       </div>
 
       {/* Perguntas Frequentes */}
-      <section className="py-8 px-4">
+      <section className="py-6 px-4">
         <div className="container mx-auto max-w-4xl">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
@@ -259,12 +259,12 @@ export default function Landing() {
       </section>
 
       {/* Separador */}
-      <div className="container mx-auto px-4">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      <div className="container mx-auto px-4 py-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-500/50 to-transparent"></div>
       </div>
 
       {/* Vídeos */}
-      <section id="videos-section" className="py-8 px-4 bg-gray-900/50">
+      <section id="videos-section" className="py-6 px-4 bg-gray-900/50">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
@@ -305,12 +305,12 @@ export default function Landing() {
       </section>
 
       {/* Separador */}
-      <div className="container mx-auto px-4">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      <div className="container mx-auto px-4 py-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-500/50 to-transparent"></div>
       </div>
 
       {/* CTA Final */}
-      <section className="py-20 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
+      <section className="py-12 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto text-center">
           <h3 
             className="text-5xl font-bold mb-6 text-red-500"
