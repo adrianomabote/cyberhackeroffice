@@ -10,6 +10,13 @@ export default function Landing() {
   useProtection();
   const [showGuide, setShowGuide] = useState(false);
   
+  const scrollToVideos = () => {
+    const videosSection = document.getElementById('videos-section');
+    if (videosSection) {
+      videosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -83,6 +90,7 @@ export default function Landing() {
               variant="outline"
               className="border-red-600 text-red-500 text-lg px-8 py-6 hover:bg-red-600 hover:text-white"
               data-testid="button-demo"
+              onClick={scrollToVideos}
             >
               Ver Demonstração
             </Button>
@@ -286,7 +294,7 @@ export default function Landing() {
       </section>
 
       {/* Vídeos */}
-      <section className="py-16 px-4 bg-gray-900/50">
+      <section id="videos-section" className="py-16 px-4 bg-gray-900/50">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
