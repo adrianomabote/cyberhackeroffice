@@ -108,7 +108,7 @@ export default function Landing() {
       <section className="py-4 px-4">
         <div className="container mx-auto">
           <h3 
-            className="text-4xl font-bold text-center mb-12 text-red-700"
+            className="text-4xl font-bold text-center mb-12 text-white"
             data-testid="text-about-title"
           >
             O Que É o Robô Cyber Hacker?
@@ -144,7 +144,7 @@ export default function Landing() {
       <section className="py-6 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto">
           <h3 
-            className="text-3xl font-bold text-center mb-8 text-red-700"
+            className="text-3xl font-bold text-center mb-8 text-white"
             data-testid="text-why-title"
           >
             Por que escolher o Robô Cyber Hacker?
@@ -193,7 +193,7 @@ export default function Landing() {
       <section className="py-6 px-4">
         <div className="container mx-auto max-w-4xl">
           <h3 
-            className="text-4xl font-bold text-center mb-12 text-red-700"
+            className="text-4xl font-bold text-center mb-12 text-white"
             data-testid="text-faq-title"
           >
             Perguntas Mais Frequentes
