@@ -93,14 +93,14 @@ export default function Landing() {
               data-testid="button-demo"
               onClick={scrollToVideos}
             >
-              Ver Demonstração
+              Ver como funciona
             </Button>
           </div>
         </div>
       </section>
 
       {/* O que é */}
-      <section className="py-16 px-4">
+      <section className="py-8 px-4">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
@@ -220,44 +220,6 @@ export default function Landing() {
             </AccordionItem>
 
             <AccordionItem value="item-4" className="bg-black border-2 border-red-600 rounded-lg px-4">
-              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
-                Como usar o robô?
-              </AccordionTrigger>
-              <AccordionContent className="text-gray-300 space-y-4">
-                <div>
-                  <p className="font-bold text-white mb-2">1. Captura Automática</p>
-                  <p>Nosso script (fornecido após cadastro) captura automaticamente cada multiplicador do jogo Aviator 
-                  e envia para nossos servidores em tempo real, sem intervenção manual.</p>
-                </div>
-                <div>
-                  <p className="font-bold text-white mb-2">2. Análise Inteligente</p>
-                  <p>O algoritmo de IA analisa as últimas 20 velas, calcula médias móveis, 
-                  detecta tendências, mede volatilidade e identifica padrões favoráveis automaticamente.</p>
-                </div>
-                <div>
-                  <p className="font-bold text-white mb-2">3. Sinais Inteligentes</p>
-                  <p>Quando o sistema detecta uma oportunidade, exibe o sinal: "APÓS: [última vela]" e 
-                  "SACAR: [multiplicador recomendado]" com cores dinâmicas baseadas no nível de confiança.</p>
-                </div>
-                <div>
-                  <p className="font-bold text-white mb-2">4. Tome Decisões</p>
-                  <p>Siga os sinais do robô ou use as estatísticas avançadas (gráfico, tendências, padrões) para 
-                  tomar suas próprias decisões informadas com base em dados reais.</p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-5" className="bg-black border-2 border-red-600 rounded-lg px-4">
-              <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
-                Como instalo o script de captura?
-              </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-lg">
-                Após o cadastro, você receberá instruções detalhadas sobre como instalar o script no seu navegador. 
-                É simples e leva menos de 2 minutos.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-6" className="bg-black border-2 border-red-600 rounded-lg px-4">
               <AccordionTrigger className="text-base text-white hover:text-red-500 hover:no-underline py-3">
                 O sistema é compatível com qual casa de apostas?
               </AccordionTrigger>
