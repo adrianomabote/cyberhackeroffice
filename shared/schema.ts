@@ -69,3 +69,18 @@ export interface PadroesResponse {
     severidade: 'info' | 'warning' | 'success';
   }>;
 }
+
+// Manutenção do sistema
+export interface ManutencaoStatus {
+  ativo: boolean;
+  mensagem: string; // Ex: "VOLTE ÀS 15:30"
+  motivo: string; // Ex: "O robô está atualizando"
+}
+
+export const manutencaoSchema = z.object({
+  ativo: z.boolean(),
+  mensagem: z.string().min(1, "Mensagem é obrigatória"),
+  motivo: z.string().min(1, "Motivo é obrigatório"),
+});
+
+export type ManutencaoInput = z.infer<typeof manutencaoSchema>;
