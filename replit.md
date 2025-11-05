@@ -16,7 +16,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - Armazenamento: sessionStorage (mostra apenas uma vez por sessão)
 
 2. **Landing Page** (`client/src/pages/landing.tsx`):
-   - **Design**: Cyberpunk profissional com paleta verde neon/cyan/azul/roxo/rosa
+   - **Design**: Tema vermelho escuro profissional (red-700/800/900) sem efeitos de brilho
    - **Header sticky**: 
      - Imagem hacker profissional (esquerda)
      - Logo "CyberHacker" (sem espaço) gradiente emerald-to-cyan, fonte normal (centro-esquerda)
@@ -24,8 +24,8 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Hero Section**: 
      - Badge com ícone Brain (IA Avançada)
      - Título "Domine o Aviator" gradiente emerald/cyan/blue
-     - Subtítulo com destaque em verde para "IA avançada"
-     - CTAs "Começar Agora" e "Ver Demonstração"
+     - Subtítulo com destaque em vermelho escuro para "100% de acerto"
+     - CTAs "Começar Agora" (vermelho escuro) e "Ver como funciona" (cinza)
    - **Stats**: 3 cards (98.5% Precisão, 1s Atualização, 24/7 Disponibilidade)
    - **Seção "O que é"**: Explicação do robô e algoritmo ML
    - **Benefícios**: 6 cards com vantagens (Análise Real-Time, ML, Sinais, Padrões, Confiança, Interface)
@@ -36,7 +36,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Asset**: attached_assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg
 
 3. **Login** (`client/src/pages/login.tsx`):
-   - Design matching landing (gradientes emerald/cyan)
+   - Design matching landing (tema vermelho escuro)
    - Header com imagem hacker + logo "CyberHacker" (fonte normal)
    - Botão voltar (ghost) para landing page
    - Formulário de login (email + senha)
@@ -44,7 +44,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - Redireciona para `/app` após login (TODO: autenticação real)
 
 4. **Cadastro** (`client/src/pages/signup.tsx`):
-   - Design matching landing (gradientes emerald/cyan)
+   - Design matching landing (tema vermelho escuro)
    - Header com imagem hacker + logo "CyberHacker" (fonte normal)
    - Botão voltar (ghost) para landing page
    - Formulário de cadastro (nome + email + senha + confirmar senha)
@@ -72,7 +72,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
   - Efeito de pulso visual quando valores atualizam
 - **Design System**: 
   - Dashboard: Cores cyber hacker (preto #000000, vermelho #ff0000, roxo #9d4edd)
-  - Landing/Login/Signup: Verde neon (#00ff88), cyan (#00bfff), emerald (#10b981), gradientes modernos
+  - Landing/Login/Signup: **Vermelho escuro profissional** (red-700 #b91c1c, red-800 #991b1b, red-900 #7f1d1d) **SEM efeitos de brilho/luz** (sem textShadow ou boxShadow)
 - **Polling Ativo**: 
   - /api/apos/cyber e /api/sacar/cyber: 1s (atualização em tempo real)
 
