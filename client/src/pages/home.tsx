@@ -108,7 +108,7 @@ export default function Home() {
                 <span
                   className="font-sans font-bold"
                   style={{
-                    color: '#9d4edd',
+                    color: '#888888',
                     fontSize: 'clamp(2rem, 5vw, 4rem)',
                     letterSpacing: '0.5rem',
                   }}

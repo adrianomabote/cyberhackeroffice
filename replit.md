@@ -10,7 +10,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
   - Interface cyberpunk minimalista - 100% conforme foto de referência
   - Header: "CYBER HACKER" em vermelho (#ff0000) com glow effect
   - Card inteligente:
-    - **Quando NÃO é hora de entrar**: Mostra "..." (três pontinhos roxos)
+    - **Quando NÃO é hora de entrar**: Mostra "..." (três pontinhos cinzas)
     - **Quando É hora de entrar**: Mostra APÓS e SACAR com valores
   - Cores dinâmicas por multiplicador:
     - 1.00x - 1.99x: Azul (#00bfff)
