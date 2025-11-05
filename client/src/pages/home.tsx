@@ -30,11 +30,11 @@ export default function Home() {
     staleTime: 0,
   });
 
-  // Função para retornar cor baseada no multiplicador
+  // Função para retornar cor baseada no multiplicador (cores da foto)
   const getMultiplicadorColor = (valor: number): string => {
-    if (valor >= 10.0) return '#ff69b4'; // Rosa (10.00x+)
+    if (valor >= 10.0) return '#ff1493'; // Rosa vibrante (10.00x+) - como na foto
     if (valor >= 2.0) return '#9d4edd';  // Roxo (2.00x - 9.99x)
-    return '#00bfff';                     // Azul (1.00x - 1.99x)
+    return '#00bfff';                     // Azul cyan (1.00x - 1.99x)
   };
 
   // Verificar se é hora de entrar
@@ -103,7 +103,7 @@ export default function Home() {
             data-testid="card-multipliers"
           >
             <div className="flex items-center justify-around gap-4">
-              {/* APÓS: */}
+              {/* APÓS: sempre mostra o último multiplicador da API */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
@@ -120,17 +120,17 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: isHoraDeEntrar && aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
+                      color: aposData?.multiplicador ? getMultiplicadorColor(aposData.multiplicador) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-apos-value"
                   >
-                    {isHoraDeEntrar && aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
+                    {aposData?.multiplicador ? `${aposData.multiplicador.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
 
-              {/* SACAR: */}
+              {/* SACAR: mostra recomendação apenas quando é hora de entrar */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
