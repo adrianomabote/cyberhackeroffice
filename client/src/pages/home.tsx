@@ -70,15 +70,15 @@ export default function Home() {
 
   // Usar sinais manuais se estiverem ativos, senão usar automáticos
   const usarSinaisManual = sinaisManualData?.ativo === true;
-  
+
   // Se receber -1 (três pontinhos), não mostrar valores
   const recebeuTresPontinhos = aposData?.multiplicador === -1;
-  
+
   // Determinar valores a exibir baseado na prioridade
   let valorAposExibir = null;
   let valorSacarExibir = null;
   let deveMostrarValores = false;
-  
+
   if (!recebeuTresPontinhos) {
     if (usarSinaisManual) {
       // Prioridade 1: Sinais manuais
