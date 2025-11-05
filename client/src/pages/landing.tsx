@@ -2,8 +2,10 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle } from 'lucide-react';
+import { useProtection } from '@/hooks/use-protection';
 
 export default function Landing() {
+  useProtection();
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}

@@ -5,8 +5,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
+import { useProtection } from '@/hooks/use-protection';
 
 export default function Signup() {
+  useProtection();
   const [, setLocation] = useLocation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

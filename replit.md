@@ -1,12 +1,44 @@
 # Sistema de Análise Aviator - CYBER HACKER
 
 ## Visão Geral
-Sistema completo de análise e previsão em tempo real do jogo Aviator com interface cyberpunk. Inclui frontend React, backend Node.js com API RESTful, PostgreSQL para persistência, algoritmo ML avançado, sistema de notificações e script de captura automática.
+Sistema completo de análise e previsão em tempo real do jogo Aviator com interface cyberpunk profissional. Inclui landing page, sistema de login/cadastro, frontend React com sinais em tempo real, backend Node.js com API RESTful, PostgreSQL para persistência, algoritmo ML avançado, sistema de notificações e script de captura automática.
 
 ## Estrutura do Projeto
 
 ### Frontend (`client/`)
-- **Página Principal** (`client/src/pages/home.tsx`): 
+
+#### **Sistema de Navegação**
+1. **Splash Screen** (`client/src/pages/splash.tsx`):
+   - Tela inicial com "ROBÔ CYBER HACKER" em vermelho neon
+   - Animação de "processando sistema"
+   - Barra de loading animada
+   - Duração: 3 segundos
+   - Armazenamento: sessionStorage (mostra apenas uma vez por sessão)
+
+2. **Landing Page** (`client/src/pages/landing.tsx`):
+   - **Header sticky**: Logo esquerda + Botões "ENTRAR" e "CRIAR CONTA" direita
+   - **Hero Section**: Título impactante + CTA "COMEÇAR AGORA"
+   - **Seção "O que é"**: Explicação do robô e algoritmo ML
+   - **Benefícios**: 6 cards com vantagens (Análise Real-Time, ML, Sinais, Padrões, Confiança, Interface)
+   - **Como Funciona**: 4 passos (Captura → Análise → Sinais → Decisões)
+   - **Vídeos Demonstrativos**: 2 placeholders para vídeos (Como Usar + Resultados)
+   - **CTA Final**: "PRONTO PARA COMEÇAR?"
+   - **Footer**: Copyright
+
+3. **Login** (`client/src/pages/login.tsx`):
+   - Formulário de login (email + senha)
+   - Botão voltar para landing page
+   - Link para criar conta
+   - Redireciona para `/app` após login (TODO: autenticação real)
+
+4. **Cadastro** (`client/src/pages/signup.tsx`):
+   - Formulário de cadastro (nome + email + senha + confirmar senha)
+   - Validação de senhas
+   - Botão voltar para landing page
+   - Link para login
+   - Redireciona para `/app` após cadastro (TODO: registro real)
+
+5. **Dashboard de Sinais** (`client/src/pages/home.tsx`): 
   - Interface cyberpunk minimalista - 100% conforme foto de referência
   - Header: "CYBER HACKER" em vermelho (#ff0000) com glow effect
   - Card inteligente com sistema de cooldown:
@@ -125,12 +157,26 @@ Analisa constantemente as últimas 20 velas e detecta **5 padrões favoráveis**
 
 ## Como Funciona
 
-1. **Usuário acessa** → Interface cyberpunk carrega
+### Fluxo de Navegação:
+1. **Primeira visita** → Splash screen (3s) → Landing page
+2. **Landing page** → Usuário lê sobre o robô → Clica "CRIAR CONTA"
+3. **Cadastro** → Preenche dados → Redireciona para `/app`
+4. **Dashboard `/app`** → Interface cyberpunk com sinais em tempo real
+
+### Fluxo de Dados:
+1. **Usuário acessa `/app`** → Dashboard de sinais carrega
 2. **Script no console** → Captura multiplicadores a cada 1s
 3. **POST /api/velas/cyber** → Backend armazena no PostgreSQL
 4. **Frontend polling** → Atualiza cards, gráfico e estatísticas
 5. **Detecção de padrões** → Sistema monitora e notifica via toasts
 6. **Algoritmo ML** → Calcula previsão usando regressão + EMA + padrões
+
+### Rotas Disponíveis:
+- `/` - Landing page
+- `/login` - Tela de login
+- `/signup` - Tela de cadastro
+- `/app` - Dashboard de sinais (ex-home)
+- `/admin/cyber` - Painel administrativo
 
 ## Tecnologias
 - React + TypeScript + Tailwind CSS

@@ -27,7 +27,6 @@ function Router() {
 }
 
 function App() {
-  useProtection();
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
