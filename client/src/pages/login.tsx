@@ -23,7 +23,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-black border-gray-700 relative z-10">
+      <Card className="w-full max-w-md bg-black border-2 relative z-10" style={{ borderColor: '#ff0000' }}>
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-3 mb-4">
             <Link href="/">
@@ -39,10 +39,15 @@ export default function Login() {
               <img 
                 src={hackerImage} 
                 alt="CyberHacker" 
-                className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
+                className="w-10 h-10 rounded-lg object-cover border-2" 
+                style={{ borderColor: '#ff0000' }}
               />
               <h1 
-                className="text-lg font-bold text-red-600"
+                className="text-lg font-bold"
+                style={{ 
+                  color: '#ff0000',
+                  textShadow: '0 0 20px rgba(255, 0, 0, 0.5)'
+                }}
                 data-testid="text-title"
               >
                 ROBÔ CYBER HACKER
@@ -65,7 +70,10 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-red-600 focus:ring-red-600"
+                className="bg-gray-800 border-gray-700 text-white"
+                style={{
+                  '--tw-ring-color': '#ff0000'
+                } as React.CSSProperties}
                 data-testid="input-email"
               />
             </div>
@@ -78,7 +86,10 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-red-600 focus:ring-red-600"
+                className="bg-gray-800 border-gray-700 text-white"
+                style={{
+                  '--tw-ring-color': '#ff0000'
+                } as React.CSSProperties}
                 data-testid="input-password"
               />
             </div>
@@ -86,14 +97,18 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-red-600 text-white hover:bg-red-700 font-semibold"
+              className="w-full text-white font-semibold"
+              style={{
+                backgroundColor: '#ff0000',
+                boxShadow: '0 0 20px rgba(255, 0, 0, 0.3)'
+              }}
               data-testid="button-submit"
             >
               Entrar
             </Button>
             <p className="text-sm text-gray-400 text-center" data-testid="text-signup-link">
               Não tem uma conta?{' '}
-              <Link href="/signup" className="text-red-400 hover:text-red-300 underline font-semibold">
+              <Link href="/signup" className="underline font-semibold" style={{ color: '#ff0000' }}>
                 Registre-se
               </Link>
             </p>
