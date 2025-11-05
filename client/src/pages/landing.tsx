@@ -1,15 +1,15 @@
+
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock, ChevronDown, ChevronUp, Users, DollarSign } from 'lucide-react';
+import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
 import { useState } from 'react';
 import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
 
 export default function Landing() {
   useProtection();
-  const [showGuide, setShowGuide] = useState(false);
   
   const scrollToVideos = () => {
     const videosSection = document.getElementById('videos-section');
@@ -133,54 +133,43 @@ export default function Landing() {
 
       {/* Por que escolher o Robô Cyber Hacker */}
       <section className="py-16 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
             style={{ textShadow: '0 0 20px #ff0000' }}
-            data-testid="text-why-choose-title"
+            data-testid="text-why-title"
           >
             Por que escolher o Robô Cyber Hacker?
           </h3>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="max-w-4xl mx-auto">
             <Card className="bg-black border-2 border-red-600">
-              <CardHeader>
-                <div className="flex flex-col items-center gap-4">
-                  <Users className="w-12 h-12 text-red-500" />
-                  <CardTitle className="text-xl text-white text-center">+10.000 Moçambicanos</CardTitle>
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-lg text-white">
+                      <span className="font-bold text-red-500">Mais de 10.000 moçambicanos</span> já estão faturando todos os dias usando o Robô Cyber Hacker
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-lg text-white">
+                      Sistema de <span className="font-bold text-red-500">Inteligência Artificial</span> que analisa o Aviator em tempo real
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-lg text-white">
+                      <span className="font-bold text-red-500">100% de acerto</span> - o robô mostra exatamente onde o Aviator vai cair
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <CheckCircle className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
+                    <p className="text-lg text-white">
+                      Suporte <span className="font-bold text-red-500">24/7</span> para todos os usuários
+                    </p>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 text-center">
-                  Mais de 10 mil moçambicanos já estão faturando todos os dias usando o Robô Cyber Hacker
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-black border-2 border-red-600">
-              <CardHeader>
-                <div className="flex flex-col items-center gap-4">
-                  <Brain className="w-12 h-12 text-red-500" />
-                  <CardTitle className="text-xl text-white text-center">100% de Acerto</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 text-center">
-                  Nosso robô mostra onde o Aviator vai cair com precisão absoluta, garantindo lucros consistentes
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-black border-2 border-red-600">
-              <CardHeader>
-                <div className="flex flex-col items-center gap-4">
-                  <Clock className="w-12 h-12 text-red-500" />
-                  <CardTitle className="text-xl text-white text-center">Análise em Tempo Real</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-300 text-center">
-                  Sistema de IA avançada analisa o Aviator em tempo real a cada segundo, 24 horas por dia
-                </p>
               </CardContent>
             </Card>
           </div>
@@ -197,70 +186,94 @@ export default function Landing() {
           >
             Perguntas Frequentes
           </h3>
-          
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="item-1" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-white text-lg font-semibold hover:text-red-500">
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
                 Como funciona o robô?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-base">
-                O Robô Cyber Hacker usa um sistema de Inteligência Artificial avançada que analisa o Aviator em tempo real. 
-                A cada segundo, o robô processa padrões, tendências e dados históricos para identificar com precisão onde o 
-                Aviator vai cair, garantindo que você entre e saia no momento certo com 100% de acerto.
+              <AccordionContent className="text-gray-300 text-lg">
+                O Robô Cyber Hacker usa um sistema de Inteligência Artificial avançado que analisa o Aviator em tempo real. 
+                Nosso algoritmo processa milhares de dados por segundo para identificar padrões e prever com precisão onde o multiplicador vai cair, 
+                garantindo que você receba sinais precisos no momento certo.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-white text-lg font-semibold hover:text-red-500">
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
                 O Robô é confiável?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-base">
-                Sim! O Robô Cyber Hacker mostra onde o Aviator vai cair com 100% de acerto, garantindo que você saia 
-                lucrando. Mais de 10 mil moçambicanos já confiam no nosso sistema e estão faturando todos os dias. 
-                Nossa tecnologia de IA é constantemente atualizada para manter a máxima precisão.
+              <AccordionContent className="text-gray-300 text-lg">
+                Sim! O robô mostra onde o Aviator vai cair com <span className="font-bold text-red-500">100% de acerto</span>, 
+                garantindo que você sai lucrando. Mais de 10.000 moçambicanos já confiam no nosso sistema e faturam todos os dias.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-3" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-white text-lg font-semibold hover:text-red-500">
-                Como usar o robô?
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+                Quanto custa o acesso ao robô?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-base">
-                Após o cadastro, você receberá acesso ao painel do robô e um script de instalação simples. 
-                Basta instalar o script no seu navegador (leva menos de 2 minutos), abrir o Aviator e deixar 
-                o robô analisar em tempo real. O sistema mostrará os sinais de quando entrar e onde sacar 
-                automaticamente.
+              <AccordionContent className="text-gray-300 text-lg">
+                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-500">450MT por 1 dia</span>. 
+                Ou seja, se você pagar agora, terá acesso completo até amanhã na mesma hora que pagou. 
+                É um investimento que se paga rapidamente com os lucros que você vai obter!
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-4" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-white text-lg font-semibold hover:text-red-500">
-                Quanto custa o acesso ao robô?
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+                Como usar o robô?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-base">
-                O acesso ao Robô Cyber Hacker custa apenas <span className="text-red-500 font-bold">450MT por 1 dia</span>. 
-                Isso significa que se você pagar agora, terá acesso completo até amanhã na mesma hora que efetuou o pagamento. 
-                É um investimento mínimo para começar a lucrar com o Aviator usando nossa tecnologia de IA avançada.
+              <AccordionContent className="text-gray-300 space-y-4">
+                <div>
+                  <p className="font-bold text-white mb-2">1. Captura Automática</p>
+                  <p>Nosso script (fornecido após cadastro) captura automaticamente cada multiplicador do jogo Aviator 
+                  e envia para nossos servidores em tempo real, sem intervenção manual.</p>
+                </div>
+                <div>
+                  <p className="font-bold text-white mb-2">2. Análise Inteligente</p>
+                  <p>O algoritmo de IA analisa as últimas 20 velas, calcula médias móveis, 
+                  detecta tendências, mede volatilidade e identifica padrões favoráveis automaticamente.</p>
+                </div>
+                <div>
+                  <p className="font-bold text-white mb-2">3. Sinais Inteligentes</p>
+                  <p>Quando o sistema detecta uma oportunidade, exibe o sinal: "APÓS: [última vela]" e 
+                  "SACAR: [multiplicador recomendado]" com cores dinâmicas baseadas no nível de confiança.</p>
+                </div>
+                <div>
+                  <p className="font-bold text-white mb-2">4. Tome Decisões</p>
+                  <p>Siga os sinais do robô ou use as estatísticas avançadas (gráfico, tendências, padrões) para 
+                  tomar suas próprias decisões informadas com base em dados reais.</p>
+                </div>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-white text-lg font-semibold hover:text-red-500">
-                O sistema é compatível com qual plataforma?
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+                Como instalo o script de captura?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-base">
-                O Robô Cyber Hacker funciona em qualquer plataforma que rode o Aviator. Basta ter um navegador 
-                moderno como Chrome, Firefox ou Edge. O sistema é 100% online e não requer downloads pesados.
+              <AccordionContent className="text-gray-300 text-lg">
+                Após o cadastro, você receberá instruções detalhadas sobre como instalar o script no seu navegador. 
+                É simples e leva menos de 2 minutos.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-6" className="bg-black border-2 border-red-600 rounded-lg px-6">
-              <AccordionTrigger className="text-white text-lg font-semibold hover:text-red-500">
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
                 Preciso deixar o navegador aberto?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300 text-base">
+              <AccordionContent className="text-gray-300 text-lg">
                 Sim, o script captura os dados em tempo real enquanto você joga. Mantenha a aba do Aviator aberta 
-                para que o sistema funcione corretamente e forneça os sinais precisos de entrada e saída.
+                para que o sistema funcione corretamente.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" className="bg-black border-2 border-red-600 rounded-lg px-6">
+              <AccordionTrigger className="text-xl text-white hover:text-red-500 hover:no-underline">
+                O sistema é compatível com qual plataforma?
+              </AccordionTrigger>
+              <AccordionContent className="text-gray-300 text-lg">
+                O Robô Cyber Hacker funciona em qualquer plataforma que rode o Aviator. 
+                Basta ter um navegador moderno (Chrome, Firefox, Edge).
               </AccordionContent>
             </AccordionItem>
           </Accordion>
