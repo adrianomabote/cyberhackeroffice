@@ -15,9 +15,9 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
-              src="https://cdn-icons-png.flaticon.com/512/6133/6133884.png"
+              src="https://cdn-icons-png.flaticon.com/512/1573/1573812.png"
               alt="CyberHacker" 
-              className="w-8 h-8 rounded object-cover"
+              className="w-6 h-6 rounded object-cover"
               data-testid="img-logo"
             />
             <h1 
@@ -38,7 +38,7 @@ export default function Landing() {
               </Link>
               <Link href="/signup">
                 <Button 
-                  className="bg-white text-black hover:bg-gray-200 font-semibold"
+                  className="bg-red-600 text-white hover:bg-red-700 font-semibold"
                   data-testid="button-signup"
                 >
                   Registre-se
