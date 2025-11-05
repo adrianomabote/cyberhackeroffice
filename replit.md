@@ -141,18 +141,18 @@ Servidor roda na porta 5000.
 
 ## Sistema de Manutenção Manual
 
-### Página Admin (`/admin`)
-- **Acesso**: Via URL `/admin`
+### Página Admin (`/admin/cyber`)
+- **Acesso**: Via URL `/admin/cyber`
 - **Funcionalidades**:
   - Ativar manutenção: Define mensagem de retorno (ex: "VOLTE ÀS 15:30")
-  - Motivo fixo: Sempre mostra "O robô está atualizando"
+  - Motivo fixo: "O ROBÔ ESTÁ ATUALIZANDO. ENTRE NO HORÁRIO INDICADO PARA CONTINUAR USANDO O SISTEMA."
   - Desativar manutenção: Retorna sistema ao normal
 - **Armazenamento**: In-memory (temporário)
 
 ### Tela de Manutenção
 - **Ativação**: Quando `manutencao.ativo === true`
-- **Display**: Mostra mensagem de retorno e motivo
-- **Atualização**: Verifica status a cada 5 segundos
+- **Display**: Mostra mensagem de retorno e motivo fixo
+- **Atualização**: Polling automático
 - **Design**: Cyberpunk matching com resto do app
 
 ### API Endpoints

@@ -79,8 +79,20 @@ export interface ManutencaoStatus {
 
 export const manutencaoSchema = z.object({
   ativo: z.boolean(),
-  mensagem: z.string().min(1, "Mensagem é obrigatória"),
-  motivo: z.string().min(1, "Motivo é obrigatório"),
-});
+  mensagem: z.string(),
+  motivo: z.string(),
+}).refine(
+  (data) => {
+    // Se ativo = true, mensagem e motivo são obrigatórios
+    if (data.ativo) {
+      return data.mensagem.trim().length > 0 && data.motivo.trim().length > 0;
+    }
+    // Se ativo = false, não precisa validar
+    return true;
+  },
+  {
+    message: "Mensagem e motivo são obrigatórios quando ativo = true",
+  }
+);
 
 export type ManutencaoInput = z.infer<typeof manutencaoSchema>;

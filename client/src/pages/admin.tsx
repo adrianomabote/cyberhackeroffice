@@ -6,7 +6,7 @@ import type { ManutencaoStatus } from "@shared/schema";
 
 export default function Admin() {
   const [mensagem, setMensagem] = useState("");
-  const motivo = "O robô está atualizando";
+  const motivo = "O ROBÔ ESTÁ ATUALIZANDO. ENTRE NO HORÁRIO INDICADO PARA CONTINUAR USANDO O SISTEMA.";
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -28,7 +28,6 @@ export default function Admin() {
         description: "Sistema entrará em manutenção imediatamente",
       });
       setMensagem("");
-      setMotivo("");
     },
     onError: () => {
       toast({
@@ -44,7 +43,7 @@ export default function Admin() {
       const res = await apiRequest("POST", "/api/manutencao/cyber", {
         ativo: false,
         mensagem: "",
-        motivo: "O robô está atualizando",
+        motivo,
       });
       return res.json();
     },
