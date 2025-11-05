@@ -1,12 +1,14 @@
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock } from 'lucide-react';
+import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
+import { useState } from 'react';
 import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
 
 export default function Landing() {
   useProtection();
+  const [showGuide, setShowGuide] = useState(false);
   
   return (
     <div className="min-h-screen bg-black text-white">
@@ -24,7 +26,7 @@ export default function Landing() {
               className="text-base font-bold text-white"
               data-testid="text-logo"
             >
-              Robô Cyber Hacker
+              CyberHacker
             </h1>
           </div>
           <div className="flex gap-3 ml-auto">
@@ -205,84 +207,92 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Como Funciona */}
+      {/* Como usar o robô */}
       <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <h3 
-            className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-            data-testid="text-how-title"
-          >
-            Como Funciona
-          </h3>
-          <div className="max-w-4xl mx-auto space-y-6">
-            <Card className="bg-gradient-to-r from-emerald-900/20 to-transparent border-emerald-500/30">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 flex items-center justify-center text-black font-bold text-xl">
-                    1
-                  </div>
-                  <CardTitle className="text-2xl text-emerald-400">Captura Automática</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white ml-16 text-lg" data-testid="text-step-1">
-                  Nosso script (fornecido após cadastro) captura automaticamente cada multiplicador do jogo Aviator 
-                  e envia para nossos servidores em tempo real, sem intervenção manual.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-r from-cyan-900/20 to-transparent border-cyan-500/30">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-black font-bold text-xl">
-                    2
-                  </div>
-                  <CardTitle className="text-2xl text-cyan-400">Análise Inteligente</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white ml-16 text-lg" data-testid="text-step-2">
-                  O algoritmo de IA analisa as últimas 20 velas, calcula médias móveis (MA5, MA10, MA20), 
-                  detecta tendências, mede volatilidade e identifica 5 padrões favoráveis diferentes automaticamente.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-r from-blue-900/20 to-transparent border-blue-500/30">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-black font-bold text-xl">
-                    3
-                  </div>
-                  <CardTitle className="text-2xl text-blue-400">Sinais Inteligentes</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white ml-16 text-lg" data-testid="text-step-3">
-                  Quando o sistema detecta uma oportunidade (pontuação ≥6), exibe o sinal: "APÓS: [última vela]" e 
-                  "SACAR: [multiplicador recomendado]" com cores dinâmicas baseadas no nível de confiança.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-r from-purple-900/20 to-transparent border-purple-500/30">
-              <CardHeader>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-black font-bold text-xl">
-                    4
-                  </div>
-                  <CardTitle className="text-2xl text-purple-400">Tome Decisões</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white ml-16 text-lg" data-testid="text-step-4">
-                  Siga os sinais do robô ou use as estatísticas avançadas (gráfico, tendências, padrões) para 
-                  tomar suas próprias decisões informadas com base em dados reais.
-                </p>
-              </CardContent>
-            </Card>
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-8">
+            <Button
+              size="lg"
+              onClick={() => setShowGuide(!showGuide)}
+              className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xl px-8 py-6 font-bold hover:from-emerald-600 hover:to-cyan-600"
+              data-testid="button-toggle-guide"
+            >
+              <span className="mr-2">Como usar o robô?</span>
+              {showGuide ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
+            </Button>
           </div>
+
+          {showGuide && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+              <Card className="bg-gradient-to-r from-emerald-900/20 to-transparent border-emerald-500/30">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 flex items-center justify-center text-black font-bold text-xl">
+                      1
+                    </div>
+                    <CardTitle className="text-2xl text-emerald-400">Captura Automática</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white ml-16 text-lg" data-testid="text-step-1">
+                    Nosso script (fornecido após cadastro) captura automaticamente cada multiplicador do jogo Aviator 
+                    e envia para nossos servidores em tempo real, sem intervenção manual.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-cyan-900/20 to-transparent border-cyan-500/30">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-black font-bold text-xl">
+                      2
+                    </div>
+                    <CardTitle className="text-2xl text-cyan-400">Análise Inteligente</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white ml-16 text-lg" data-testid="text-step-2">
+                    O algoritmo de IA analisa as últimas 20 velas, calcula médias móveis (MA5, MA10, MA20), 
+                    detecta tendências, mede volatilidade e identifica 5 padrões favoráveis diferentes automaticamente.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-blue-900/20 to-transparent border-blue-500/30">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-black font-bold text-xl">
+                      3
+                    </div>
+                    <CardTitle className="text-2xl text-blue-400">Sinais Inteligentes</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white ml-16 text-lg" data-testid="text-step-3">
+                    Quando o sistema detecta uma oportunidade (pontuação ≥6), exibe o sinal: "APÓS: [última vela]" e 
+                    "SACAR: [multiplicador recomendado]" com cores dinâmicas baseadas no nível de confiança.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-r from-purple-900/20 to-transparent border-purple-500/30">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-black font-bold text-xl">
+                      4
+                    </div>
+                    <CardTitle className="text-2xl text-purple-400">Tome Decisões</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-white ml-16 text-lg" data-testid="text-step-4">
+                    Siga os sinais do robô ou use as estatísticas avançadas (gráfico, tendências, padrões) para 
+                    tomar suas próprias decisões informadas com base em dados reais.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </section>
 
