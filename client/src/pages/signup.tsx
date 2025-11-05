@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
-import hackerImage from '@assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg';
+import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
 
 export default function Signup() {
   useProtection();

@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
-import hackerImage from '@assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg';
+import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
 
 export default function Landing() {
   useProtection();
