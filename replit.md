@@ -172,6 +172,24 @@ Servidor roda na porta 5000.
 - GET /api/sinais-manual/cyber - Retorna sinais manuais
 - POST /api/sinais-manual/cyber - Define sinais com { ativo, apos, sacar }
 
+## Sistema de Proteção de Código
+
+### Camadas de Segurança Implementadas:
+1. **Desabilitar clique direito** - Previne "Inspecionar elemento"
+2. **Desabilitar seleção de texto** - Impede copiar conteúdo
+3. **Bloqueio de DevTools** - Desabilita F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+4. **Bloqueio de View Source** - Desabilita Ctrl+U
+5. **Bloqueio de Save/Print** - Desabilita Ctrl+S, Ctrl+P
+6. **Bloqueio de Copy/Cut** - Desabilita Ctrl+C, Ctrl+X, Ctrl+A
+7. **Detecção de DevTools aberto** - Redireciona para "ACESSO NEGADO"
+8. **Desabilita Console** - Bloqueia console.log e métodos relacionados
+9. **Proteção de imagens** - Impede drag de imagens
+10. **CSS anti-seleção** - Força user-select: none em todos elementos
+11. **Meta tags de proteção** - noindex, no-cache, pragma
+12. **Ofuscação** - Código minificado e ofuscado no build de produção
+
+**Nota**: Estas são camadas de dificultação. Usuários muito técnicos ainda podem acessar o código através de proxies ou ferramentas avançadas, mas 99% dos usuários comuns serão bloqueados.
+
 ## Estado Atual - COMPLETO
 ✅ PostgreSQL com Drizzle ORM (persistência)
 ✅ Frontend cyberpunk com 6 cards + gráfico
@@ -182,6 +200,7 @@ Servidor roda na porta 5000.
 ✅ Sistema de manutenção manual (página admin + tela de manutenção)
 ✅ Sistema de sinais manuais (envio manual de APÓS e SACAR)
 ✅ Script de captura automática
+✅ Proteção de código fonte (12 camadas de segurança)
 ✅ Testes E2E validados
 ✅ Guards contra crashes (optional chaining, arrays vazios)
 ✅ CORS habilitado
