@@ -64,7 +64,7 @@ export default function Landing() {
             Domine o Aviator
           </h2>
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
-            O robô mostra onde o aviator vai cair com <span className="font-semibold text-red-500">100% de acerto</span> usando IA avançada em tempo real
+            O robô mostra onde o Aviator vai cair com <span className="font-semibold text-red-500">100% de acerto</span> usando IA avançada em tempo real
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/signup">
