@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
+import hackerImage from '@assets/stock_images/hacker_cyberpunk_neo_193d439f.jpg';
 
 export default function Login() {
   useProtection();
@@ -21,26 +22,36 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-gray-900 border-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5"></div>
+      
+      <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 relative z-10">
         <CardHeader className="space-y-1">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-3 mb-4">
             <Link href="/">
-              <Button variant="ghost" size="icon" data-testid="button-back">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="hover:bg-gray-800"
+                data-testid="button-back"
+              >
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Button>
             </Link>
-            <h1 
-              className="text-2xl font-bold"
-              style={{
-                color: '#ff0000',
-                textShadow: '0 0 10px #ff0000',
-                fontFamily: 'Orbitron, monospace'
-              }}
-              data-testid="text-title"
-            >
-              ROBÔ CYBER HACKER
-            </h1>
+            <div className="flex items-center gap-2">
+              <img 
+                src={hackerImage} 
+                alt="Cyber Hacker" 
+                className="w-10 h-10 rounded-lg object-cover border-2 border-emerald-500/50"
+              />
+              <h1 
+                className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+                style={{ fontFamily: 'Orbitron, monospace' }}
+                data-testid="text-title"
+              >
+                Cyber Hacker
+              </h1>
+            </div>
           </div>
           <CardTitle className="text-2xl text-white" data-testid="text-login-title">Entrar</CardTitle>
           <CardDescription className="text-gray-400" data-testid="text-login-subtitle">
@@ -50,7 +61,7 @@ export default function Login() {
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
+              <Label htmlFor="email" className="text-gray-300">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -58,12 +69,12 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white"
+                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
                 data-testid="input-email"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">Senha</Label>
+              <Label htmlFor="password" className="text-gray-300">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -71,7 +82,7 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white"
+                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
                 data-testid="input-password"
               />
             </div>
@@ -79,15 +90,15 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-red-600 hover:bg-red-700 text-white"
+              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-black font-semibold"
               data-testid="button-submit"
             >
-              ENTRAR
+              Entrar
             </Button>
             <p className="text-sm text-gray-400 text-center" data-testid="text-signup-link">
               Não tem uma conta?{' '}
-              <Link href="/signup" className="text-red-500 hover:text-red-400 underline">
-                Criar conta
+              <Link href="/signup" className="text-emerald-400 hover:text-emerald-300 underline font-semibold">
+                Registre-se
               </Link>
             </p>
           </CardFooter>
