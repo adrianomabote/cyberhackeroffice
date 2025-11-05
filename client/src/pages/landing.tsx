@@ -12,16 +12,16 @@ export default function Landing() {
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white bg-black backdrop-blur">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
               src="https://cdn-icons-png.flaticon.com/512/1573/1573812.png"
               alt="CyberHacker" 
-              className="w-6 h-6 rounded object-cover"
+              className="w-5 h-5 rounded object-cover"
               data-testid="img-logo"
             />
             <h1 
-              className="text-xl font-bold text-white"
+              className="text-base font-bold text-white"
               data-testid="text-logo"
             >
               CyberHacker
