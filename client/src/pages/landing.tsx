@@ -99,6 +99,11 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Separador */}
+      <div className="container mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      </div>
+
       {/* O que é */}
       <section className="py-2 px-4">
         <div className="container mx-auto">
@@ -130,6 +135,11 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Separador */}
+      <div className="container mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      </div>
 
       {/* Por que escolher o Robô Cyber Hacker */}
       <section className="py-8 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
@@ -175,6 +185,11 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Separador */}
+      <div className="container mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      </div>
 
       {/* Perguntas Frequentes */}
       <section className="py-8 px-4">
@@ -243,6 +258,11 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Separador */}
+      <div className="container mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      </div>
+
       {/* Vídeos */}
       <section id="videos-section" className="py-8 px-4 bg-gray-900/50">
         <div className="container mx-auto">
@@ -283,6 +303,11 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Separador */}
+      <div className="container mx-auto px-4">
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-700/30 to-transparent"></div>
+      </div>
 
       {/* CTA Final */}
       <section className="py-20 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
