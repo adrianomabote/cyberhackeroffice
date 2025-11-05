@@ -89,13 +89,15 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   if (pontos >= 6) {
     sinal = "ENTRAR";
     confianca = "alta";
-    // Confiança alta: recomendar sacar em multiplicador mais conservador
+    // Confiança alta: recomendar sacar baseado na média geral
     if (mediaGeral < 2.5) {
       multiplicadorSacar = 2.0; // Após sequência muito baixa, sacar em 2.00x
     } else if (mediaGeral < 3.5) {
       multiplicadorSacar = 3.0; // Média normal, sacar em 3.00x
-    } else {
+    } else if (mediaGeral < 5.0) {
       multiplicadorSacar = 4.0; // Média alta, pode arriscar 4.00x
+    } else {
+      multiplicadorSacar = 10.0; // Média muito alta, pode arriscar 10.00x
     }
   } else if (pontos >= 4) {
     sinal = "ENTRAR";

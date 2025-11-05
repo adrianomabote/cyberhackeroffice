@@ -82,8 +82,9 @@ Analisa constantemente as últimas 20 velas e detecta **5 padrões favoráveis**
 
 ### Lógica de Multiplicador de Saída:
 - **Média Geral <2.5**: Sacar em 2.00x (conservador)
-- **Média Geral <3.5**: Sacar em 2.50x ou 3.00x
-- **Média Geral ≥3.5**: Sacar em 4.00x (mais arriscado)
+- **Média Geral 2.5-3.5**: Sacar em 3.00x (moderado)
+- **Média Geral 3.5-5.0**: Sacar em 4.00x (arriscado)
+- **Média Geral ≥5.0**: Sacar em 10.00x (muito arriscado)
 
 ## Sistema de Estatísticas
 
