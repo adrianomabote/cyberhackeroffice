@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
 import { useState } from 'react';
-import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
+import hackerImage from '@assets/IMG-20251105-WA0172_1762361840807.jpg';
 
 export default function Landing() {
   useProtection();
@@ -31,7 +31,7 @@ export default function Landing() {
               data-testid="img-hacker"
             />
             <h1 
-              className="text-base font-bold text-red-600"
+              className="text-base font-bold text-white"
               data-testid="text-logo"
             >
               CyberHacker
