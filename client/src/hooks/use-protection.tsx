@@ -1,7 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useProtection() {
+  const [devToolsOpen, setDevToolsOpen] = useState(false);
+
   useEffect(() => {
+    // Detectar se DevTools está aberto
+    const detectDevTools = () => {
+      const threshold = 160;
+      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+      
+      const isOpen = widthThreshold || heightThreshold;
+      setDevToolsOpen(isOpen);
+      
+      // Ocultar conteúdo se DevTools estiver aberto
+      if (isOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    };
+
     // Desabilitar clique direito
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
@@ -64,6 +83,10 @@ export function useProtection() {
     document.addEventListener('selectstart', handleSelectStart);
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('dragstart', handleDragStart);
+    
+    // Verificar DevTools a cada 1 segundo
+    const devToolsInterval = setInterval(detectDevTools, 1000);
+    detectDevTools(); // Verificar imediatamente
 
     // Adicionar CSS para prevenir seleção
     const style = document.createElement('style');
@@ -92,15 +115,71 @@ export function useProtection() {
     `;
     document.head.appendChild(style);
 
+    // Criar overlay de bloqueio de DevTools
+    const overlay = document.createElement('div');
+    overlay.id = 'devtools-overlay';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000000;
+      color: #ff0000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      font-family: monospace;
+      text-align: center;
+      padding: 2rem;
+    `;
+    overlay.innerHTML = `
+      <div style="font-size: 3rem; font-weight: bold; margin-bottom: 2rem; text-shadow: 0 0 20px #ff0000;">
+        ⚠️ DEVTOOLS DETECTADO ⚠️
+      </div>
+      <div style="font-size: 1.5rem; margin-bottom: 1rem; color: #ffffff;">
+        Feche as ferramentas de desenvolvedor para continuar
+      </div>
+      <div style="font-size: 1rem; color: #888888; margin-top: 2rem;">
+        Pressione F12 ou Ctrl+Shift+I para fechar
+      </div>
+      <div style="font-size: 0.875rem; color: #444444; margin-top: 1rem;">
+        A página voltará automaticamente quando você fechar
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Atualizar visibilidade do overlay
+    const updateOverlay = () => {
+      const overlayElement = document.getElementById('devtools-overlay');
+      if (overlayElement) {
+        overlayElement.style.display = devToolsOpen ? 'flex' : 'none';
+      }
+    };
+
     // Limpar listeners ao desmontar
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('selectstart', handleSelectStart);
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('dragstart', handleDragStart);
+      clearInterval(devToolsInterval);
       if (style.parentNode) {
         style.parentNode.removeChild(style);
       }
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
     };
   }, []);
+
+  // Atualizar overlay quando devToolsOpen mudar
+  useEffect(() => {
+    const overlayElement = document.getElementById('devtools-overlay');
+    if (overlayElement) {
+      overlayElement.style.display = devToolsOpen ? 'flex' : 'none';
+    }
+  }, [devToolsOpen]);
 }
