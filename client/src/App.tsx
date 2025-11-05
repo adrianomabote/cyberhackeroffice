@@ -9,6 +9,7 @@ import Splash from "@/pages/splash";
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
+import Subscription from "@/pages/subscription";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
@@ -18,9 +19,10 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
+      <Route path="/signup" component={Subscription} />
+      <Route path="/subscription" component={Subscription} />
       <Route path="/app" component={Home} />
-      <Route path="/admin/cyber" component={Admin} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -32,7 +34,7 @@ function App() {
   useEffect(() => {
     // Verificar se já viu o splash antes (na sessão atual)
     const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
-    
+
     if (hasSeenSplash) {
       setShowSplash(false);
     } else {
@@ -49,7 +51,7 @@ function App() {
   if (showSplash) {
     return <Splash />;
   }
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
