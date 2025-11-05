@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
-import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
+import robotImage from '@assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png';
 
 export default function Login() {
   useProtection();
@@ -35,6 +35,16 @@ export default function Login() {
                 <ArrowLeft className="w-5 h-5 text-gray-400" />
               </Button>
             </Link>
+            <div className="flex items-center gap-3 ml-2">
+              <img 
+                src={robotImage}
+                alt="Robô CyberHacker" 
+                className="w-10 h-10 rounded-lg object-cover"
+              />
+              <h1 className="text-base font-bold text-white">
+                ROBÔ CYBER HACKER
+              </h1>
+            </div>
           </div>
           <CardTitle className="text-2xl text-white" data-testid="text-login-title">Entrar</CardTitle>
           <CardDescription className="text-gray-400" data-testid="text-login-subtitle">
