@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse } from "@shared/schema";
+import { insertVelaSchema, manutencaoSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus } from "@shared/schema";
 import { z } from "zod";
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -495,6 +495,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         volatilidade: { valor: 0, nivel: 'baixa' },
         extremos: { maximo: 0, minimo: 0, amplitude: 0 },
         error: "Erro ao calcular estatísticas",
+      });
+    }
+  });
+
+  // GET /api/manutencao/cyber - Retorna status de manutenção
+  app.get("/api/manutencao/cyber", async (req, res) => {
+    try {
+      const status = await storage.getManutencaoStatus();
+      res.json(status);
+    } catch (error) {
+      console.error('[MANUTENÇÃO] Erro ao buscar status:', error);
+      res.status(500).json({
+        ativo: false,
+        mensagem: "",
+        motivo: "",
+        error: "Erro ao buscar status de manutenção",
+      });
+    }
+  });
+
+  // POST /api/manutencao/cyber - Ativa/desativa manutenção
+  app.post("/api/manutencao/cyber", async (req, res) => {
+    try {
+      const validatedData = manutencaoSchema.parse(req.body);
+      const status = await storage.setManutencaoStatus(validatedData);
+      
+      console.log('[MANUTENÇÃO] Status alterado:', {
+        ativo: status.ativo,
+        mensagem: status.mensagem,
+        motivo: status.motivo,
+      });
+      
+      res.json({
+        success: true,
+        data: status,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+          details: error.errors,
+        });
+      }
+      
+      console.error('[MANUTENÇÃO] Erro ao atualizar status:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao atualizar status de manutenção",
       });
     }
   });
