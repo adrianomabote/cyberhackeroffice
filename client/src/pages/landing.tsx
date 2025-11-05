@@ -76,7 +76,7 @@ export default function Landing() {
           <p className="text-xl md:text-2xl text-white mb-8 max-w-3xl mx-auto" data-testid="text-hero-subtitle">
             O robô mostra onde o Aviator vai cair com <span className="font-semibold text-red-500">100% de acerto</span> usando IA avançada em tempo real
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link href="/signup">
               <Button 
                 size="lg" 
@@ -100,7 +100,7 @@ export default function Landing() {
       </section>
 
       {/* Separador */}
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-2">
         <div className="h-px bg-gradient-to-r from-transparent via-gray-500/50 to-transparent"></div>
       </div>
 
