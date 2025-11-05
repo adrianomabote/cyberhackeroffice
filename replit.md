@@ -33,6 +33,8 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
   - GET /api/historico/cyber - Últimas 50+ velas para gráfico
   - GET /api/estatisticas/cyber - Médias móveis, tendência, volatilidade, extremos
   - GET /api/padroes/cyber - Detecta 4 tipos de padrões favoráveis
+  - GET /api/manutencao/cyber - Retorna status de manutenção
+  - POST /api/manutencao/cyber - Ativa/desativa manutenção
 - **Storage** (`server/storage.ts`): 
   - PostgreSQL com Drizzle ORM
   - DbStorage class com proteção contra duplicatas
@@ -137,13 +139,33 @@ Analisa constantemente as últimas 20 velas e detecta **5 padrões favoráveis**
 ## Porta
 Servidor roda na porta 5000.
 
+## Sistema de Manutenção Manual
+
+### Página Admin (`/admin`)
+- **Acesso**: Via URL `/admin`
+- **Funcionalidades**:
+  - Ativar manutenção: Define mensagem (ex: "VOLTE ÀS 15:30") e motivo (ex: "O robô está atualizando")
+  - Desativar manutenção: Retorna sistema ao normal
+- **Armazenamento**: In-memory (temporário)
+
+### Tela de Manutenção
+- **Ativação**: Quando `manutencao.ativo === true`
+- **Display**: Mostra mensagem de retorno e motivo
+- **Atualização**: Verifica status a cada 5 segundos
+- **Design**: Cyberpunk matching com resto do app
+
+### API Endpoints
+- GET /api/manutencao/cyber - Verifica status
+- POST /api/manutencao/cyber - Ativa/desativa com { ativo, mensagem, motivo }
+
 ## Estado Atual - COMPLETO
 ✅ PostgreSQL com Drizzle ORM (persistência)
 ✅ Frontend cyberpunk com 6 cards + gráfico
-✅ Backend com 6 endpoints RESTful
+✅ Backend com 8 endpoints RESTful
 ✅ Algoritmo ML avançado (regressão + EMA + volatilidade)
 ✅ Sistema de estatísticas (médias móveis, tendência, volatilidade)
 ✅ Sistema de notificações (4 detectores de padrões)
+✅ Sistema de manutenção manual (página admin + tela de manutenção)
 ✅ Script de captura automática
 ✅ Testes E2E validados
 ✅ Guards contra crashes (optional chaining, arrays vazios)
