@@ -15,9 +15,9 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
-              src="https://cdn-icons-png.flaticon.com/512/1573/1573812.png"
+              src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
               alt="Hacker" 
-              className="w-8 h-8 rounded object-cover"
+              className="w-10 h-10 rounded object-cover"
               data-testid="img-hacker"
             />
             <h1 
