@@ -25,10 +25,12 @@ export interface UltimaVelaResponse {
   timestamp?: string;
 }
 
-// Resposta da API para previsão
+// Resposta da API para previsão e análise de entrada
 export interface PrevisaoResponse {
   multiplicador: number | null;
-  confianca?: string;
+  sinal?: string; // "ENTRAR", "AGUARDAR", "POSSÍVEL"
+  confianca?: string; // "alta", "média", "baixa"
+  motivo?: string; // Descrição dos padrões detectados
 }
 
 // Resposta da API para histórico

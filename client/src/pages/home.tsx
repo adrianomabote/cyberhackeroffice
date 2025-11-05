@@ -129,21 +129,34 @@ export default function Home() {
                 <div
                   className="px-3 py-1 rounded border"
                   style={{
-                    borderColor: '#333333',
-                    borderWidth: '1px',
+                    borderColor: sacarData?.sinal === 'ENTRAR' ? '#00ff00' : '#333333',
+                    borderWidth: sacarData?.sinal === 'ENTRAR' ? '2px' : '1px',
                     backgroundColor: '#000000',
                   }}
                 >
-                  <span
-                    className="font-sans font-semibold"
-                    style={{
-                      color: '#9d4edd',
-                      fontSize: 'clamp(1rem, 3vw, 2.25rem)',
-                    }}
-                    data-testid="text-sacar-value"
-                  >
-                    {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
-                  </span>
+                  <div className="flex flex-col items-center gap-1">
+                    <span
+                      className="font-sans font-semibold"
+                      style={{
+                        color: sacarData?.sinal === 'ENTRAR' ? '#00ff00' : '#9d4edd',
+                        fontSize: 'clamp(1rem, 3vw, 2.25rem)',
+                      }}
+                      data-testid="text-sacar-value"
+                    >
+                      {sacarData?.multiplicador ? `${sacarData.multiplicador.toFixed(2)}X` : '--'}
+                    </span>
+                    {sacarData?.sinal === 'ENTRAR' && (
+                      <span
+                        className="font-sans font-bold"
+                        style={{
+                          color: '#00ff00',
+                          fontSize: 'clamp(0.6rem, 1.5vw, 0.9rem)',
+                        }}
+                      >
+                        ENTRAR AGORA!
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

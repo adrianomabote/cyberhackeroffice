@@ -4,76 +4,105 @@ import { storage } from "./storage";
 import { insertVelaSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse } from "@shared/schema";
 import { z } from "zod";
 
-// Função avançada usando Regressão Linear + Média Exponencial + Detecção de Padrões
-function calcularPrevisao(velas: Array<{ multiplicador: number }>): number | null {
-  if (velas.length === 0) {
-    return null;
+// Função que detecta oportunidades de entrada analisando padrões
+function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
+  if (velas.length < 5) {
+    return {
+      multiplicador: null,
+      sinal: "AGUARDAR",
+      confianca: "baixa",
+      motivo: "Aguardando mais dados",
+    };
   }
 
-  // Se temos menos de 3 velas, retornar uma previsão conservadora
-  if (velas.length < 3) {
-    return 1.5;
-  }
-
-  // Pegar últimas 20 velas (ou todas se houver menos)
   const ultimas = velas.slice(-20);
   const multiplicadores = ultimas.map(v => v.multiplicador);
   const n = multiplicadores.length;
+  const ultimas5 = multiplicadores.slice(-5);
+  const ultimas10 = multiplicadores.slice(-10);
 
-  // 1. Regressão Linear Simples (y = ax + b)
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-  for (let i = 0; i < n; i++) {
-    const x = i;
-    const y = multiplicadores[i];
-    sumX += x;
-    sumY += y;
-    sumXY += x * y;
-    sumX2 += x * x;
+  // Calcular médias
+  const media5 = ultimas5.reduce((a, b) => a + b, 0) / ultimas5.length;
+  const media10 = ultimas10.reduce((a, b) => a + b, 0) / Math.min(ultimas10.length, 10);
+  const mediaGeral = multiplicadores.reduce((a, b) => a + b, 0) / n;
+
+  // Detectar padrões favoráveis
+  let pontos = 0;
+  let motivos: string[] = [];
+
+  // Padrão 1: Sequência de baixos (3+ velas <2x nas últimas 5)
+  const baixosRecentes = ultimas5.filter(m => m < 2).length;
+  if (baixosRecentes >= 3) {
+    pontos += 3;
+    motivos.push(`${baixosRecentes} velas baixas consecutivas`);
   }
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
-  const previsaoLinear = slope * n + intercept;
+  // Padrão 2: Última vela baixa (<2.5x) após média razoável
+  const ultimaVela = multiplicadores[multiplicadores.length - 1];
+  if (ultimaVela < 2.5 && media10 > 2.5) {
+    pontos += 2;
+    motivos.push("Última vela baixa após média alta");
+  }
 
-  // 2. Média Móvel Exponencial (EMA) com α = 0.3
+  // Padrão 3: Tendência de recuperação (média das 5 últimas < média geral)
+  if (media5 < mediaGeral * 0.85) {
+    pontos += 2;
+    motivos.push("Tendência de recuperação detectada");
+  }
+
+  // Padrão 4: Não houve alto recente (nenhuma vela >5x nas últimas 3)
+  const ultimas3 = multiplicadores.slice(-3);
+  const altosRecentes = ultimas3.filter(m => m > 5).length;
+  if (altosRecentes === 0) {
+    pontos += 1;
+    motivos.push("Sem altos extremos recentes");
+  }
+
+  // Padrão 5: Volatilidade moderada (não muito caótico)
+  const variancia = multiplicadores.reduce((sum, m) => sum + Math.pow(m - mediaGeral, 2), 0) / n;
+  const desvioPadrao = Math.sqrt(variancia);
+  const cv = desvioPadrao / mediaGeral;
+  if (cv < 0.6) {
+    pontos += 1;
+    motivos.push("Volatilidade controlada");
+  }
+
+  // Calcular previsão usando EMA
   const alpha = 0.3;
   let ema = multiplicadores[0];
   for (let i = 1; i < n; i++) {
     ema = alpha * multiplicadores[i] + (1 - alpha) * ema;
   }
 
-  // 3. Detecção de Volatilidade
-  const media = multiplicadores.reduce((sum, m) => sum + m, 0) / n;
-  const variancia = multiplicadores.reduce((sum, m) => sum + Math.pow(m - media, 2), 0) / n;
-  const desvioPadrao = Math.sqrt(variancia);
-  const coeficienteVariacao = desvioPadrao / media;
+  // Ajustar previsão baseado em padrões
+  let previsao = ema;
+  if (baixosRecentes >= 3) previsao *= 1.15;
+  if (media5 < 2.2) previsao *= 1.1;
+  
+  previsao = Math.round(Math.max(1.5, Math.min(10, previsao)) * 100) / 100;
 
-  // 4. Ponderação baseada em volatilidade
-  let peso_linear = 0.4;
-  let peso_ema = 0.6;
-  if (coeficienteVariacao > 0.5) {
-    peso_linear = 0.3;
-    peso_ema = 0.7;
-  } else if (coeficienteVariacao < 0.2) {
-    peso_linear = 0.6;
-    peso_ema = 0.4;
+  // Determinar sinal baseado nos pontos
+  let sinal = "AGUARDAR";
+  let confianca = "baixa";
+
+  if (pontos >= 6) {
+    sinal = "ENTRAR";
+    confianca = "alta";
+  } else if (pontos >= 4) {
+    sinal = "ENTRAR";
+    confianca = "média";
+  } else if (pontos >= 2) {
+    sinal = "POSSÍVEL";
+    confianca = "baixa";
   }
 
-  // 5. Combinação ponderada
-  let previsao = peso_linear * previsaoLinear + peso_ema * ema;
-
-  // 6. Ajuste baseado em padrões recentes
-  if (n >= 5) {
-    const ultimas5 = multiplicadores.slice(-5);
-    const baixosRecentes = ultimas5.filter(m => m < 2).length;
-    const altosRecentes = ultimas5.filter(m => m > 3).length;
-    
-    if (baixosRecentes >= 3) previsao *= 1.1;
-    if (altosRecentes >= 3) previsao *= 0.9;
-  }
-
-  // 7. Limitar e arredondar
-  return Math.round(Math.max(1.2, Math.min(10, previsao)) * 100) / 100;
+  return {
+    multiplicador: previsao,
+    sinal,
+    confianca,
+    motivo: motivos.length > 0 ? motivos.join(" | ") : "Análise em andamento",
+    pontos, // Para debug
+  };
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -224,22 +253,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/sacar/cyber - Retorna previsão da próxima vela baseada nas últimas 10
+  // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
-      const ultimas10 = await storage.getUltimas10Velas();
-      const previsao = calcularPrevisao(ultimas10);
+      // Buscar mais velas para análise mais precisa
+      const historico = await storage.getHistorico(20);
+      const analise = analisarOportunidadeEntrada(historico);
       
-      const response: PrevisaoResponse = {
-        multiplicador: previsao,
-        confianca: ultimas10.length >= 10 ? "alta" : ultimas10.length >= 5 ? "média" : "baixa",
-      };
-      
-      res.json(response);
+      res.json({
+        multiplicador: analise.multiplicador,
+        sinal: analise.sinal,
+        confianca: analise.confianca,
+        motivo: analise.motivo,
+      });
     } catch (error) {
       res.status(500).json({
         multiplicador: null,
-        error: "Erro ao calcular previsão",
+        sinal: "AGUARDAR",
+        confianca: "baixa",
+        error: "Erro ao calcular análise",
       });
     }
   });
