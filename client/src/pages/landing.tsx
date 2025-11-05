@@ -122,91 +122,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Benefícios */}
-      <section className="py-16 px-4 bg-gradient-to-b from-transparent to-gray-900/50">
-        <div className="container mx-auto">
-          <h3 
-            className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-            data-testid="text-benefits-title"
-          >
-            Por Que Escolher o Robô Cyber Hacker?
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 hover-elevate" data-testid="card-benefit-1">
-              <CardHeader>
-                <Clock className="w-12 h-12 text-emerald-400 mb-2" />
-                <CardTitle className="text-emerald-400">Análise em Tempo Real</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-400">
-                  Sistema atualiza a cada 1 segundo com os últimos multiplicadores e padrões detectados automaticamente
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-cyan-500/30 hover-elevate" data-testid="card-benefit-2">
-              <CardHeader>
-                <Brain className="w-12 h-12 text-cyan-400 mb-2" />
-                <CardTitle className="text-cyan-400">Inteligência Artificial</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-400">
-                  Algoritmo ML avançado analisa 5 padrões favoráveis para identificar as melhores oportunidades
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-blue-500/30 hover-elevate" data-testid="card-benefit-3">
-              <CardHeader>
-                <Target className="w-12 h-12 text-blue-400 mb-2" />
-                <CardTitle className="text-blue-400">Sinais Precisos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-400">
-                  Receba indicações exatas de quando entrar e em qual multiplicador sacar com alta precisão
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-purple-500/30 hover-elevate" data-testid="card-benefit-4">
-              <CardHeader>
-                <BarChart3 className="w-12 h-12 text-purple-400 mb-2" />
-                <CardTitle className="text-purple-400">Detecção de Padrões</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-400">
-                  Identifica sequências de baixos, tendências de recuperação e volatilidade controlada em tempo real
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-green-500/30 hover-elevate" data-testid="card-benefit-5">
-              <CardHeader>
-                <CheckCircle className="w-12 h-12 text-green-400 mb-2" />
-                <CardTitle className="text-green-400">Sistema de Confiança</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-400">
-                  Cada sinal vem com nível de confiança (Alta, Média, Baixa) baseado em análise de múltiplos fatores
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-pink-500/30 hover-elevate" data-testid="card-benefit-6">
-              <CardHeader>
-                <Zap className="w-12 h-12 text-pink-400 mb-2" />
-                <CardTitle className="text-pink-400">Interface Moderna</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-400">
-                  Design futurista com cores dinâmicas, efeitos visuais e navegação intuitiva para todos
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* Como usar o robô */}
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
@@ -214,7 +129,7 @@ export default function Landing() {
             <Button
               size="lg"
               onClick={() => setShowGuide(!showGuide)}
-              className="bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-xl px-8 py-6 font-bold hover:from-emerald-600 hover:to-cyan-600"
+              className="bg-red-600 text-white text-xl px-8 py-6 font-bold hover:bg-red-700 border-2 border-white"
               data-testid="button-toggle-guide"
             >
               <span className="mr-2">Como usar o robô?</span>
@@ -224,68 +139,68 @@ export default function Landing() {
 
           {showGuide && (
             <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-              <Card className="bg-gradient-to-r from-emerald-900/20 to-transparent border-emerald-500/30">
+              <Card className="bg-black border-2 border-red-600">
                 <CardHeader>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 flex items-center justify-center text-black font-bold text-xl">
+                    <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xl">
                       1
                     </div>
-                    <CardTitle className="text-2xl text-emerald-400">Captura Automática</CardTitle>
+                    <CardTitle className="text-2xl text-white">Captura Automática</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-white ml-16 text-lg" data-testid="text-step-1">
+                  <p className="text-gray-300 ml-16 text-lg" data-testid="text-step-1">
                     Nosso script (fornecido após cadastro) captura automaticamente cada multiplicador do jogo Aviator 
                     e envia para nossos servidores em tempo real, sem intervenção manual.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-cyan-900/20 to-transparent border-cyan-500/30">
+              <Card className="bg-black border-2 border-red-600">
                 <CardHeader>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center text-black font-bold text-xl">
+                    <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xl">
                       2
                     </div>
-                    <CardTitle className="text-2xl text-cyan-400">Análise Inteligente</CardTitle>
+                    <CardTitle className="text-2xl text-white">Análise Inteligente</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-white ml-16 text-lg" data-testid="text-step-2">
+                  <p className="text-gray-300 ml-16 text-lg" data-testid="text-step-2">
                     O algoritmo de IA analisa as últimas 20 velas, calcula médias móveis (MA5, MA10, MA20), 
                     detecta tendências, mede volatilidade e identifica 5 padrões favoráveis diferentes automaticamente.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-blue-900/20 to-transparent border-blue-500/30">
+              <Card className="bg-black border-2 border-red-600">
                 <CardHeader>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-black font-bold text-xl">
+                    <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xl">
                       3
                     </div>
-                    <CardTitle className="text-2xl text-blue-400">Sinais Inteligentes</CardTitle>
+                    <CardTitle className="text-2xl text-white">Sinais Inteligentes</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-white ml-16 text-lg" data-testid="text-step-3">
+                  <p className="text-gray-300 ml-16 text-lg" data-testid="text-step-3">
                     Quando o sistema detecta uma oportunidade (pontuação ≥6), exibe o sinal: "APÓS: [última vela]" e 
                     "SACAR: [multiplicador recomendado]" com cores dinâmicas baseadas no nível de confiança.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-r from-purple-900/20 to-transparent border-purple-500/30">
+              <Card className="bg-black border-2 border-red-600">
                 <CardHeader>
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-black font-bold text-xl">
+                    <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white font-bold text-xl">
                       4
                     </div>
-                    <CardTitle className="text-2xl text-purple-400">Tome Decisões</CardTitle>
+                    <CardTitle className="text-2xl text-white">Tome Decisões</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-white ml-16 text-lg" data-testid="text-step-4">
+                  <p className="text-gray-300 ml-16 text-lg" data-testid="text-step-4">
                     Siga os sinais do robô ou use as estatísticas avançadas (gráfico, tendências, padrões) para 
                     tomar suas próprias decisões informadas com base em dados reais.
                   </p>
@@ -293,6 +208,80 @@ export default function Landing() {
               </Card>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Perguntas Frequentes */}
+      <section className="py-16 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <h3 
+            className="text-4xl font-bold text-center mb-12 text-red-500"
+            style={{ textShadow: '0 0 20px #ff0000' }}
+            data-testid="text-faq-title"
+          >
+            Perguntas Frequentes
+          </h3>
+          <div className="space-y-4">
+            <Card className="bg-black border-2 border-red-600">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">O robô funciona 100% do tempo?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  O robô analisa padrões em tempo real com alta precisão, mas o Aviator é um jogo de probabilidades. 
+                  Recomendamos usar o sistema como uma ferramenta de auxílio nas suas decisões.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black border-2 border-red-600">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">Como instalo o script de captura?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Após o cadastro, você receberá instruções detalhadas sobre como instalar o script no seu navegador. 
+                  É simples e leva menos de 2 minutos.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black border-2 border-red-600">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">Preciso deixar o navegador aberto?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Sim, o script captura os dados em tempo real enquanto você joga. Mantenha a aba do Aviator aberta 
+                  para que o sistema funcione corretamente.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black border-2 border-red-600">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">O sistema é compatível com qual plataforma?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  O Robô Cyber Hacker funciona em qualquer plataforma que rode o Aviator. 
+                  Basta ter um navegador moderno (Chrome, Firefox, Edge).
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black border-2 border-red-600">
+              <CardHeader>
+                <CardTitle className="text-xl text-white">Quanto custa o acesso ao robô?</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-300">
+                  Oferecemos planos flexíveis. Entre em contato após o cadastro para conhecer as opções disponíveis 
+                  e escolher a melhor para você.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
