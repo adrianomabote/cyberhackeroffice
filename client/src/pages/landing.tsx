@@ -80,7 +80,7 @@ export default function Landing() {
             <Link href="/signup">
               <Button 
                 size="lg" 
-                className="bg-red-600 text-white text-lg px-8 py-6 font-bold hover:bg-red-700"
+                className="bg-red-600 text-white text-lg px-8 py-4 font-bold hover:bg-red-700"
                 data-testid="button-start"
               >
                 Começar Agora
@@ -100,7 +100,7 @@ export default function Landing() {
       </section>
 
       {/* O que é */}
-      <section className="py-8 px-4">
+      <section className="py-4 px-4">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
@@ -132,7 +132,7 @@ export default function Landing() {
       </section>
 
       {/* Por que escolher o Robô Cyber Hacker */}
-      <section className="py-12 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
+      <section className="py-8 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto">
           <h3 
             className="text-3xl font-bold text-center mb-8 text-red-500"
@@ -177,14 +177,14 @@ export default function Landing() {
       </section>
 
       {/* Perguntas Frequentes */}
-      <section className="py-16 px-4">
+      <section className="py-8 px-4">
         <div className="container mx-auto max-w-4xl">
           <h3 
             className="text-4xl font-bold text-center mb-12 text-red-500"
             style={{ textShadow: '0 0 20px #ff0000' }}
             data-testid="text-faq-title"
           >
-            Perguntas Frequentes
+            Perguntas Mais Frequentes
           </h3>
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="item-1" className="bg-black border-2 border-red-600 rounded-lg px-4">
@@ -244,7 +244,7 @@ export default function Landing() {
       </section>
 
       {/* Vídeos */}
-      <section id="videos-section" className="py-16 px-4 bg-gray-900/50">
+      <section id="videos-section" className="py-8 px-4 bg-gray-900/50">
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
