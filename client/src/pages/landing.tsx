@@ -13,12 +13,12 @@ export default function Landing() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-white bg-black backdrop-blur">
         <div className="container mx-auto px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <img 
               src="https://cdn-icons-png.flaticon.com/512/1573/1573812.png"
-              alt="CyberHacker" 
-              className="w-5 h-5 rounded object-cover"
-              data-testid="img-logo"
+              alt="Hacker" 
+              className="w-8 h-8 rounded object-cover"
+              data-testid="img-hacker"
             />
             <h1 
               className="text-base font-bold text-white"
@@ -26,25 +26,24 @@ export default function Landing() {
             >
               CyberHacker
             </h1>
-            <div className="flex gap-3 ml-4">
-              <Link href="/login">
-                <Button 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-black"
-                  data-testid="button-login"
-                >
-                  Entrar
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button 
-                  className="bg-red-600 text-white hover:bg-red-700 font-semibold"
-                  data-testid="button-signup"
-                >
-                  Registre-se
-                </Button>
-              </Link>
-            </div>
+          </div>
+          <div className="flex gap-3">
+            <Link href="/login">
+              <Button 
+                className="bg-white text-black hover:bg-gray-200 font-semibold"
+                data-testid="button-login"
+              >
+                Entrar
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button 
+                className="bg-red-600 text-white hover:bg-red-700 font-semibold"
+                data-testid="button-signup"
+              >
+                Registre-se
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
