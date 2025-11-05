@@ -9,7 +9,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 #### **Sistema de Navegação**
 1. **Splash Screen** (`client/src/pages/splash.tsx`):
-   - Tela inicial com "ROBÔ CYBER HACKER" em vermelho neon
+   - Tela inicial com "ROBÔ CYBERHACKER" em vermelho neon (fonte normal)
    - Animação de "processando sistema"
    - Barra de loading animada
    - Duração: 3 segundos
@@ -19,7 +19,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Design**: Cyberpunk profissional com paleta verde neon/cyan/azul/roxo/rosa
    - **Header sticky**: 
      - Imagem hacker profissional (esquerda)
-     - Logo "Cyber Hacker" gradiente emerald-to-cyan (centro-esquerda)
+     - Logo "CyberHacker" (sem espaço) gradiente emerald-to-cyan, fonte normal (centro-esquerda)
      - Botões "ENTRAR" e "REGISTRE-SE" (direita)
    - **Hero Section**: 
      - Badge com ícone Brain (IA Avançada)
@@ -37,7 +37,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 3. **Login** (`client/src/pages/login.tsx`):
    - Design matching landing (gradientes emerald/cyan)
-   - Header com imagem hacker + logo "Cyber Hacker"
+   - Header com imagem hacker + logo "CyberHacker" (fonte normal)
    - Botão voltar (ghost) para landing page
    - Formulário de login (email + senha)
    - Link para criar conta
@@ -45,7 +45,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 
 4. **Cadastro** (`client/src/pages/signup.tsx`):
    - Design matching landing (gradientes emerald/cyan)
-   - Header com imagem hacker + logo "Cyber Hacker"
+   - Header com imagem hacker + logo "CyberHacker" (fonte normal)
    - Botão voltar (ghost) para landing page
    - Formulário de cadastro (nome + email + senha + confirmar senha)
    - Validação de senhas

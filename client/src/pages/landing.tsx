@@ -16,16 +16,15 @@ export default function Landing() {
           <div className="flex items-center gap-3">
             <img 
               src={hackerImage} 
-              alt="Cyber Hacker" 
+              alt="CyberHacker" 
               className="w-12 h-12 rounded-lg object-cover border-2 border-emerald-500/50"
               data-testid="img-logo"
             />
             <h1 
-              className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-              style={{ fontFamily: 'Orbitron, monospace' }}
+              className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
               data-testid="text-logo"
             >
-              Cyber Hacker
+              CyberHacker
             </h1>
           </div>
 
@@ -63,7 +62,6 @@ export default function Landing() {
           </div>
           <h2 
             className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Orbitron, monospace' }}
             data-testid="text-hero-title"
           >
             Domine o Aviator
@@ -124,16 +122,15 @@ export default function Landing() {
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Orbitron, monospace' }}
             data-testid="text-about-title"
           >
-            O Que É o Cyber Hacker?
+            O Que É o CyberHacker?
           </h3>
           <div className="max-w-4xl mx-auto">
             <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30">
               <CardContent className="p-8">
                 <p className="text-lg text-gray-300 leading-relaxed mb-4" data-testid="text-about-description">
-                  O <span className="text-emerald-400 font-bold">Cyber Hacker</span> é um sistema revolucionário de análise preditiva 
+                  O <span className="text-emerald-400 font-bold">CyberHacker</span> é um sistema revolucionário de análise preditiva 
                   desenvolvido especificamente para o jogo <span className="text-cyan-400 font-bold">Aviator</span>. 
                   Utilizando algoritmos de <span className="text-blue-400 font-semibold">machine learning</span> e análise de padrões em tempo real, 
                   nosso robô identifica as melhores oportunidades de entrada e os momentos ideais para sacar seus ganhos.
@@ -155,10 +152,9 @@ export default function Landing() {
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Orbitron, monospace' }}
             data-testid="text-benefits-title"
           >
-            Por Que Escolher o Cyber Hacker?
+            Por Que Escolher o CyberHacker?
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 hover-elevate" data-testid="card-benefit-1">
@@ -241,7 +237,6 @@ export default function Landing() {
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Orbitron, monospace' }}
             data-testid="text-how-title"
           >
             Como Funciona
@@ -323,7 +318,6 @@ export default function Landing() {
         <div className="container mx-auto">
           <h3 
             className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Orbitron, monospace' }}
             data-testid="text-videos-title"
           >
             Veja o Sistema em Ação
@@ -365,7 +359,6 @@ export default function Landing() {
         <div className="container mx-auto text-center">
           <h3 
             className="text-5xl font-bold mb-6 bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent"
-            style={{ fontFamily: 'Orbitron, monospace' }}
             data-testid="text-cta-title"
           >
             Pronto Para Começar?
@@ -388,7 +381,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-gray-800 bg-gray-950">
         <div className="container mx-auto text-center text-gray-500">
-          <p data-testid="text-footer">© 2025 Cyber Hacker - Todos os direitos reservados</p>
+          <p data-testid="text-footer">© 2025 CyberHacker - Todos os direitos reservados</p>
         </div>
       </footer>
     </div>

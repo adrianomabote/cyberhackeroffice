@@ -40,15 +40,14 @@ export default function Login() {
             <div className="flex items-center gap-2">
               <img 
                 src={hackerImage} 
-                alt="Cyber Hacker" 
+                alt="CyberHacker" 
                 className="w-10 h-10 rounded-lg object-cover border-2 border-emerald-500/50"
               />
               <h1 
-                className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
-                style={{ fontFamily: 'Orbitron, monospace' }}
+                className="text-lg font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
                 data-testid="text-title"
               >
-                Cyber Hacker
+                CyberHacker
               </h1>
             </div>
           </div>

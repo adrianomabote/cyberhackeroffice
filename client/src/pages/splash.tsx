@@ -20,12 +20,11 @@ export default function Splash() {
             className="text-6xl md:text-8xl font-bold tracking-wider"
             style={{
               color: '#ff0000',
-              textShadow: '0 0 30px #ff0000, 0 0 60px #ff0000, 0 0 90px #ff0000',
-              fontFamily: 'Orbitron, monospace'
+              textShadow: '0 0 30px #ff0000, 0 0 60px #ff0000, 0 0 90px #ff0000'
             }}
             data-testid="text-splash-title"
           >
-            ROBÔ CYBER HACKER
+            ROBÔ CYBERHACKER
           </h1>
         </div>
 
