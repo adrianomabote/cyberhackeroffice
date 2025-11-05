@@ -78,7 +78,7 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   let previsao = ema;
   if (baixosRecentes >= 3) previsao *= 1.15;
   if (media5 < 2.2) previsao *= 1.1;
-  
+
   previsao = Math.round(Math.max(1.5, Math.min(10, previsao)) * 100) / 100;
 
   // Determinar sinal baseado nos pontos
@@ -89,20 +89,29 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   if (pontos >= 6) {
     sinal = "ENTRAR";
     confianca = "alta";
-    // Confiança alta: recomendar sacar baseado na média geral
+    // Confiança alta: recomendar sacar baseado na média geral - MUITO CONSERVADOR
     if (mediaGeral < 2.5) {
       multiplicadorSacar = 2.0; // Após sequência muito baixa, sacar em 2.00x
     } else if (mediaGeral < 3.5) {
-      multiplicadorSacar = 3.0; // Média normal, sacar em 3.00x
+      multiplicadorSacar = 2.5; // Média normal, sacar em 2.50x
     } else if (mediaGeral < 5.0) {
-      multiplicadorSacar = 4.0; // Média alta, pode arriscar 4.00x
+      multiplicadorSacar = 3.0; // Média alta, sacar em 3.00x
+    } else if (mediaGeral < 7.0) {
+      multiplicadorSacar = 4.0; // Média muito alta, sacar em 4.00x
     } else {
-      multiplicadorSacar = 10.0; // Média muito alta, pode arriscar 10.00x
+      // MUITO RARO: só recomendar 10.00x se média geral >= 7.0
+      // e teve pelo menos 2 velas >= 8.0x nas últimas 10
+      const altosExtremos = ultimas10.filter(m => m >= 8.0).length;
+      if (altosExtremos >= 2) {
+        multiplicadorSacar = 10.0; // Apenas em condições extremamente favoráveis
+      } else {
+        multiplicadorSacar = 5.0; // Caso contrário, mais conservador
+      }
     }
   } else if (pontos >= 4) {
     sinal = "ENTRAR";
     confianca = "média";
-    // Confiança média: mais conservador
+    // Confiança média: muito conservador
     if (mediaGeral < 2.5) {
       multiplicadorSacar = 2.0;
     } else {
@@ -113,6 +122,9 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
     confianca = "baixa";
     multiplicadorSacar = 2.0; // Se entrar, sacar rápido
   }
+
+  // Garantir que o multiplicador está arredondado corretamente
+  multiplicadorSacar = Math.round(multiplicadorSacar * 100) / 100;
 
   return {
     multiplicador: multiplicadorSacar,
@@ -129,12 +141,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    
+
     // Preflight requests
     if (req.method === 'OPTIONS') {
       return res.sendStatus(200);
     }
-    
+
     next();
   });
 
@@ -202,13 +214,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
       const historico = await storage.getHistorico(limit);
-      
+
       // Inverter para mostrar da mais recente para a mais antiga (ordem de fila)
       const velasEmFila = [...historico].reverse();
-      
+
       // Extrair apenas os multiplicadores em array simples
       const multiplicadores = velasEmFila.map(vela => vela.multiplicador);
-      
+
       res.json({
         ok: "verdade",
         velas: multiplicadores,
@@ -227,7 +239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Permitir -1 como sinal especial para três pontinhos
       const multiplicador = req.body.multiplicador;
-      
+
       if (multiplicador === -1) {
         // Três pontinhos enviado manualmente
         const vela = await storage.addVela({ multiplicador: -1 });
@@ -241,10 +253,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           message: "Três pontinhos enviado"
         });
       }
-      
+
       const validatedData = insertVelaSchema.parse(req.body);
       const vela = await storage.addVela(validatedData);
-      
+
       res.json({
         success: true,
         data: {
@@ -261,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           details: error.errors,
         });
       }
-      
+
       res.status(500).json({
         success: false,
         error: "Erro ao processar vela",
@@ -273,24 +285,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/apos/cyber", async (req, res) => {
     try {
       const ultimaVela = await storage.getUltimaVela();
-      
+
       const response: UltimaVelaResponse = {
         multiplicador: ultimaVela ? ultimaVela.multiplicador : null,
         timestamp: ultimaVela ? ultimaVela.timestamp.toISOString() : undefined,
       };
-      
+
       // Log para debug - ver exatamente o que está sendo retornado
       console.log('[APÓS] Última vela do DB:', {
         multiplicador: response.multiplicador,
         timestamp: response.timestamp,
         id: ultimaVela?.id,
       });
-      
+
       // Headers para evitar cache
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
-      
+
       res.json(response);
     } catch (error) {
       console.error('[APÓS] Erro ao buscar última vela:', error);
@@ -307,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Buscar mais velas para análise mais precisa
       const historico = await storage.getHistorico(20);
       const analise = analisarOportunidadeEntrada(historico);
-      
+
       res.json({
         multiplicador: analise.multiplicador,
         sinal: analise.sinal,
@@ -329,7 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
       const historico = await storage.getHistorico(limit);
-      
+
       res.json({
         velas: historico,
         total: historico.length,
@@ -420,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/estatisticas/cyber", async (req, res) => {
     try {
       const historico = await storage.getHistorico(20); // Últimas 20 velas para cálculos
-      
+
       if (historico.length === 0) {
         return res.json({
           mediasMoveis: { media5: null, media10: null, media20: null },
@@ -434,8 +446,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Calcular médias móveis
       const calcularMedia = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
-      
-      const media5 = multiplicadores.length >= 5 
+
+      const media5 = multiplicadores.length >= 5
         ? calcularMedia(multiplicadores.slice(-5))
         : null;
       const media10 = multiplicadores.length >= 10
@@ -448,19 +460,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calcular tendência (usar APENAS últimas 10 velas para capturar comportamento recente)
       let tipoTendencia: 'alta' | 'baixa' | 'estável' = 'estável';
       let variacao = 0;
-      
+
       if (multiplicadores.length >= 2) {
         // Usar só últimas 10 velas para tendência (não todas as 20)
         const velasParaTendencia = multiplicadores.slice(-10);
         const metade = Math.floor(velasParaTendencia.length / 2);
         const primeiraMetade = velasParaTendencia.slice(0, metade);
         const segundaMetade = velasParaTendencia.slice(metade);
-        
+
         if (primeiraMetade.length > 0 && segundaMetade.length > 0) {
           const mediaPrimeira = calcularMedia(primeiraMetade);
           const mediaSegunda = calcularMedia(segundaMetade);
           variacao = ((mediaSegunda - mediaPrimeira) / mediaPrimeira) * 100;
-          
+
           if (variacao > 5) tipoTendencia = 'alta';
           else if (variacao < -5) tipoTendencia = 'baixa';
           else tipoTendencia = 'estável';
@@ -537,13 +549,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = manutencaoSchema.parse(req.body);
       const status = await storage.setManutencaoStatus(validatedData);
-      
+
       console.log('[MANUTENÇÃO] Status alterado:', {
         ativo: status.ativo,
         mensagem: status.mensagem,
         motivo: status.motivo,
       });
-      
+
       res.json({
         success: true,
         data: status,
@@ -556,7 +568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           details: error.errors,
         });
       }
-      
+
       console.error('[MANUTENÇÃO] Erro ao atualizar status:', error);
       res.status(500).json({
         success: false,
@@ -584,13 +596,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = sinaisManualSchema.parse(req.body);
       const sinais = await storage.setSinaisManual(validatedData);
-      
+
       console.log('[SINAIS MANUAL] Definidos:', {
         ativo: sinais.ativo,
         apos: sinais.apos,
         sacar: sinais.sacar,
       });
-      
+
       res.json({
         success: true,
         data: sinais,
@@ -603,7 +615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           details: error.errors,
         });
       }
-      
+
       console.error('[SINAIS MANUAL] Erro ao definir:', error);
       res.status(500).json({
         success: false,
