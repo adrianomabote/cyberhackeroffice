@@ -262,8 +262,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: ultimaVela ? ultimaVela.timestamp.toISOString() : undefined,
       };
       
+      // Log para debug - ver exatamente o que está sendo retornado
+      console.log('[APÓS] Última vela do DB:', {
+        multiplicador: response.multiplicador,
+        timestamp: response.timestamp,
+        id: ultimaVela?.id,
+      });
+      
+      // Headers para evitar cache
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      
       res.json(response);
     } catch (error) {
+      console.error('[APÓS] Erro ao buscar última vela:', error);
       res.status(500).json({
         multiplicador: null,
         error: "Erro ao buscar última vela",

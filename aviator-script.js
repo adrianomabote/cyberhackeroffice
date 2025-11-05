@@ -138,7 +138,7 @@
     stopAviatorCapture();
     setTimeout(iniciarCaptura, 1000);
   };
-
+  
   iniciarCaptura();
 
   console.log('');

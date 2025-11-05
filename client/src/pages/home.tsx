@@ -6,16 +6,25 @@ export default function Home() {
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
 
-  // Buscar última vela (APÓS:)
+  // Buscar última vela (APÓS:) - sempre dados frescos sem cache
   const { data: aposData } = useQuery<UltimaVelaResponse>({
     queryKey: ['/api/apos/cyber'],
     queryFn: async () => {
-      const res = await fetch('/api/apos/cyber');
+      const res = await fetch('/api/apos/cyber', {
+        cache: 'no-store', // Força buscar sem cache
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (!res.ok) throw new Error('Failed to fetch');
-      return res.json();
+      const data = await res.json();
+      console.log('[FRONTEND APÓS] Dados recebidos:', data);
+      return data;
     },
     refetchInterval: 1000,
     staleTime: 0,
+    gcTime: 0, // Não manter em cache
   });
 
   // Buscar previsão (SACAR:)
