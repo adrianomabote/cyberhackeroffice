@@ -88,7 +88,8 @@ export default function Landing() {
             </Link>
             <Button 
               size="lg" 
-              className="bg-gray-700 text-white text-lg px-8 py-6 hover:bg-gray-800"
+              variant="ghost"
+              className="bg-gray-700 text-white text-lg px-8 py-4 hover:bg-gray-800 border-0"
               data-testid="button-demo"
               onClick={scrollToVideos}
             >
