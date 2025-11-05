@@ -47,32 +47,43 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
 - **Tipos**: InsertVela, UltimaVelaResponse, PrevisaoResponse
 - **Validação**: Zod schemas para todas as entradas
 
-## Algoritmo ML de Previsão Avançado
+## Algoritmo de Detecção de Oportunidades de Entrada
 
-### Técnicas Implementadas (calcularPrevisao):
-1. **Regressão Linear** (y = ax + b)
-   - Calcula slope e intercept para detectar tendência linear
-   - Fórmulas estatísticas: slope = (n×ΣXY - ΣX×ΣY) / (n×ΣX² - (ΣX)²)
+### Sistema de Análise (analisarOportunidadeEntrada):
+Analisa constantemente as últimas 20 velas e detecta **5 padrões favoráveis**:
 
-2. **Média Móvel Exponencial (EMA)**
-   - α = 0.3 (fator de suavização)
-   - EMA[i] = α×valor[i] + (1-α)×EMA[i-1]
-   - Maior peso para valores recentes
+#### 1. **Sequência de Baixos** (3 pontos)
+- Detecta 3+ velas <2x nas últimas 5
+- Indica probabilidade de recuperação
 
-3. **Detecção de Volatilidade**
-   - Calcula coeficiente de variação (CV = desvio_padrão / média)
-   - Ajusta pesos dinamicamente baseado em volatilidade
+#### 2. **Última Vela Baixa** (2 pontos)
+- Última vela <2.5x após média >2.5x
+- Ponto de entrada após queda
 
-4. **Ponderação Adaptativa**
-   - Alta volatilidade (CV > 0.5): 30% linear + 70% EMA
-   - Baixa volatilidade (CV < 0.2): 60% linear + 40% EMA
-   - Volatilidade média: 40% linear + 60% EMA
+#### 3. **Tendência de Recuperação** (2 pontos)
+- Média das 5 últimas < 85% da média geral
+- Ciclo de baixa prestes a reverter
 
-5. **Ajustes por Padrões Recentes**
-   - ≥3 velas baixas (<2x): +10% (espera recuperação)
-   - ≥3 velas altas (>3x): -10% (espera correção)
+#### 4. **Sem Altos Extremos** (1 ponto)
+- Nenhuma vela >5x nas últimas 3
+- Evita entrar após pico
 
-6. **Limitação**: 1.2x a 10x, arredondado para 2 casas
+#### 5. **Volatilidade Controlada** (1 ponto)
+- Coeficiente de variação < 0.6
+- Maior previsibilidade
+
+### Sistema de Sinais:
+| Pontos | Sinal | Confiança | Multiplicador Recomendado |
+|--------|-------|-----------|---------------------------|
+| 6+ | ENTRAR | Alta | 2.00x / 3.00x / 4.00x |
+| 4-5 | ENTRAR | Média | 2.00x / 2.50x |
+| 2-3 | POSSÍVEL | Baixa | 2.00x |
+| 0-1 | AGUARDAR | Baixa | Análise |
+
+### Lógica de Multiplicador de Saída:
+- **Média Geral <2.5**: Sacar em 2.00x (conservador)
+- **Média Geral <3.5**: Sacar em 2.50x ou 3.00x
+- **Média Geral ≥3.5**: Sacar em 4.00x (mais arriscado)
 
 ## Sistema de Estatísticas
 

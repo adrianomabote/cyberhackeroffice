@@ -84,20 +84,36 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   // Determinar sinal baseado nos pontos
   let sinal = "AGUARDAR";
   let confianca = "baixa";
+  let multiplicadorSacar = previsao;
 
   if (pontos >= 6) {
     sinal = "ENTRAR";
     confianca = "alta";
+    // Confiança alta: recomendar sacar em multiplicador mais conservador
+    if (mediaGeral < 2.5) {
+      multiplicadorSacar = 2.0; // Após sequência muito baixa, sacar em 2.00x
+    } else if (mediaGeral < 3.5) {
+      multiplicadorSacar = 3.0; // Média normal, sacar em 3.00x
+    } else {
+      multiplicadorSacar = 4.0; // Média alta, pode arriscar 4.00x
+    }
   } else if (pontos >= 4) {
     sinal = "ENTRAR";
     confianca = "média";
+    // Confiança média: mais conservador
+    if (mediaGeral < 2.5) {
+      multiplicadorSacar = 2.0;
+    } else {
+      multiplicadorSacar = 2.5; // Mais seguro com confiança média
+    }
   } else if (pontos >= 2) {
     sinal = "POSSÍVEL";
     confianca = "baixa";
+    multiplicadorSacar = 2.0; // Se entrar, sacar rápido
   }
 
   return {
-    multiplicador: previsao,
+    multiplicador: multiplicadorSacar,
     sinal,
     confianca,
     motivo: motivos.length > 0 ? motivos.join(" | ") : "Análise em andamento",
