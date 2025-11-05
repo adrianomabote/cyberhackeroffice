@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  const API_URL = 'https://robo-cyber-hacker.replit.app';
+  const API_URL = 'https://2f2c1010-895d-4611-b195-eefc87229a70-00-1koowbrdox0gs.picard.replit.dev';
   const CAPTURE_INTERVAL = 1000;
 
   let captureInterval = null;
