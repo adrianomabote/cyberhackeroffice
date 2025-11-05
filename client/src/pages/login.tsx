@@ -42,7 +42,7 @@ export default function Login() {
                 className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
               />
               <h1 
-                className="text-lg font-bold text-white"
+                className="text-lg font-bold text-red-600"
                 data-testid="text-title"
               >
                 ROBÔ CYBER HACKER
@@ -86,7 +86,7 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full bg-gradient-to-r from-red-600 to-red-800 text-white font-semibold"
+              className="w-full bg-gray-600 text-white hover:bg-gray-700 font-semibold"
               data-testid="button-submit"
             >
               Entrar

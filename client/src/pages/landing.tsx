@@ -30,7 +30,7 @@ export default function Landing() {
           <div className="flex gap-3 ml-auto">
             <Link href="/login">
               <Button 
-                className="bg-gray-600 text-white hover:bg-gray-700 font-semibold"
+                className="bg-white text-black hover:bg-gray-200 font-semibold"
                 data-testid="button-login"
               >
                 Entrar
