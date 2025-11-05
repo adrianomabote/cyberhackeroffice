@@ -27,14 +27,14 @@ export default function Landing() {
             <img 
               src={hackerImage}
               alt="Hacker" 
-              className="w-8 h-8 rounded object-cover border border-cyan-500/30"
+              className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
               data-testid="img-hacker"
             />
             <h1 
-              className="text-base font-bold text-white"
+              className="text-base font-bold text-red-600"
               data-testid="text-logo"
             >
-              CyberHacker
+              ROBÔ CYBER HACKER
             </h1>
           </div>
           <div className="flex gap-3 ml-auto">
@@ -320,11 +320,11 @@ export default function Landing() {
           </p>
           <Link href="/signup">
             <Button 
-              size="lg" 
-              className="bg-red-800 text-white text-lg px-12 py-6 font-bold hover:bg-red-900"
+              size="default" 
+              className="bg-red-800 text-white text-base px-8 py-3 font-bold hover:bg-red-900"
               data-testid="button-cta-signup"
             >
-              Registre-se Agora
+              Começar Agora
             </Button>
           </Link>
         </div>
