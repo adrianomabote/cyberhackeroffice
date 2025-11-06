@@ -211,7 +211,7 @@ export default function Home() {
                 </p>
                 <p className="font-mono font-bold"
                   style={{
-                    color: '#9d4edd',
+                    color: '#ff0000',
                     fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
                   }}
                   data-testid="text-mensagem-manutencao"
