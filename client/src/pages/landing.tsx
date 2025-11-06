@@ -279,7 +279,7 @@ export default function Landing() {
                     controls
                     controlsList="nodownload"
                     className="block"
-                    style={{ maxHeight: '600px', width: 'auto', height: 'auto', display: 'block' }}
+                    style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
                   >
                     <source src="/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
@@ -301,14 +301,14 @@ export default function Landing() {
                     controls
                     controlsList="nodownload"
                     className="block"
-                    style={{ maxHeight: '600px', width: 'auto', height: 'auto', display: 'block' }}
+                    style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
                   >
                     <source src="/VideoDeComoEntrarNoSistema_1762406620740.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
                 <p className="text-gray-400 mt-4 text-center" data-testid="text-video-2-desc">
-                  Tutorial passo a passo de como criar sua conta e começar a usar
+                  Tutorial passo a passo de como entrar no Sistema e começar a usar
                 </p>
               </CardContent>
             </Card>
@@ -322,15 +322,15 @@ export default function Landing() {
       </div>
 
       {/* CTA Final */}
-      <section className="py-12 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
+      <section className="py-8 px-4 bg-gradient-to-b from-transparent via-red-900/10 to-transparent">
         <div className="container mx-auto text-center">
           <h3
-            className="text-5xl font-bold mb-6 text-red-700"
+            className="text-3xl font-bold mb-4 text-red-700"
             data-testid="text-cta-title"
           >
             Pronto Para Começar?
           </h3>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto" data-testid="text-cta-subtitle">
+          <p className="text-base text-gray-300 mb-6 max-w-2xl mx-auto" data-testid="text-cta-subtitle">
             Junte-se a centenas de jogadores que já estão maximizando seus ganhos no Aviator com IA
           </p>
           <Link href="/signup">
