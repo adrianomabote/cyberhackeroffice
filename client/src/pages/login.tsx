@@ -16,9 +16,9 @@ export default function Login() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Por enquanto, apenas redireciona para a página principal
+    // Por enquanto, redireciona para tela de boas-vindas
     // TODO: Implementar autenticação real
-    setLocation('/app');
+    setLocation('/welcome');
   };
 
   return (

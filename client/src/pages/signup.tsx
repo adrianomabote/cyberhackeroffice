@@ -24,9 +24,9 @@ export default function Signup() {
       return;
     }
 
-    // Por enquanto, apenas redireciona para a página principal
+    // Por enquanto, redireciona para tela de boas-vindas
     // TODO: Implementar registro real
-    setLocation('/app');
+    setLocation('/welcome');
   };
 
   return (

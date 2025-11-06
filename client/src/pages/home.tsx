@@ -1,10 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { useProtection } from "@/hooks/use-protection";
 import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Home() {
   useProtection();
+  const [, setLocation] = useLocation();
+
+  // Verificar se já viu a mensagem de boas-vindas
+  useEffect(() => {
+    const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome');
+    if (!hasSeenWelcome) {
+      setLocation('/welcome');
+    }
+  }, [setLocation]);
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
   const [ultimaEntradaMostrada, setUltimaEntradaMostrada] = useState<{

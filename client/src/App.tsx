@@ -10,6 +10,7 @@ import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Signup from "@/pages/signup";
 import Subscription from "@/pages/subscription";
+import Welcome from "@/pages/welcome";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
 import NotFound from "@/pages/not-found";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Subscription} />
       <Route path="/subscription" component={Subscription} />
+      <Route path="/welcome" component={Welcome} />
       <Route path="/app" component={Home} />
       <Route path="/admin/cyber" component={Admin} />
       <Route component={NotFound} />

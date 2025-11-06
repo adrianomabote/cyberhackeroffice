@@ -1,4 +1,4 @@
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Check } from 'lucide-react';
@@ -6,10 +6,12 @@ import { useProtection } from '@/hooks/use-protection';
 
 export default function Subscription() {
   useProtection();
+  const [, setLocation] = useLocation();
 
   const handlePurchase = () => {
     // TODO: Implementar integração de pagamento
-    alert('Funcionalidade de pagamento será implementada em breve!');
+    // Simulando compra bem-sucedida - redireciona para boas-vindas
+    setLocation('/welcome');
   };
 
   return (
