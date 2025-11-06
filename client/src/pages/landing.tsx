@@ -268,50 +268,62 @@ export default function Landing() {
           >
             Veja o Sistema em Ação
           </h3>
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent" data-testid="card-video-1">
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent shadow-2xl" data-testid="card-video-1">
               <CardHeader>
-                <CardTitle className="text-red-700">Como o sistema funciona</CardTitle>
+                <CardTitle className="text-red-700 text-xl font-bold">Como o sistema funciona</CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <div className="rounded-lg overflow-hidden border border-gray-800/30">
+              <CardContent className="flex flex-col items-center p-6">
+                <div className="rounded-xl overflow-hidden bg-black w-full" style={{ aspectRatio: '16/9' }}>
                   <video
                     controls
                     controlsList="nodownload"
-                    className="block"
-                    style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
+                    className="w-full h-full object-contain"
+                    style={{ 
+                      backgroundColor: '#000',
+                      imageRendering: 'crisp-edges',
+                      filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
+                    }}
                     preload="auto"
                     playsInline
+                    disablePictureInPicture
                     src="/ComoFunciona.mp4"
+                    poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='9' viewBox='0 0 16 9'%3E%3Crect fill='%23000' width='16' height='9'/%3E%3C/svg%3E"
                   >
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
-                <p className="text-gray-400 mt-4 text-center" data-testid="text-video-1-desc">
+                <p className="text-gray-300 mt-6 text-center text-base leading-relaxed" data-testid="text-video-1-desc">
                   Veja como o robô analisa o Aviator em tempo real e mostra onde vai cair
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent" data-testid="card-video-2">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent shadow-2xl" data-testid="card-video-2">
               <CardHeader>
-                <CardTitle className="text-red-700">Como entrar no sistema</CardTitle>
+                <CardTitle className="text-red-700 text-xl font-bold">Como entrar no sistema</CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <div className="rounded-lg overflow-hidden border border-gray-800/30">
+              <CardContent className="flex flex-col items-center p-6">
+                <div className="rounded-xl overflow-hidden bg-black w-full" style={{ aspectRatio: '16/9' }}>
                   <video
                     controls
                     controlsList="nodownload"
-                    className="block"
-                    style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
+                    className="w-full h-full object-contain"
+                    style={{ 
+                      backgroundColor: '#000',
+                      imageRendering: 'crisp-edges',
+                      filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
+                    }}
                     preload="auto"
                     playsInline
+                    disablePictureInPicture
                     src="/ComoEntrar.mp4"
+                    poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='9' viewBox='0 0 16 9'%3E%3Crect fill='%23000' width='16' height='9'/%3E%3C/svg%3E"
                   >
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
-                <p className="text-gray-400 mt-4 text-center" data-testid="text-video-2-desc">
+                <p className="text-gray-300 mt-6 text-center text-base leading-relaxed" data-testid="text-video-2-desc">
                   Tutorial passo a passo de como entrar no Sistema e começar a usar
                 </p>
               </CardContent>
