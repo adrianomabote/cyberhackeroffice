@@ -11,11 +11,11 @@ export default function BotGratuito() {
 
   const handleCompartilhar = async () => {
     const texto = encodeURIComponent(
-      '🤖 *ROBÔ AVIATOR COM IA*\n\n' +
-      '✅ Análise com IA avançada\n' +
-      '✅ 100% de precisão nos sinais\n' +
-      '✅ Mais de 10.000 moçambicanos faturando!\n\n' +
-      'Junte-se agora: ' + window.location.origin
+      'Já viu este site? É uma empresa de sistemas IA que ajuda a ganhar no Aviator! ✈️\n\n' +
+      'Eles oferecem bots gratuitos que mostram o momento certo de entrar e quando sair no jogo.\n\n' +
+      'Eu já testei e funciona mesmo — vale muito a pena!\n\n' +
+      'Clica no link abaixo e veja com os teus próprios olhos.\n\n' +
+      '🔗 Link: ' + window.location.origin
     );
 
     const urlWhatsApp = `https://wa.me/?text=${texto}`;
