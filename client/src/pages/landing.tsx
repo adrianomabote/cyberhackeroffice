@@ -279,9 +279,8 @@ export default function Landing() {
                     controls
                     className="w-full h-full"
                     style={{ objectFit: 'contain' }}
-                    poster=""
                   >
-                    <source src="/attached_assets/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
+                    <source src="../attached_assets/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
