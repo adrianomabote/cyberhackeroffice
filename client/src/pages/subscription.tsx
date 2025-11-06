@@ -15,7 +15,7 @@ export default function Subscription() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 gap-6">
       <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-cyan-500/5"></div>
 
       <Card className="w-full max-w-sm bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-800 relative z-10">
@@ -36,7 +36,7 @@ export default function Subscription() {
             Plano de Assinatura
           </CardTitle>
           <CardDescription className="text-gray-400 text-xs text-center" data-testid="text-subscription-subtitle">
-            Acesso completo ao Robô Cyber Hacker
+            Bot Cyber Hacker Premium
           </CardDescription>
         </CardHeader>
 
@@ -46,7 +46,7 @@ export default function Subscription() {
             <div className="text-3xl font-bold text-white mb-1">
               450<span className="text-lg">MT</span>
             </div>
-            <div className="text-gray-400 text-xs">por 1 dia de acesso</div>
+            <div className="text-gray-400 text-xs">por 1 dia de uso</div>
           </div>
 
           {/* Benefícios */}
@@ -54,7 +54,7 @@ export default function Subscription() {
             <div className="flex items-start gap-2">
               <Check className="w-4 h-4 text-red-700 mt-0.5 flex-shrink-0" />
               <p className="text-white text-xs">
-                Acesso completo ao sistema por <span className="font-bold text-red-700">24 horas</span>
+                Bot funcionando por <span className="font-bold text-red-700">24 horas</span>
               </p>
             </div>
             <div className="flex items-start gap-2">
@@ -80,7 +80,7 @@ export default function Subscription() {
           {/* Informação adicional */}
           <div className="bg-gray-900 p-3 rounded-lg border border-gray-700">
             <p className="text-[10px] text-gray-300 text-center leading-relaxed">
-              Após o pagamento, você terá acesso imediato ao sistema. 
+              Após o pagamento, você receberá o bot imediatamente. 
               O período de 24 horas começa a contar a partir do momento da confirmação do pagamento.
             </p>
           </div>
@@ -88,7 +88,8 @@ export default function Subscription() {
           {/* Botão de Compra */}
           <Button 
             onClick={handlePurchase}
-            className="w-full bg-red-600 hover:bg-red-700 text-white"
+            className="w-full bg-red-800 hover:bg-red-900 text-white"
+            size="default"
             data-testid="button-purchase"
           >
             Comprar Agora
@@ -104,16 +105,11 @@ export default function Subscription() {
       </Card>
 
       {/* Botão Obter Bot Gratuito - Fora do Card */}
-      <div className="mt-6 text-center">
-        <a
-          href="/bot-gratuito"
-          className="inline-block"
-        >
-          <button className="bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat flex items-center gap-2 mx-auto">
-            🎁 Obter Bot Gratuito
-          </button>
-        </a>
-      </div>
+      <Link href="/bot-gratuito" className="w-full max-w-sm relative z-10">
+        <button className="w-full bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat flex items-center justify-center gap-2">
+          🎁 Obter Bot Gratuito
+        </button>
+      </Link>
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function Landing() {
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black backdrop-blur border-b border-white/20">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-6">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src={robotImage}
@@ -36,18 +36,18 @@ export default function Landing() {
               CyberHacker
             </h1>
           </div>
-          <div className="flex gap-2 items-center">
-            <Link href="/login">
+          <div className="flex gap-3 flex-shrink-0" style={{ marginLeft: '100px' }}>
+            <Link href="/login" className="flex-shrink-0">
               <Button
-                className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap text-sm px-4"
+                className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"
                 data-testid="button-login"
               >
                 Entrar
               </Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/signup" className="flex-shrink-0">
               <Button
-                className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap text-sm px-4"
+                className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap"
                 data-testid="button-signup"
               >
                 Registre-se
