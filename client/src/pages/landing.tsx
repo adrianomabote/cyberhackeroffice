@@ -304,7 +304,7 @@ export default function Landing() {
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
                     preload="metadata"
-                    src="/VideoDeComoEntrarNoSistema_1762406620740.mp4"
+                    src="/ComoEntrar.mp4"
                   >
                     Seu navegador não suporta vídeos.
                   </video>
