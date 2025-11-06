@@ -280,13 +280,16 @@ export default function Landing() {
                     controlsList="nodownload"
                     className="w-full h-auto"
                     style={{ 
-                      imageRendering: 'crisp-edges',
-                      filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
+                      imageRendering: 'high-quality',
+                      filter: 'contrast(1.08) brightness(1.05) saturate(1.15) sharpen(1.2)',
                       display: 'block',
+                      backfaceVisibility: 'hidden',
+                      WebkitFontSmoothing: 'antialiased',
                     }}
                     preload="auto"
                     playsInline
                     disablePictureInPicture
+                    webkit-playsinline="true"
                     src="/ComoFunciona.mp4"
                   >
                     Seu navegador não suporta vídeos.
@@ -309,13 +312,16 @@ export default function Landing() {
                     controlsList="nodownload"
                     className="w-full h-auto"
                     style={{ 
-                      imageRendering: 'crisp-edges',
-                      filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
+                      imageRendering: 'high-quality',
+                      filter: 'contrast(1.08) brightness(1.05) saturate(1.15) sharpen(1.2)',
                       display: 'block',
+                      backfaceVisibility: 'hidden',
+                      WebkitFontSmoothing: 'antialiased',
                     }}
                     preload="auto"
                     playsInline
                     disablePictureInPicture
+                    webkit-playsinline="true"
                     src="/ComoEntrar.mp4"
                   >
                     Seu navegador não suporta vídeos.
