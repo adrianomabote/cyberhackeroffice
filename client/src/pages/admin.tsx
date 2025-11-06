@@ -154,14 +154,14 @@ export default function Admin() {
 
   const handleAtivarSinais = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const apos = parseFloat(valorApos);
     const sacar = parseFloat(valorSacar);
-    
+
     // Permitir valores vazios (será null) ou valores >= 0.01
     const aposValido = valorApos.trim() === '' || (!isNaN(apos) && apos >= 0.01);
     const sacarValido = valorSacar.trim() === '' || (!isNaN(sacar) && sacar >= 0.01);
-    
+
     if (!aposValido) {
       toast({
         title: "⚠️ Valor inválido",
@@ -170,7 +170,7 @@ export default function Admin() {
       });
       return;
     }
-    
+
     if (!sacarValido) {
       toast({
         title: "⚠️ Valor inválido",
@@ -179,7 +179,7 @@ export default function Admin() {
       });
       return;
     }
-    
+
     ativarSinaisManual.mutate({
       ativo: true,
       apos: valorApos.trim() === '' ? null : apos,
@@ -480,7 +480,7 @@ export default function Admin() {
 
         {/* Enviar Três Pontinhos Manualmente */}
         <div
-          className="rounded-xl border p-8"
+          className="rounded-xl border p-8 mb-6"
           style={{
             borderColor: '#444444',
             borderWidth: '1px',
@@ -517,14 +517,60 @@ export default function Admin() {
             }}
             className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
             style={{
+              backgroundColor: '#ffaa00',
+              color: '#000000',
+              fontSize: '1.25rem',
+              border: 'none',
+            }}
+            data-testid="button-tres-pontinhos"
+          >
+            ENVIAR TRÊS PONTINHOS
+          </button>
+        </div>
+
+        {/* Copiar Script do Aviator */}
+        <div
+          className="rounded-xl border p-8"
+          style={{
+            borderColor: '#444444',
+            borderWidth: '1px',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <h2 className="font-sans font-bold mb-4" style={{ color: '#ffffff', fontSize: '1.5rem' }}>
+            Script de Captura do Aviator
+          </h2>
+          <p className="font-sans mb-4" style={{ color: '#888888', fontSize: '0.875rem' }}>
+            Copie este código e cole no console do Aviator (F12) para ativar a captura automática
+          </p>
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch('/aviator-script.js');
+                const scriptContent = await response.text();
+                await navigator.clipboard.writeText(scriptContent);
+                toast({
+                  title: "✅ Script Copiado!",
+                  description: "Cole no console do Aviator (F12) e pressione Enter",
+                });
+              } catch (error) {
+                toast({
+                  title: "❌ Erro ao Copiar",
+                  description: "Não foi possível copiar o script",
+                  variant: "destructive",
+                });
+              }
+            }}
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+            style={{
               backgroundColor: '#00bfff',
               color: '#000000',
               fontSize: '1.25rem',
               border: 'none',
             }}
-            data-testid="button-enviar-pontinhos"
+            data-testid="button-copiar-script"
           >
-            ENVIAR ⁙
+            📋 COPIAR CÓDIGO DO AVIATOR
           </button>
         </div>
       </div>

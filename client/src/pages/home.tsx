@@ -83,22 +83,21 @@ export default function Home() {
   // Usar sinais manuais se estiverem ativos, senão usar automáticos
   const usarSinaisManual = sinaisManualData?.ativo === true;
 
-  // Se receber -1 (três pontinhos), não mostrar valores
-  const recebeuTresPontinhos = aposData?.multiplicador === -1;
-
   // Determinar valores a exibir baseado na prioridade
   let valorAposExibir = null;
   let valorSacarExibir = null;
   let deveMostrarValores = false;
 
-  if (!recebeuTresPontinhos) {
-    if (usarSinaisManual) {
-      // Prioridade 1: Sinais manuais
-      valorAposExibir = sinaisManualData?.apos ?? null;
-      valorSacarExibir = sinaisManualData?.sacar ?? null;
-      deveMostrarValores = true;
-    } else if (isHoraDeEntrar && mostrandoEntrada) {
-      // Prioridade 2: Sistema automático
+  if (usarSinaisManual) {
+    // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
+    valorAposExibir = sinaisManualData?.apos ?? null;
+    valorSacarExibir = sinaisManualData?.sacar ?? null;
+    deveMostrarValores = true;
+  } else {
+    // Prioridade 2: Sistema automático (requer script rodando)
+    const recebeuTresPontinhos = aposData?.multiplicador === -1;
+    
+    if (!recebeuTresPontinhos && isHoraDeEntrar && mostrandoEntrada) {
       valorAposExibir = aposData?.multiplicador ?? null;
       valorSacarExibir = sacarData?.multiplicador ?? null;
       deveMostrarValores = true;
