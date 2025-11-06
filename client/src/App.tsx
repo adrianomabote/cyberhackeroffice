@@ -23,7 +23,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
+      <Route path="/signup" component={Subscription} />
       <Route path="/bot-gratuito" component={BotGratuito} />
       <Route path="/subscription" component={Subscription} />
       <Route path="/welcome" component={Welcome} />
