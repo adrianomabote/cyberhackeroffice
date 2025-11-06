@@ -331,8 +331,22 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="py-8 px-4 border-t-2 border-red-800 bg-black">
-        <div className="container mx-auto text-center text-white">
-          <p data-testid="text-footer">© 2025 Robô Cyber Hacker - Todos os direitos reservados</p>
+        <div className="container mx-auto">
+          <div className="text-center mb-6">
+            <a
+              href="https://chat.whatsapp.com/GoJBrv28CRjEmPsdX5n8ey?mode=wwt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+            >
+              <button className="bg-green-600 text-white text-lg px-8 py-4 rounded-lg font-bold hover:bg-green-700 transition-all">
+                📱 Entrar no Grupo Oficial do WhatsApp
+              </button>
+            </a>
+          </div>
+          <p className="text-center text-white text-sm" data-testid="text-footer">
+            © 2025 Robô Cyber Hacker - Todos os direitos reservados
+          </p>
         </div>
       </footer>
     </div>

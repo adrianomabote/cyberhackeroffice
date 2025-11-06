@@ -247,6 +247,16 @@
     @apply hidden;
   }
 
+  /* Animação de clique para botões */
+  button {
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+
+  button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
   /* Placeholder styling for contentEditable div */
   [contenteditable][data-placeholder]:empty::before {
     content: attr(data-placeholder);
