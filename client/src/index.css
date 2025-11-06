@@ -257,6 +257,23 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
+  /* Animação de pulsação (heartbeat) para o botão do WhatsApp */
+  @keyframes heartbeat {
+    0%, 100% {
+      transform: scale(1);
+    }
+    25% {
+      transform: scale(1.08);
+    }
+    50% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-heartbeat {
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
   /* Placeholder styling for contentEditable div */
   [contenteditable][data-placeholder]:empty::before {
     content: attr(data-placeholder);

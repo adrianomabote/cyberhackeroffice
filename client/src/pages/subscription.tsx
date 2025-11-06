@@ -9,9 +9,7 @@ export default function Subscription() {
   const [, setLocation] = useLocation();
 
   const handlePurchase = () => {
-    // TODO: Implementar integração de pagamento
-    // Simulando compra bem-sucedida - redireciona para boas-vindas
-    setLocation('/welcome');
+    alert('Sistema de pagamento ainda não está disponível. Em breve estará ativo!');
   };
 
   return (
