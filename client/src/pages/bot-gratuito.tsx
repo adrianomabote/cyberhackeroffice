@@ -68,6 +68,9 @@ export default function BotGratuito() {
               Bot Gratuito
             </CardTitle>
           </div>
+          <CardDescription className="text-center text-gray-300 text-sm px-4 leading-relaxed" data-testid="text-page-subtitle">
+            Para liberar o teu acesso do bot gratuito você deve partilhar o nosso site para 15 pessoas ou 5 grupos. Ajuda outras pessoas a entrar a nossa comunidade e ganhas acesso a um bot gratuito!
+          </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
