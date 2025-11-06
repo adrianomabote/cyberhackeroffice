@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Share2, Gift, Users, MessageCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Share2, Gift, CheckCircle2 } from 'lucide-react';
 
 export default function BotGratuito() {
   const [compartilhamentos, setCompartilhamentos] = useState(0);
   const [progresso, setProgresso] = useState(0);
   const compartilhamentosNecessarios = 15;
-  const gruposNecessarios = 5;
 
   const handleCompartilhar = async () => {
     const texto = encodeURIComponent(
@@ -26,12 +25,12 @@ export default function BotGratuito() {
     // Registrar compartilhamento e animar progresso
     const novoCompartilhamento = compartilhamentos + 1;
     setCompartilhamentos(novoCompartilhamento);
-    
+
     // Animação gradual da barra
     const targetProgress = Math.min((novoCompartilhamento / compartilhamentosNecessarios) * 100, 100);
     let currentProgress = progresso;
     const step = (targetProgress - currentProgress) / 20; // 20 frames
-    
+
     const animateProgress = () => {
       currentProgress += step;
       if (currentProgress < targetProgress) {
@@ -41,7 +40,7 @@ export default function BotGratuito() {
         setProgresso(targetProgress);
       }
     };
-    
+
     animateProgress();
   };
 
@@ -66,88 +65,20 @@ export default function BotGratuito() {
           <div className="flex items-center gap-3 justify-center">
             <Gift className="w-7 h-7 text-green-500" />
             <CardTitle className="text-2xl text-white font-bold" data-testid="text-page-title">
-              Bot Gratuito do Aviator
+              Bot Gratuito
             </CardTitle>
           </div>
           <CardDescription className="text-center text-gray-400 text-sm" data-testid="text-page-subtitle">
-            Ganhe um bot gratuito compartilhando com sua rede
+            Compartilhe com 15 pessoas ou 5 grupos
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Benefícios do Bot Gratuito */}
-          <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-5 rounded-xl border border-green-600/30">
-            <h3 className="text-lg font-bold text-green-400 mb-4 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5" />
-              O que você recebe gratuitamente:
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-white text-sm">
-                  <span className="font-bold text-green-400">Bot externo</span> com sinais do Aviator
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-white text-sm">
-                  Recomendações de entrada e saída <span className="font-bold text-green-400">automáticas</span>
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-white text-sm">
-                  Acesso <span className="font-bold text-green-400">ilimitado</span> sem custo mensal
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-white text-sm">
-                  <span className="font-bold text-green-400">100% gratuito</span> após compartilhar
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Requisitos */}
-          <div>
-            <h3 className="text-base font-semibold text-white mb-4 text-center">
-              Como receber o bot gratuito?
-            </h3>
-            <p className="text-gray-400 text-sm text-center mb-4">
-              Compartilhe o link em <span className="font-bold text-green-400">15 pessoas</span> ou <span className="font-bold text-green-400">5 grupos</span> do WhatsApp:
-            </p>
-            
-            <div className="grid grid-cols-1 gap-3">
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <div>
-                    <p className="text-white font-semibold text-sm">Opção 1: 15 pessoas no WhatsApp</p>
-                    <p className="text-gray-400 text-xs mt-0.5">Compartilhe individualmente com 15 contatos</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="text-center text-gray-500 text-sm font-bold">OU</div>
-              
-              <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <div>
-                    <p className="text-white font-semibold text-sm">Opção 2: 5 grupos no WhatsApp</p>
-                    <p className="text-gray-400 text-xs mt-0.5">Envie em 5 grupos de WhatsApp diferentes</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Barra de Progresso */}
           <div>
             <div className="flex justify-between items-center mb-2">
               <p className="text-sm text-gray-400">
-                Seu progresso
+                Progresso
               </p>
               <p className="text-sm font-bold text-green-400">
                 {compartilhamentos}/{compartilhamentosNecessarios}
@@ -171,7 +102,7 @@ export default function BotGratuito() {
           {compartilhamentos < compartilhamentosNecessarios ? (
             <button
               onClick={handleCompartilhar}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors animate-heartbeat flex items-center gap-2 justify-center text-base"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors animate-heartbeat flex items-center gap-2 justify-center text-base"
               data-testid="button-share"
             >
               <Share2 className="w-5 h-5" />
@@ -182,10 +113,7 @@ export default function BotGratuito() {
               <div className="bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
                 <CheckCircle2 className="w-12 h-12 text-green-400 mx-auto mb-2" />
                 <p className="text-green-400 font-bold text-lg">
-                  Parabéns! Bot Gratuito Liberado!
-                </p>
-                <p className="text-gray-300 text-sm mt-1">
-                  Você desbloqueou seu bot gratuito
+                  Bot Liberado!
                 </p>
               </div>
               <a
@@ -194,10 +122,10 @@ export default function BotGratuito() {
                 rel="noopener noreferrer"
               >
                 <Button 
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3"
                   data-testid="button-access-bot"
                 >
-                  Acessar Meu Bot Gratuito
+                  Acessar Bot Gratuito
                 </Button>
               </a>
             </div>
@@ -216,7 +144,7 @@ export default function BotGratuito() {
           {/* Link Premium */}
           <div className="text-center">
             <p className="text-gray-400 text-xs mb-3">
-              Quer acesso imediato ao sistema CyberHacker?
+              Quer acesso imediato?
             </p>
             <Link href="/signup">
               <Button 
