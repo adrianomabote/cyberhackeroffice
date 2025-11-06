@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -118,7 +117,7 @@ export default function Welcome() {
           style={{
             backgroundColor: '#6b7280',
             color: '#ffffff',
-            border: 'none',
+            border: '1px solid #dc2626',
             boxShadow: 'none',
           }}
         >
