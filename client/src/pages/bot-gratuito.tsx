@@ -169,14 +169,14 @@ export default function BotGratuito() {
 
           {/* Botão de Ação */}
           {compartilhamentos < compartilhamentosNecessarios ? (
-            <Button
+            <button
               onClick={handleCompartilhar}
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors animate-heartbeat flex items-center gap-2 justify-center text-base"
               data-testid="button-share"
             >
-              <Share2 className="w-5 h-5 mr-2" />
+              <Share2 className="w-5 h-5" />
               Compartilhar no WhatsApp
-            </Button>
+            </button>
           ) : (
             <div className="text-center space-y-4">
               <div className="bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
