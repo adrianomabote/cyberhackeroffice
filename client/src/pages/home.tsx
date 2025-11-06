@@ -349,14 +349,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Iframe Lotto24 */}
+        {/* Iframe Casa de Apostas */}
         <div className="w-full px-4 py-2">
           <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor: '#444444', borderWidth: '1px' }}>
             <iframe
-              src="https://lotto24.co.mz/"
+              src="https://go.aff.betvivo.partners/epkorle4"
               className="w-full"
               style={{ height: '800px', minHeight: '600px' }}
-              title="Lotto24"
+              title="Casa de Apostas"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
             />
