@@ -280,8 +280,10 @@ export default function Landing() {
                     controlsList="nodownload"
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
+                    preload="metadata"
                   >
                     <source src="/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
+                    <source src="./VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
@@ -302,8 +304,10 @@ export default function Landing() {
                     controlsList="nodownload"
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
+                    preload="metadata"
                   >
                     <source src="/VideoDeComoEntrarNoSistema_1762406620740.mp4" type="video/mp4" />
+                    <source src="./VideoDeComoEntrarNoSistema_1762406620740.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
