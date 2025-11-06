@@ -665,12 +665,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, senha } = req.body;
       const { storageUsuarios } = await import("./storage");
+      
+      // Verificar se o usuário existe
+      const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
+      
+      if (!usuarioExistente) {
+        return res.status(401).json({
+          success: false,
+          error: "Conta não registrada. Verifique se escreveu o email corretamente e tente novamente.",
+        });
+      }
+
       const usuario = await storageUsuarios.verificarUsuario(email, senha);
 
       if (!usuario) {
         return res.status(401).json({
           success: false,
-          error: "Email ou senha incorretos, ou conta não aprovada",
+          error: "Email ou senha incorretos, ou conta não aprovada pelo administrador",
         });
       }
 
