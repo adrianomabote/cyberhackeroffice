@@ -274,26 +274,22 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como o sistema funciona</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden w-full">
-                  <video
-                    controls
-                    controlsList="nodownload"
-                    className="w-full h-auto"
-                    style={{ 
-                      imageRendering: 'high-quality',
-                      filter: 'contrast(1.08) brightness(1.05) saturate(1.15) sharpen(1.2)',
-                      display: 'block',
-                      backfaceVisibility: 'hidden',
-                      WebkitFontSmoothing: 'antialiased',
+                <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', paddingBottom: '177.78%', height: 0 }}>
+                  <iframe
+                    src="https://www.youtube.com/embed/OiRkW-zdWo8"
+                    title="Como o sistema funciona"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: '0.75rem'
                     }}
-                    preload="auto"
-                    playsInline
-                    disablePictureInPicture
-                    webkit-playsinline="true"
-                    src="/ComoFunciona.mp4"
-                  >
-                    Seu navegador não suporta vídeos.
-                  </video>
+                  />
                 </div>
                 <p className="text-gray-300 mt-6 text-center text-base leading-relaxed" data-testid="text-video-1-desc">
                   Veja como o robô analisa o Aviator em tempo real e mostra onde vai cair
@@ -306,26 +302,22 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como entrar no sistema</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden w-full">
-                  <video
-                    controls
-                    controlsList="nodownload"
-                    className="w-full h-auto"
-                    style={{ 
-                      imageRendering: 'high-quality',
-                      filter: 'contrast(1.08) brightness(1.05) saturate(1.15) sharpen(1.2)',
-                      display: 'block',
-                      backfaceVisibility: 'hidden',
-                      WebkitFontSmoothing: 'antialiased',
+                <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', paddingBottom: '177.78%', height: 0 }}>
+                  <iframe
+                    src="https://www.youtube.com/embed/lVkmzPwt3uE"
+                    title="Como entrar no sistema"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: '0.75rem'
                     }}
-                    preload="auto"
-                    playsInline
-                    disablePictureInPicture
-                    webkit-playsinline="true"
-                    src="/ComoEntrar.mp4"
-                  >
-                    Seu navegador não suporta vídeos.
-                  </video>
+                  />
                 </div>
                 <p className="text-gray-300 mt-6 text-center text-base leading-relaxed" data-testid="text-video-2-desc">
                   Tutorial passo a passo de como entrar no Sistema e começar a usar
