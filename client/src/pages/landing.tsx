@@ -274,11 +274,11 @@ export default function Landing() {
                 <CardTitle className="text-white">Como o Sistema Funciona</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-black rounded-lg overflow-hidden border border-red-800">
+                <div className="aspect-video rounded-lg overflow-hidden border border-red-800">
                   <video
                     controls
                     className="w-full h-full"
-                    style={{ objectFit: 'contain' }}
+                    style={{ objectFit: 'cover' }}
                   >
                     <source src="/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
