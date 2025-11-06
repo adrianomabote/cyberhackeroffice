@@ -36,14 +36,7 @@ export default function Landing() {
               CyberHacker
             </h1>
           </div>
-          <div className="flex gap-3 ml-auto flex-shrink-0" style={{ marginLeft: '3rem' }}>
-            <Link href="/bot-gratuito" className="flex-shrink-0">
-              <Button
-                className="bg-green-600 text-white hover:bg-green-700 font-semibold whitespace-nowrap animate-pulse"
-              >
-                🎁 Bot Gratuito
-              </Button>
-            </Link>
+          <div className="flex gap-3 ml-auto flex-shrink-0">
             <Link href="/login" className="flex-shrink-0">
               <Button
                 className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"

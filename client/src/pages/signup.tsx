@@ -48,9 +48,9 @@ export default function Signup() {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5"></div>
 
-      <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-600 relative z-10">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center gap-3 mb-4">
+      <Card className="w-full max-w-lg bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-600 relative z-10">
+        <CardHeader className="space-y-2 pb-4">
+          <div className="flex items-center gap-3 mb-2">
             <Link href="/">
               <Button
                 variant="ghost"
@@ -64,10 +64,10 @@ export default function Signup() {
               <img
                 src={hackerImage}
                 alt="CyberHacker"
-                className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
+                className="w-12 h-12 rounded-lg object-cover border-2 border-red-600"
               />
               <h1
-                className="text-lg font-bold text-red-500"
+                className="text-xl font-bold text-red-500"
                 style={{ textShadow: '0 0 10px #ff0000' }}
                 data-testid="text-title"
               >
@@ -75,15 +75,15 @@ export default function Signup() {
               </h1>
             </div>
           </div>
-          <CardTitle className="text-2xl text-white" data-testid="text-signup-title">Registre-se</CardTitle>
-          <CardDescription className="text-gray-400" data-testid="text-signup-subtitle">
+          <CardTitle className="text-3xl text-white font-bold" data-testid="text-signup-title">Registre-se</CardTitle>
+          <CardDescription className="text-gray-400 text-base" data-testid="text-signup-subtitle">
             Preencha os dados abaixo para criar sua conta
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 py-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-gray-300">Nome</Label>
+              <Label htmlFor="name" className="text-gray-300 text-base">Nome</Label>
               <Input
                 id="name"
                 type="text"
@@ -91,12 +91,12 @@ export default function Signup() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 h-12 text-base"
                 data-testid="input-name"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-300">Email</Label>
+              <Label htmlFor="email" className="text-gray-300 text-base">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -104,12 +104,12 @@ export default function Signup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 h-12 text-base"
                 data-testid="input-email"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-300">Senha</Label>
+              <Label htmlFor="password" className="text-gray-300 text-base">Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -117,12 +117,12 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 h-12 text-base"
                 data-testid="input-password"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-gray-300">Confirmar Senha</Label>
+              <Label htmlFor="confirmPassword" className="text-gray-300 text-base">Confirmar Senha</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -130,21 +130,21 @@ export default function Signup() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500"
+                className="bg-gray-800 border-gray-700 text-white focus:border-emerald-500 focus:ring-emerald-500 h-12 text-base"
                 data-testid="input-confirm-password"
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-4">
+          <CardFooter className="flex flex-col gap-4 pt-2">
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold"
+              className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold h-12 text-base"
               data-testid="button-submit"
             >
               Criar Conta
             </Button>
 
-            <p className="text-sm text-gray-400 text-center" data-testid="text-login-link">
+            <p className="text-base text-gray-400 text-center" data-testid="text-login-link">
               Já tem uma conta?{' '}
               <Link href="/login" className="text-emerald-400 hover:text-emerald-300 underline font-semibold">
                 Entrar
