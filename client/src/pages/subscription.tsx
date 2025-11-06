@@ -2,16 +2,23 @@ import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, Check } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
 
 export default function Subscription() {
   useProtection();
   const [, setLocation] = useLocation();
+  const [showDialog, setShowDialog] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   const handlePurchase = () => {
-    alert('Funcionalidade de pagamento será implementada em breve!');
-    setLocation('/app');
+    setShowDialog(true);
+  };
+
+  const handleProceed = () => {
+    setShowDialog(false);
+    setShowPayment(true);
   };
 
   return (
@@ -110,6 +117,65 @@ export default function Subscription() {
           🎁 Obter Acesso Gratuito
         </button>
       </Link>
+
+      {/* Diálogo de Confirmação */}
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-center mb-2">
+              Redirecionamento para Pagamento
+            </DialogTitle>
+            <DialogDescription className="text-gray-300 text-sm leading-relaxed space-y-3">
+              <p>
+                Você será redirecionado para a tela do pagamento para efetuar o pagamento.
+              </p>
+              <p>
+                Lá será <span className="font-bold text-white">obrigatório escrever o seu número do WhatsApp</span>.
+              </p>
+              <p>
+                Após o pagamento, você receberá o teu acesso diretamente no teu WhatsApp em <span className="font-bold text-green-400">menos de 5 minutos</span>.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowDialog(false)}
+              className="flex-1 border-gray-600 text-white hover:bg-gray-800"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleProceed}
+              className="flex-1 bg-red-800 hover:bg-red-900 text-white"
+            >
+              Prosseguir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Iframe de Pagamento */}
+      {showPayment && (
+        <div className="fixed inset-0 z-50 bg-black">
+          <div className="absolute top-4 left-4 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowPayment(false)}
+              className="bg-gray-900/80 hover:bg-gray-800 text-white"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </div>
+          <iframe
+            src="https://mozpayment.co.mz/pagaemento?check=1752618418119x419424557279477760"
+            className="w-full h-full"
+            title="Página de Pagamento"
+            allow="payment"
+          />
+        </div>
+      )}
     </div>
   );
 }
