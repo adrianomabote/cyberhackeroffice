@@ -52,7 +52,7 @@ export default function Subscription() {
             <div className="text-3xl font-bold text-white mb-1">
               450<span className="text-lg">MT</span>
             </div>
-            <div className="text-gray-400 text-xs">por 1 dia de uso</div>
+            <div className="text-gray-400 text-xs">por 2 dias de uso (48 horas)</div>
           </div>
 
           {/* Benefícios */}
@@ -60,7 +60,7 @@ export default function Subscription() {
             <div className="flex items-start gap-2">
               <Check className="w-4 h-4 text-red-700 mt-0.5 flex-shrink-0" />
               <p className="text-white text-xs">
-                Acesso funcionando por <span className="font-bold text-red-700">24 horas</span>
+                Acesso funcionando por <span className="font-bold text-red-700">48 horas (2 dias)</span>
               </p>
             </div>
             <div className="flex items-start gap-2">
@@ -87,7 +87,7 @@ export default function Subscription() {
           <div className="bg-gray-900 p-3 rounded-lg border border-gray-700">
             <p className="text-[10px] text-gray-300 text-center leading-relaxed">
               Após o pagamento, você receberá o acesso imediatamente. 
-              O período de 24 horas começa a contar a partir do momento da confirmação do pagamento.
+              O período de 48 horas (2 dias) começa a contar a partir do momento da confirmação do pagamento.
             </p>
           </div>
 
@@ -119,7 +119,7 @@ export default function Subscription() {
 
       {/* Diálogo de Confirmação */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-md rounded-xl sm:max-w-lg">
+        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-[85%] sm:max-w-md rounded-xl mx-4">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-center mb-2">
               Redirecionamento para Pagamento
