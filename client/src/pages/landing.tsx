@@ -6,6 +6,8 @@ import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarCha
 import { useProtection } from '@/hooks/use-protection';
 import { useState } from 'react';
 import robotImage from '@assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png';
+import videoComoFunciona from '@assets/VídeoDeComoFunciona_1762400296019.mp4';
+import videoComoEntrar from '@assets/VideoDeComoEntrarNoSistema_1762406620740.mp4';
 
 export default function Landing() {
   useProtection();
@@ -281,9 +283,8 @@ export default function Landing() {
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
                     preload="metadata"
+                    src={videoComoFunciona}
                   >
-                    <source src="/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
-                    <source src="./VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
@@ -305,9 +306,8 @@ export default function Landing() {
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
                     preload="metadata"
+                    src={videoComoEntrar}
                   >
-                    <source src="/VideoDeComoEntrarNoSistema_1762406620740.mp4" type="video/mp4" />
-                    <source src="./VideoDeComoEntrarNoSistema_1762406620740.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
