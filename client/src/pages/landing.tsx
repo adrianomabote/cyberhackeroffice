@@ -274,14 +274,15 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como o sistema funciona</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="rounded-xl overflow-hidden w-full">
                   <video
                     controls
                     controlsList="nodownload"
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto"
                     style={{ 
                       imageRendering: 'crisp-edges',
                       filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
+                      display: 'block',
                     }}
                     preload="auto"
                     playsInline
@@ -302,14 +303,15 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como entrar no sistema</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="rounded-xl overflow-hidden w-full">
                   <video
                     controls
                     controlsList="nodownload"
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto"
                     style={{ 
                       imageRendering: 'crisp-edges',
                       filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
+                      display: 'block',
                     }}
                     preload="auto"
                     playsInline
