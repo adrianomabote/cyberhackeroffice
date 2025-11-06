@@ -10,7 +10,6 @@ export default function Subscription() {
   useProtection();
   const [, setLocation] = useLocation();
   const [showDialog, setShowDialog] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
 
   const handlePurchase = () => {
     setShowDialog(true);
@@ -18,7 +17,7 @@ export default function Subscription() {
 
   const handleProceed = () => {
     setShowDialog(false);
-    setShowPayment(true);
+    window.open('https://mozpayment.co.mz/pagaemento?check=1752618418119x419424557279477760', '_blank');
   };
 
   return (
@@ -120,7 +119,7 @@ export default function Subscription() {
 
       {/* Diálogo de Confirmação */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-md">
+        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-md rounded-xl sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-center mb-2">
               Redirecionamento para Pagamento
@@ -154,28 +153,6 @@ export default function Subscription() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Iframe de Pagamento */}
-      {showPayment && (
-        <div className="fixed inset-0 z-50 bg-black">
-          <div className="absolute top-4 left-4 z-10">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowPayment(false)}
-              className="bg-gray-900/80 hover:bg-gray-800 text-white"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </div>
-          <iframe
-            src="https://mozpayment.co.mz/pagaemento?check=1752618418119x419424557279477760"
-            className="w-full h-full"
-            title="Página de Pagamento"
-            allow="payment"
-          />
-        </div>
-      )}
     </div>
   );
 }
