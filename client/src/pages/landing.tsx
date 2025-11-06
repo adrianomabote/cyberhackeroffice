@@ -281,7 +281,7 @@ export default function Landing() {
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
                     preload="metadata"
-                    src="/ComoFunciona_1762416017120.mp4"
+                    src="/ComoOSistemaFunciona.mp4"
                   >
                     Seu navegador não suporta vídeos.
                   </video>
