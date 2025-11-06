@@ -263,36 +263,43 @@ export default function Landing() {
       <section id="videos-section" className="py-6 px-4 bg-gray-900/50">
         <div className="container mx-auto">
           <h3
-            className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"
+            className="text-4xl font-bold text-center mb-12 text-white"
             data-testid="text-videos-title"
           >
             Veja o Sistema em Ação
           </h3>
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-emerald-500/30 hover-elevate" data-testid="card-video-1">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-red-800 border-2" data-testid="card-video-1">
               <CardHeader>
-                <CardTitle className="text-emerald-400">Como Usar o Sistema</CardTitle>
+                <CardTitle className="text-white">Como o Sistema Funciona</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-gradient-to-br from-emerald-900/20 to-gray-900 rounded-lg flex items-center justify-center border border-emerald-500/30 hover:border-emerald-500/50 transition-colors">
-                  <PlayCircle className="w-20 h-20 text-emerald-400" />
+                <div className="aspect-video bg-black rounded-lg overflow-hidden border border-red-800">
+                  <video
+                    controls
+                    className="w-full h-full"
+                    poster=""
+                  >
+                    <source src="/attached_assets/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
+                    Seu navegador não suporta vídeos.
+                  </video>
                 </div>
                 <p className="text-gray-400 mt-4" data-testid="text-video-1-desc">
-                  Tutorial completo mostrando como configurar e usar o sistema passo a passo
+                  Veja como o robô analisa o Aviator em tempo real e mostra onde vai cair
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-cyan-500/30 hover-elevate" data-testid="card-video-2">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-red-800 border-2" data-testid="card-video-2">
               <CardHeader>
-                <CardTitle className="text-cyan-400">Resultados Reais</CardTitle>
+                <CardTitle className="text-white">Como Entrar no Sistema</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="aspect-video bg-gradient-to-br from-cyan-900/20 to-gray-900 rounded-lg flex items-center justify-center border border-cyan-500/30 hover:border-cyan-500/50 transition-colors">
-                  <PlayCircle className="w-20 h-20 text-cyan-400" />
+                <div className="aspect-video bg-gradient-to-br from-red-900/20 to-gray-900 rounded-lg flex items-center justify-center border border-red-800">
+                  <PlayCircle className="w-20 h-20 text-red-700" />
                 </div>
                 <p className="text-gray-400 mt-4" data-testid="text-video-2-desc">
-                  Demonstração ao vivo dos sinais do robô e resultados obtidos em sessões reais
+                  Tutorial passo a passo de como criar sua conta e começar a usar
                 </p>
               </CardContent>
             </Card>
