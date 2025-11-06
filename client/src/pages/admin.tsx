@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useProtection } from "@/hooks/use-protection";
+import { useLocation } from "wouter";
 import type { ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Admin() {
   useProtection();
+  const [, setLocation] = useLocation();
+
+  // Verificar autenticação
+  useEffect(() => {
+    const isAuthenticated = sessionStorage.getItem('admin_authenticated');
+    if (!isAuthenticated) {
+      setLocation('/admin/login');
+    }
+  }, [setLocation]);
   const [mensagem, setMensagem] = useState("");
   const [valorApos, setValorApos] = useState("");
   const [valorSacar, setValorSacar] = useState("");
@@ -148,19 +158,23 @@ export default function Admin() {
     const apos = parseFloat(valorApos);
     const sacar = parseFloat(valorSacar);
     
-    if (isNaN(apos) || apos < 1) {
+    // Permitir valores vazios (será null) ou valores >= 0.01
+    const aposValido = valorApos.trim() === '' || (!isNaN(apos) && apos >= 0.01);
+    const sacarValido = valorSacar.trim() === '' || (!isNaN(sacar) && sacar >= 0.01);
+    
+    if (!aposValido) {
       toast({
         title: "⚠️ Valor inválido",
-        description: "APÓS deve ser um número maior ou igual a 1",
+        description: "APÓS deve ser vazio ou um número >= 0.01",
         variant: "destructive",
       });
       return;
     }
     
-    if (isNaN(sacar) || sacar < 1) {
+    if (!sacarValido) {
       toast({
         title: "⚠️ Valor inválido",
-        description: "SACAR deve ser um número maior ou igual a 1",
+        description: "SACAR deve ser vazio ou um número >= 0.01",
         variant: "destructive",
       });
       return;
@@ -168,8 +182,8 @@ export default function Admin() {
     
     ativarSinaisManual.mutate({
       ativo: true,
-      apos,
-      sacar,
+      apos: valorApos.trim() === '' ? null : apos,
+      sacar: valorSacar.trim() === '' ? null : sacar,
     });
   };
 
@@ -381,10 +395,10 @@ export default function Admin() {
                 <input
                   type="number"
                   step="0.01"
-                  min="1"
+                  min="0.01"
                   value={valorApos}
                   onChange={(e) => setValorApos(e.target.value)}
-                  placeholder="2.45"
+                  placeholder="2.45 (ou vazio)"
                   className="w-full px-4 py-3 rounded border font-mono"
                   style={{
                     backgroundColor: '#000000',
@@ -403,10 +417,10 @@ export default function Admin() {
                 <input
                   type="number"
                   step="0.01"
-                  min="1"
+                  min="0.01"
                   value={valorSacar}
                   onChange={(e) => setValorSacar(e.target.value)}
-                  placeholder="3.00"
+                  placeholder="3.00 (ou vazio)"
                   className="w-full px-4 py-3 rounded border font-mono"
                   style={{
                     backgroundColor: '#000000',

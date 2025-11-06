@@ -109,8 +109,8 @@ export interface SinaisManual {
 
 export const sinaisManualSchema = z.object({
   ativo: z.boolean(),
-  apos: z.number().min(1).nullable(),
-  sacar: z.number().min(1).nullable(),
+  apos: z.number().min(0.01).nullable(),
+  sacar: z.number().min(0.01).nullable(),
 });
 
 export type SinaisManualInput = z.infer<typeof sinaisManualSchema>;
