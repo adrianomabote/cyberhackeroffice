@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useProtection } from "@/hooks/use-protection";
 import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Home() {
+  useProtection();
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
   const [ultimaEntradaMostrada, setUltimaEntradaMostrada] = useState<{
