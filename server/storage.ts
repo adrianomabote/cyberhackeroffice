@@ -190,3 +190,62 @@ export class DbStorage implements IStorage {
 
 // Usar DbStorage em produção
 export const storage = new DbStorage();
+
+
+
+// Gerenciamento de usuários
+interface Usuario {
+  id: string;
+  email: string;
+  nome: string;
+  senha: string;
+  aprovado: boolean;
+  compartilhamentos: number;
+  createdAt: Date;
+}
+
+const usuarios: Usuario[] = [];
+
+export const storageUsuarios = {
+  async criarUsuario(data: { email: string; nome: string; senha: string }) {
+    const usuario: Usuario = {
+      id: Math.random().toString(36).substring(7),
+      email: data.email,
+      nome: data.nome,
+      senha: data.senha,
+      aprovado: false,
+      compartilhamentos: 0,
+      createdAt: new Date(),
+    };
+    usuarios.push(usuario);
+    return usuario;
+  },
+
+  async listarUsuarios() {
+    return usuarios;
+  },
+
+  async aprovarUsuario(id: string) {
+    const usuario = usuarios.find(u => u.id === id);
+    if (usuario) {
+      usuario.aprovado = true;
+    }
+    return usuario;
+  },
+
+  async verificarUsuario(email: string, senha: string) {
+    return usuarios.find(u => u.email === email && u.senha === senha && u.aprovado);
+  },
+
+  async adicionarCompartilhamento(email: string) {
+    const usuario = usuarios.find(u => u.email === email);
+    if (usuario) {
+      usuario.compartilhamentos += 1;
+    }
+    return usuario;
+  },
+
+  async obterUsuarioPorEmail(email: string) {
+    return usuarios.find(u => u.email === email);
+  },
+};

@@ -624,6 +624,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rotas de usuários
+  app.post("/api/usuarios/registrar", async (req, res) => {
+    try {
+      const { email, nome, senha } = req.body;
+      
+      if (!email || !nome || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Email, nome e senha são obrigatórios",
+        });
+      }
+
+      const { storageUsuarios } = await import("./storage");
+      const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
+      
+      if (usuarioExistente) {
+        return res.status(400).json({
+          success: false,
+          error: "Email já cadastrado",
+        });
+      }
+
+      const usuario = await storageUsuarios.criarUsuario({ email, nome, senha });
+      
+      res.json({
+        success: true,
+        message: "Cadastro enviado para aprovação do administrador",
+        data: { id: usuario.id, email: usuario.email },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao registrar usuário",
+      });
+    }
+  });
+
+  app.post("/api/usuarios/login", async (req, res) => {
+    try {
+      const { email, senha } = req.body;
+      const { storageUsuarios } = await import("./storage");
+      const usuario = await storageUsuarios.verificarUsuario(email, senha);
+
+      if (!usuario) {
+        return res.status(401).json({
+          success: false,
+          error: "Email ou senha incorretos, ou conta não aprovada",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: { 
+          id: usuario.id, 
+          email: usuario.email, 
+          nome: usuario.nome,
+          compartilhamentos: usuario.compartilhamentos,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao fazer login",
+      });
+    }
+  });
+
+  app.get("/api/usuarios/admin", async (req, res) => {
+    try {
+      const { storageUsuarios } = await import("./storage");
+      const usuarios = await storageUsuarios.listarUsuarios();
+      res.json({ success: true, data: usuarios });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao listar usuários",
+      });
+    }
+  });
+
+  app.post("/api/usuarios/aprovar/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { storageUsuarios } = await import("./storage");
+      const usuario = await storageUsuarios.aprovarUsuario(id);
+
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          error: "Usuário não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Usuário aprovado com sucesso",
+        data: usuario,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao aprovar usuário",
+      });
+    }
+  });
+
+  app.post("/api/usuarios/compartilhar", async (req, res) => {
+    try {
+      const { email } = req.body;
+      const { storageUsuarios } = await import("./storage");
+      const usuario = await storageUsuarios.adicionarCompartilhamento(email);
+
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          error: "Usuário não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: { compartilhamentos: usuario.compartilhamentos },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao registrar compartilhamento",
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

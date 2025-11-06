@@ -16,7 +16,11 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSignup = (e: React.FormEvent) => {
+  const [showFreeBot, setShowFreeBot] = useState(false);
+  const [compartilhamentos, setCompartilhamentos] = useState(0);
+  const compartilhamentosNecessarios = 15;
+
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -24,10 +28,56 @@ export default function Signup() {
       return;
     }
 
-    // Por enquanto, redireciona para tela de boas-vindas
-    // TODO: Implementar registro real
-    setLocation('/welcome');
+    try {
+      const response = await fetch('/api/usuarios/registrar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, nome: name, senha: password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert('Cadastro enviado! Aguarde aprovação do administrador.');
+        setLocation('/login');
+      } else {
+        alert(data.error || 'Erro ao registrar');
+      }
+    } catch (error) {
+      alert('Erro ao registrar. Tente novamente.');
+    }
   };
+
+  const handleCompartilhar = async () => {
+    const urlCompartilhar = window.location.origin;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Robô Cyber Hacker - Aviator',
+          text: 'Junte-se ao melhor sistema de IA para Aviator! 🚀',
+          url: urlCompartilhar,
+        });
+        
+        // Registrar compartilhamento
+        await fetch('/api/usuarios/compartilhar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        
+        setCompartilhamentos(prev => prev + 1);
+      } catch (error) {
+        console.log('Compartilhamento cancelado');
+      }
+    } else {
+      // Fallback: copiar link
+      navigator.clipboard.writeText(urlCompartilhar);
+      alert('Link copiado! Compartilhe com 15 pessoas para obter o bot gratuito.');
+    }
+  };
+
+  const progressoPercentual = Math.min((compartilhamentos / compartilhamentosNecessarios) * 100, 100);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
@@ -128,6 +178,60 @@ export default function Signup() {
             >
               Criar Conta
             </Button>
+
+            {/* Botão Bot Gratuito */}
+            <Button
+              type="button"
+              onClick={() => setShowFreeBot(!showFreeBot)}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold animate-pulse hover:animate-none"
+            >
+              🎁 Obter Bot Gratuito
+            </Button>
+
+            {/* Modal Bot Gratuito */}
+            {showFreeBot && (
+              <div className="mt-4 p-4 bg-gray-800 rounded-lg border-2 border-green-500">
+                <h3 className="text-lg font-bold text-green-400 mb-2">
+                  Obtenha o Bot Gratuito!
+                </h3>
+                <p className="text-sm text-gray-300 mb-4">
+                  Compartilhe com {compartilhamentosNecessarios} pessoas para liberar acesso gratuito ao bot
+                </p>
+                
+                {/* Barra de Progresso */}
+                <div className="w-full bg-gray-700 rounded-full h-6 mb-4 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-green-400 to-green-600 h-full flex items-center justify-center text-xs font-bold text-white transition-all duration-500"
+                    style={{ width: `${progressoPercentual}%` }}
+                  >
+                    {compartilhamentos}/{compartilhamentosNecessarios}
+                  </div>
+                </div>
+
+                {compartilhamentos < compartilhamentosNecessarios ? (
+                  <Button
+                    type="button"
+                    onClick={handleCompartilhar}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+                  >
+                    📤 Compartilhar Agora
+                  </Button>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-green-400 font-bold mb-3">✅ Parabéns! Bot liberado!</p>
+                    <a
+                      href="https://bot-aviator-cashout.onrender.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 px-4 rounded hover:opacity-90 transition-opacity"
+                    >
+                      🤖 Acessar Bot Gratuito
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+
             <p className="text-sm text-gray-400 text-center" data-testid="text-login-link">
               Já tem uma conta?{' '}
               <Link href="/login" className="text-emerald-400 hover:text-emerald-300 underline font-semibold">

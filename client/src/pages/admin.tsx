@@ -226,6 +226,22 @@ export default function Admin() {
           </h1>
         </div>
 
+        {/* Botão Gerenciar Usuários */}
+        <div className="mb-8">
+          <button
+            onClick={() => setLocation('/admin/usuarios')}
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+            style={{
+              backgroundColor: '#00ff00',
+              color: '#000000',
+              fontSize: '1.25rem',
+              border: 'none',
+            }}
+          >
+            👥 GERENCIAR USUÁRIOS
+          </button>
+        </div>
+
         {/* Status Atual */}
         <div
           className="rounded-xl border p-6 mb-8 text-center"

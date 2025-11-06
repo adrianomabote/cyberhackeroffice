@@ -14,11 +14,27 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Por enquanto, redireciona para tela de boas-vindas
-    // TODO: Implementar autenticação real
-    setLocation('/welcome');
+
+    try {
+      const response = await fetch('/api/usuarios/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha: password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        sessionStorage.setItem('user', JSON.stringify(data.data));
+        setLocation('/welcome');
+      } else {
+        alert(data.error || 'Credenciais inválidas ou conta não aprovada');
+      }
+    } catch (error) {
+      alert('Erro ao fazer login. Tente novamente.');
+    }
   };
 
   return (

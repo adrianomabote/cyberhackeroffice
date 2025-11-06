@@ -14,6 +14,7 @@ import Welcome from "@/pages/welcome";
 import Home from "@/pages/home";
 import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
+import AdminUsuarios from "@/pages/admin-usuarios"; // Import AdminUsuarios component
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,12 +22,13 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/login" component={Login} />
-      <Route path="/signup" component={Subscription} />
+      <Route path="/signup" component={Signup} /> {/* Changed to Signup page */}
       <Route path="/subscription" component={Subscription} />
       <Route path="/welcome" component={Welcome} />
       <Route path="/app" component={Home} />
       <Route path="/admin/login" component={AdminLogin} />
-      <Route path="/admin/cyber" component={Admin} />
+      <Route path="/admin/usuarios" component={AdminUsuarios} /> {/* New route for user management */}
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
