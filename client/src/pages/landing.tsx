@@ -280,7 +280,7 @@ export default function Landing() {
                     className="w-full h-full"
                     style={{ objectFit: 'contain' }}
                   >
-                    <source src="../attached_assets/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
+                    <source src="/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
