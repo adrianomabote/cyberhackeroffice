@@ -274,7 +274,7 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como o sistema funciona</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', paddingBottom: '177.78%', height: 0 }}>
+                <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', height: '500px' }}>
                   <iframe
                     src="https://www.youtube.com/embed/OiRkW-zdWo8"
                     title="Como o sistema funciona"
@@ -283,8 +283,9 @@ export default function Landing() {
                     allowFullScreen
                     style={{
                       position: 'absolute',
-                      top: 0,
-                      left: 0,
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
                       width: '100%',
                       height: '100%',
                       borderRadius: '0.75rem'
@@ -302,7 +303,7 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como entrar no sistema</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', paddingBottom: '177.78%', height: 0 }}>
+                <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', height: '500px' }}>
                   <iframe
                     src="https://www.youtube.com/embed/lVkmzPwt3uE"
                     title="Como entrar no sistema"
@@ -311,8 +312,9 @@ export default function Landing() {
                     allowFullScreen
                     style={{
                       position: 'absolute',
-                      top: 0,
-                      left: 0,
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
                       width: '100%',
                       height: '100%',
                       borderRadius: '0.75rem'
