@@ -21,7 +21,7 @@ export default function Landing() {
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-black backdrop-blur border-b border-white/20">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <img
               src={robotImage}
