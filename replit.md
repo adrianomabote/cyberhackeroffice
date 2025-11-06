@@ -39,7 +39,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Como Funciona**: 4 passos (Captura → Análise → Sinais → Decisões)
    - **Vídeos Demonstrativos**: 2 vídeos servidos estaticamente de client/public/ (Como Funciona + Como Entrar)
      - /ComoFunciona_1762416017120.mp4 (168MB)
-     - /VideoDeComoEntrarNoSistema_1762406620740.mp4 (70MB)
+     - /ComoEntrar.mp4 (16MB) - NOVO, versão otimizada
      - **Nota**: Vídeos grandes não são empacotados, são servidos diretamente da pasta public
    - **CTA Final**: "PRONTO PARA COMEÇAR?" + botão "Criar Conta Grátis"
    - **Footer**: Copyright
