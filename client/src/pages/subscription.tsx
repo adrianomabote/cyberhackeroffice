@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -101,19 +100,16 @@ export default function Subscription() {
               Voltar para a página inicial
             </Link>
           </p>
-        </CardContent>
+        </div>
       </Card>
 
-      {/* Botão Obter Bot Gratuito - Fora do Card */}
-      <div className="mt-6 text-center">
-        <a
-          href="/bot-gratuito"
-          className="inline-block"
-        >
-          <button className="bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat flex items-center gap-2 mx-auto">
+      {/* Botão Obter Bot Gratuito - Fora do card */}
+      <div className="w-full max-w-md mt-6">
+        <Link href="/bot-gratuito">
+          <button className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat flex items-center justify-center gap-2 text-base">
             🎁 Obter Bot Gratuito
           </button>
-        </a>
+        </Link>
       </div>
     </div>
   );
