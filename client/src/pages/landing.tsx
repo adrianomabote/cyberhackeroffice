@@ -278,6 +278,7 @@ export default function Landing() {
                   <video
                     controls
                     className="w-full h-full"
+                    style={{ objectFit: 'contain' }}
                     poster=""
                   >
                     <source src="/attached_assets/VídeoDeComoFunciona_1762400296019.mp4" type="video/mp4" />
