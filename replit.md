@@ -38,7 +38,7 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Benefícios**: 6 cards com vantagens (Análise Real-Time, ML, Sinais, Padrões, Confiança, Interface)
    - **Como Funciona**: 4 passos (Captura → Análise → Sinais → Decisões)
    - **Vídeos Demonstrativos**: 2 vídeos servidos estaticamente de client/public/ (Como Funciona + Como Entrar)
-     - /VídeoDeComoFunciona_1762400296019.mp4 (168MB)
+     - /ComoFunciona_1762416017120.mp4 (168MB)
      - /VideoDeComoEntrarNoSistema_1762406620740.mp4 (70MB)
      - **Nota**: Vídeos grandes não são empacotados, são servidos diretamente da pasta public
    - **CTA Final**: "PRONTO PARA COMEÇAR?" + botão "Criar Conta Grátis"
