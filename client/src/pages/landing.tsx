@@ -30,13 +30,13 @@ export default function Landing() {
               data-testid="img-robot"
             />
             <h1
-              className="text-base font-bold text-white mr-4"
+              className="text-base font-bold text-white"
               data-testid="text-logo"
             >
               CyberHacker
             </h1>
           </div>
-          <div className="flex gap-3 flex-shrink-0">
+          <div className="flex gap-3 flex-shrink-0 ml-6">
             <Link href="/login" className="flex-shrink-0">
               <Button
                 className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"

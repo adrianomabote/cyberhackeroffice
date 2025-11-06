@@ -94,7 +94,7 @@ export default function BotGratuito() {
                 rel="noopener noreferrer"
               >
                 <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-6 text-lg">
-                  🤖 Acessar Meu Bot Gratuito
+                  🤖 Usar Meu Bot Gratuito
                 </Button>
               </a>
             </div>
