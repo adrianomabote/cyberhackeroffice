@@ -154,14 +154,14 @@ export default function Signup() {
           </CardFooter>
         </form>
       </Card>
-      {/* Botão Obter bot gratuito adicionado aqui, fora da seção de assinatura */}
-      <div className="mt-4">
-        <Button
-          className="w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-bold text-sm whitespace-nowrap animate-pulse"
-          data-testid="button-get-free-bot"
-        >
-          Obter bot gratuito
-        </Button>
+      
+      {/* Botão Obter bot gratuito - abaixo do card */}
+      <div className="mt-4 w-full max-w-sm">
+        <Link href="/bot-gratuito">
+          <button className="w-full bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat">
+            🎁 Obter Bot Gratuito
+          </button>
+        </Link>
       </div>
     </div>
   );

@@ -36,18 +36,18 @@ export default function Landing() {
               CyberHacker
             </h1>
           </div>
-          <div className="flex gap-3 flex-shrink-0" style={{ marginLeft: '60px' }}>
-            <Link href="/login" className="flex-shrink-0">
+          <div className="flex gap-2 items-center">
+            <Link href="/login">
               <Button
-                className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"
+                className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap text-sm px-4"
                 data-testid="button-login"
               >
                 Entrar
               </Button>
             </Link>
-            <Link href="/signup" className="flex-shrink-0">
+            <Link href="/signup">
               <Button
-                className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap"
+                className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap text-sm px-4"
                 data-testid="button-signup"
               >
                 Registre-se
