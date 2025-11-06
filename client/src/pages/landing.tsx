@@ -269,12 +269,12 @@ export default function Landing() {
             Veja o Sistema em Ação
           </h3>
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-red-800 border-2" data-testid="card-video-1">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent" data-testid="card-video-1">
               <CardHeader>
-                <CardTitle className="text-white">Como o Sistema Funciona</CardTitle>
+                <CardTitle className="text-red-700">Veja como o sistema funciona</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="rounded-lg overflow-hidden border-2 border-red-800 inline-block">
+              <CardContent className="flex flex-col items-center">
+                <div className="rounded-lg overflow-hidden border border-gray-800/30">
                   <video
                     controls
                     className="block"
@@ -284,7 +284,7 @@ export default function Landing() {
                     Seu navegador não suporta vídeos.
                   </video>
                 </div>
-                <p className="text-gray-400 mt-4" data-testid="text-video-1-desc">
+                <p className="text-gray-400 mt-4 text-center" data-testid="text-video-1-desc">
                   Veja como o robô analisa o Aviator em tempo real e mostra onde vai cair
                 </p>
               </CardContent>
