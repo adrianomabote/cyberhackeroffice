@@ -676,12 +676,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Verificar se está aprovado
+      if (usuarioExistente.aprovado !== 'true') {
+        return res.status(401).json({
+          success: false,
+          error: "Sua conta ainda não foi aprovada pelo administrador. Aguarde a aprovação.",
+        });
+      }
+
+      // Verificar se está ativo
+      if (usuarioExistente.ativo !== 'true') {
+        return res.status(401).json({
+          success: false,
+          error: "Sua conta foi desativada. Entre em contato com o administrador.",
+        });
+      }
+
       const usuario = await storageUsuarios.verificarUsuario(email, senha);
 
       if (!usuario) {
         return res.status(401).json({
           success: false,
-          error: "Email ou senha incorretos, ou conta não aprovada pelo administrador",
+          error: "Senha incorreta. Tente novamente.",
         });
       }
 
@@ -695,9 +711,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error) {
+      console.error('[LOGIN] Erro:', error);
       res.status(500).json({
         success: false,
-        error: "Erro ao fazer login",
+        error: "Erro ao fazer login. Tente novamente.",
       });
     }
   });

@@ -136,6 +136,15 @@ class StorageUsuarios {
     return usuario;
   }
 
+  async obterUsuarioPorEmail(email: string) {
+    const [usuario] = await db
+      .select()
+      .from(usuarios)
+      .where(eq(usuarios.email, email));
+
+    return usuario;
+  }
+
   async verificarUsuario(email: string, senha: string) {
     const [usuario] = await db
       .select()
@@ -157,15 +166,6 @@ class StorageUsuarios {
 
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
     if (!senhaValida) return null;
-
-    return usuario;
-  }
-
-  async obterUsuarioPorEmail(email: string) {
-    const [usuario] = await db
-      .select()
-      .from(usuarios)
-      .where(eq(usuarios.email, email));
 
     return usuario;
   }
