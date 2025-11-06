@@ -69,10 +69,9 @@ export default function BotGratuito() {
             </CardTitle>
           </div>
           <CardDescription className="text-center text-gray-300 text-sm px-4 leading-relaxed" data-testid="text-page-subtitle">
-            🎯 <span className="font-bold text-white">Partilhe até encher a barra abaixo!</span>
+            Compartilhe o nosso site com 15 amigos ou 5 grupos no WhatsApp e libere seu acesso imediato ao bot gratuito!
             <br />
-            Compartilhe com 15 amigos ou 5 grupos de WhatsApp e libere seu acesso ao bot gratuito. 
-            Ajude outros a faturar e ganhe acesso imediato! 🚀
+            <span className="font-bold text-green-400">Compartilhar até encher a barra abaixo</span>
           </CardDescription>
         </CardHeader>
 
