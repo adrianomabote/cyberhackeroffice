@@ -36,7 +36,7 @@ export default function Subscription() {
             Plano de Assinatura
           </CardTitle>
           <CardDescription className="text-gray-400 text-xs text-center" data-testid="text-subscription-subtitle">
-            Bot Cyber Hacker Premium
+            Acesso Cyber Hacker Premium
           </CardDescription>
         </CardHeader>
 
@@ -54,7 +54,7 @@ export default function Subscription() {
             <div className="flex items-start gap-2">
               <Check className="w-4 h-4 text-red-700 mt-0.5 flex-shrink-0" />
               <p className="text-white text-xs">
-                Bot funcionando por <span className="font-bold text-red-700">24 horas</span>
+                Acesso funcionando por <span className="font-bold text-red-700">24 horas</span>
               </p>
             </div>
             <div className="flex items-start gap-2">
@@ -80,7 +80,7 @@ export default function Subscription() {
           {/* Informação adicional */}
           <div className="bg-gray-900 p-3 rounded-lg border border-gray-700">
             <p className="text-[10px] text-gray-300 text-center leading-relaxed">
-              Após o pagamento, você receberá o bot imediatamente. 
+              Após o pagamento, você receberá o acesso imediatamente. 
               O período de 24 horas começa a contar a partir do momento da confirmação do pagamento.
             </p>
           </div>
@@ -104,10 +104,10 @@ export default function Subscription() {
         </CardContent>
       </Card>
 
-      {/* Botão Obter Bot Gratuito - Fora do Card */}
+      {/* Botão Obter Acesso Gratuito - Fora do Card */}
       <Link href="/bot-gratuito" className="w-full max-w-sm relative z-10">
         <button className="w-full bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat flex items-center justify-center gap-2">
-          🎁 Obter Bot Gratuito
+          🎁 Obter Acesso Gratuito
         </button>
       </Link>
     </div>
