@@ -757,7 +757,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/usuarios/admin/criar", async (req, res) => {
     try {
-      const { email, nome, senha } = req.body;
+      const { email, nome, senha, dias_acesso } = req.body;
       const { storageUsuarios } = await import("./storage");
       
       const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
@@ -768,7 +768,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const usuario = await storageUsuarios.criarUsuarioAprovado({ email, nome, senha });
+      const usuario = await storageUsuarios.criarUsuarioAprovado({ 
+        email, 
+        nome, 
+        senha,
+        dias_acesso: dias_acesso || 2,
+      });
       res.json({
         success: true,
         message: "Usuário criado e aprovado automaticamente",

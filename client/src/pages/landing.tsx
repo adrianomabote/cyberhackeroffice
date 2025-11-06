@@ -226,8 +226,8 @@ export default function Landing() {
                 Quanto custa o acesso ao robô?
               </AccordionTrigger>
               <AccordionContent className="text-gray-300 text-lg">
-                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-700">450MT por 1 dia</span>.
-                Ou seja, se você pagar agora, terá acesso completo até amanhã na mesma hora que pagou.
+                O acesso ao Robô Cyber Hacker custa <span className="font-bold text-red-700">450MT por 2 dias</span>.
+                Ou seja, se você pagar agora, terá acesso completo até daqui a dois dias na mesma hora que pagou.
                 É um investimento que se paga rapidamente com os lucros que você vai obter!
               </AccordionContent>
             </AccordionItem>

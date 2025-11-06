@@ -1,181 +1,90 @@
-import { type Vela, type InsertVela, velas, type ManutencaoStatus, type SinaisManual } from "@shared/schema";
-import { randomUUID } from "crypto";
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { desc } from "drizzle-orm";
-import { Pool, neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
 
-neonConfig.webSocketConstructor = ws;
+import { drizzle } from "drizzle-orm/node-postgres";
+import pkg from "pg";
+const { Pool } = pkg;
+import { eq, desc, sql, and, lt } from "drizzle-orm";
+import { velas, usuarios, type InsertVela } from "@shared/schema";
+import type { ManutencaoStatus, SinaisManual } from "@shared/schema";
+import bcrypt from "bcryptjs";
 
-export interface IStorage {
-  addVela(vela: InsertVela): Promise<Vela>;
-  getUltimaVela(): Promise<Vela | null>;
-  getUltimas10Velas(): Promise<Vela[]>;
-  getHistorico(limit?: number): Promise<Vela[]>;
-  getManutencaoStatus(): Promise<ManutencaoStatus>;
-  setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus>;
-  getSinaisManual(): Promise<SinaisManual>;
-  setSinaisManual(sinais: SinaisManual): Promise<SinaisManual>;
-}
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-export class MemStorage implements IStorage {
-  private velas: Vela[];
-  private ultimoMultiplicador: number | null;
-  private manutencao: ManutencaoStatus;
-  private sinaisManual: SinaisManual;
+const db = drizzle(pool);
 
-  constructor() {
-    this.velas = [];
-    this.ultimoMultiplicador = null;
-    this.manutencao = {
-      ativo: false,
-      mensagem: "",
-      motivo: "",
-    };
-    this.sinaisManual = {
-      ativo: false,
-      apos: null,
-      sacar: null,
-    };
-  }
+// Storage principal de velas
+class DbStorage {
+  private lastMultiplicador: number | null = null;
 
-  async addVela(insertVela: InsertVela): Promise<Vela> {
-    // Evitar duplicatas consecutivas
-    if (this.ultimoMultiplicador === insertVela.multiplicador && this.velas.length > 0) {
-      // Retornar a última vela sem adicionar duplicata
-      return this.velas[this.velas.length - 1];
+  async addVela(data: InsertVela) {
+    if (data.multiplicador !== -1 && data.multiplicador === this.lastMultiplicador) {
+      console.log('[STORAGE] Ignorando multiplicador duplicado:', data.multiplicador);
+      const ultimaVela = await this.getUltimaVela();
+      return ultimaVela!;
     }
 
-    const id = randomUUID();
-    const vela: Vela = {
-      ...insertVela,
-      id,
-      timestamp: new Date(),
-    };
+    this.lastMultiplicador = data.multiplicador;
 
-    this.velas.push(vela);
-    this.ultimoMultiplicador = insertVela.multiplicador;
+    const [vela] = await db.insert(velas).values({
+      multiplicador: data.multiplicador,
+    }).returning();
 
-    // Manter apenas as últimas 100 velas para não crescer indefinidamente
-    if (this.velas.length > 100) {
-      this.velas = this.velas.slice(-100);
-    }
+    console.log('[STORAGE] Nova vela inserida:', {
+      id: vela.id,
+      multiplicador: vela.multiplicador,
+      timestamp: vela.timestamp,
+    });
 
     return vela;
   }
 
-  async getUltimaVela(): Promise<Vela | null> {
-    if (this.velas.length === 0) {
-      return null;
-    }
-    return this.velas[this.velas.length - 1];
-  }
-
-  async getUltimas10Velas(): Promise<Vela[]> {
-    return this.velas.slice(-10);
-  }
-
-  async getHistorico(limit: number = 100): Promise<Vela[]> {
-    return this.velas.slice(-limit);
-  }
-
-  async getManutencaoStatus(): Promise<ManutencaoStatus> {
-    return this.manutencao;
-  }
-
-  async setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus> {
-    this.manutencao = status;
-    return this.manutencao;
-  }
-
-  async getSinaisManual(): Promise<SinaisManual> {
-    return this.sinaisManual;
-  }
-
-  async setSinaisManual(sinais: SinaisManual): Promise<SinaisManual> {
-    this.sinaisManual = sinais;
-    return this.sinaisManual;
-  }
-}
-
-export class DbStorage implements IStorage {
-  private db;
-  private manutencao: ManutencaoStatus;
-  private sinaisManual: SinaisManual;
-
-  constructor() {
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    this.db = drizzle(pool);
-    this.manutencao = {
-      ativo: false,
-      mensagem: "",
-      motivo: "",
-    };
-    this.sinaisManual = {
-      ativo: false,
-      apos: null,
-      sacar: null,
-    };
-  }
-
-  async addVela(insertVela: InsertVela): Promise<Vela> {
-    // Evitar duplicatas consecutivas - verificar última vela
-    const ultimaVela = await this.getUltimaVela();
-    
-    if (ultimaVela && ultimaVela.multiplicador === insertVela.multiplicador) {
-      // Retornar a última vela sem adicionar duplicata
-      return ultimaVela;
-    }
-
-    const [novaVela] = await this.db
-      .insert(velas)
-      .values(insertVela)
-      .returning();
-
-    return novaVela;
-  }
-
-  async getUltimaVela(): Promise<Vela | null> {
-    const result = await this.db
+  async getUltimaVela() {
+    const [vela] = await db
       .select()
       .from(velas)
       .orderBy(desc(velas.timestamp))
       .limit(1);
 
-    return result[0] || null;
+    console.log('[STORAGE] Última vela recuperada:', vela ? {
+      id: vela.id,
+      multiplicador: vela.multiplicador,
+      timestamp: vela.timestamp,
+    } : 'nenhuma');
+
+    return vela;
   }
 
-  async getUltimas10Velas(): Promise<Vela[]> {
-    const result = await this.db
-      .select()
-      .from(velas)
-      .orderBy(desc(velas.timestamp))
-      .limit(10);
-
-    // Retornar em ordem cronológica (mais antiga primeira)
-    return result.reverse();
-  }
-
-  async getHistorico(limit: number = 100): Promise<Vela[]> {
-    const result = await this.db
+  async getHistorico(limit: number = 100) {
+    const historico = await db
       .select()
       .from(velas)
       .orderBy(desc(velas.timestamp))
       .limit(limit);
 
-    // Retornar em ordem cronológica (mais antiga primeira)
-    return result.reverse();
+    return historico;
   }
 
+  private manutencaoStatus: ManutencaoStatus = {
+    ativo: false,
+    mensagem: "",
+    motivo: "",
+  };
+
   async getManutencaoStatus(): Promise<ManutencaoStatus> {
-    return this.manutencao;
+    return this.manutencaoStatus;
   }
 
   async setManutencaoStatus(status: ManutencaoStatus): Promise<ManutencaoStatus> {
-    this.manutencao = status;
-    console.log('[MANUTENÇÃO] Status atualizado:', status);
-    return this.manutencao;
+    this.manutencaoStatus = status;
+    return this.manutencaoStatus;
   }
+
+  private sinaisManual: SinaisManual = {
+    ativo: false,
+    apos: null,
+    sacar: null,
+  };
 
   async getSinaisManual(): Promise<SinaisManual> {
     return this.sinaisManual;
@@ -183,111 +92,191 @@ export class DbStorage implements IStorage {
 
   async setSinaisManual(sinais: SinaisManual): Promise<SinaisManual> {
     this.sinaisManual = sinais;
-    console.log('[SINAIS MANUAL] Atualizados:', sinais);
     return this.sinaisManual;
   }
 }
 
-// Usar DbStorage em produção
-export const storage = new DbStorage();
+// Storage de usuários com sistema de expiração
+class StorageUsuarios {
+  async criarUsuario(data: { email: string; nome: string; senha: string; dias_acesso?: number }) {
+    const senhaHash = await bcrypt.hash(data.senha, 10);
+    const diasAcesso = data.dias_acesso || 2;
+    const dataExpiracao = new Date();
+    dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
 
-
-
-// Gerenciamento de usuários
-interface Usuario {
-  id: string;
-  email: string;
-  nome: string;
-  senha: string;
-  aprovado: boolean;
-  ativo: boolean;
-  compartilhamentos: number;
-  createdAt: Date;
-}
-
-const usuarios: Usuario[] = [];
-
-export const storageUsuarios = {
-  async criarUsuario(data: { email: string; nome: string; senha: string }) {
-    const usuario: Usuario = {
-      id: Math.random().toString(36).substring(7),
+    const [usuario] = await db.insert(usuarios).values({
       email: data.email,
       nome: data.nome,
-      senha: data.senha,
-      aprovado: false,
-      ativo: true,
-      compartilhamentos: 0,
-      createdAt: new Date(),
-    };
-    usuarios.push(usuario);
-    return usuario;
-  },
+      senha: senhaHash,
+      aprovado: 'false',
+      ativo: 'true',
+      dias_acesso: diasAcesso,
+      data_expiracao: dataExpiracao,
+    }).returning();
 
-  async criarUsuarioAprovado(data: { email: string; nome: string; senha: string }) {
-    const usuario: Usuario = {
-      id: Math.random().toString(36).substring(7),
+    return usuario;
+  }
+
+  async criarUsuarioAprovado(data: { email: string; nome: string; senha: string; dias_acesso?: number }) {
+    const senhaHash = await bcrypt.hash(data.senha, 10);
+    const diasAcesso = data.dias_acesso || 2;
+    const dataExpiracao = new Date();
+    dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
+
+    const [usuario] = await db.insert(usuarios).values({
       email: data.email,
       nome: data.nome,
-      senha: data.senha,
-      aprovado: true,
-      ativo: true,
-      compartilhamentos: 0,
-      createdAt: new Date(),
-    };
-    usuarios.push(usuario);
+      senha: senhaHash,
+      aprovado: 'true',
+      ativo: 'true',
+      dias_acesso: diasAcesso,
+      data_expiracao: dataExpiracao,
+    }).returning();
+
     return usuario;
-  },
-
-  async listarUsuarios() {
-    return usuarios;
-  },
-
-  async aprovarUsuario(id: string) {
-    const usuario = usuarios.find(u => u.id === id);
-    if (usuario) {
-      usuario.aprovado = true;
-    }
-    return usuario;
-  },
-
-  async desativarUsuario(id: string) {
-    const usuario = usuarios.find(u => u.id === id);
-    if (usuario) {
-      usuario.ativo = false;
-    }
-    return usuario;
-  },
-
-  async ativarUsuario(id: string) {
-    const usuario = usuarios.find(u => u.id === id);
-    if (usuario) {
-      usuario.ativo = true;
-    }
-    return usuario;
-  },
-
-  async eliminarUsuario(id: string) {
-    const index = usuarios.findIndex(u => u.id === id);
-    if (index !== -1) {
-      usuarios.splice(index, 1);
-      return true;
-    }
-    return false;
-  },
+  }
 
   async verificarUsuario(email: string, senha: string) {
-    return usuarios.find(u => u.email === email && u.senha === senha && u.aprovado && u.ativo);
-  },
+    const [usuario] = await db
+      .select()
+      .from(usuarios)
+      .where(and(
+        eq(usuarios.email, email),
+        eq(usuarios.aprovado, 'true'),
+        eq(usuarios.ativo, 'true')
+      ));
 
-  async adicionarCompartilhamento(email: string) {
-    const usuario = usuarios.find(u => u.email === email);
-    if (usuario) {
-      usuario.compartilhamentos += 1;
+    if (!usuario) return null;
+
+    // Verificar expiração
+    if (usuario.data_expiracao && new Date() > new Date(usuario.data_expiracao)) {
+      // Desativar automaticamente se expirou
+      await this.desativarUsuario(usuario.id);
+      return null;
     }
+
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaValida) return null;
+
     return usuario;
-  },
+  }
 
   async obterUsuarioPorEmail(email: string) {
-    return usuarios.find(u => u.email === email);
-  },
-};
+    const [usuario] = await db
+      .select()
+      .from(usuarios)
+      .where(eq(usuarios.email, email));
+
+    return usuario;
+  }
+
+  async listarUsuarios() {
+    const todosUsuarios = await db.select().from(usuarios);
+    
+    // Calcular tempo restante para cada usuário
+    const usuariosComTempo = todosUsuarios.map(user => {
+      let tempoRestante = null;
+      if (user.data_expiracao) {
+        const agora = new Date();
+        const expiracao = new Date(user.data_expiracao);
+        const diff = expiracao.getTime() - agora.getTime();
+        
+        if (diff > 0) {
+          const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          tempoRestante = { dias, horas, expirado: false };
+        } else {
+          tempoRestante = { dias: 0, horas: 0, expirado: true };
+        }
+      }
+      
+      return {
+        ...user,
+        tempoRestante,
+      };
+    });
+
+    return usuariosComTempo;
+  }
+
+  async aprovarUsuario(id: string) {
+    // Ao aprovar, recalcular data de expiração a partir de agora
+    const [usuario] = await db
+      .select()
+      .from(usuarios)
+      .where(eq(usuarios.id, id));
+
+    if (!usuario) return null;
+
+    const dataExpiracao = new Date();
+    dataExpiracao.setDate(dataExpiracao.getDate() + usuario.dias_acesso);
+
+    const [atualizado] = await db
+      .update(usuarios)
+      .set({ 
+        aprovado: 'true',
+        data_expiracao: dataExpiracao,
+      })
+      .where(eq(usuarios.id, id))
+      .returning();
+
+    return atualizado;
+  }
+
+  async desativarUsuario(id: string) {
+    const [usuario] = await db
+      .update(usuarios)
+      .set({ ativo: 'false' })
+      .where(eq(usuarios.id, id))
+      .returning();
+
+    return usuario;
+  }
+
+  async ativarUsuario(id: string) {
+    const [usuario] = await db
+      .update(usuarios)
+      .set({ ativo: 'true' })
+      .where(eq(usuarios.id, id))
+      .returning();
+
+    return usuario;
+  }
+
+  async eliminarUsuario(id: string) {
+    await db.delete(usuarios).where(eq(usuarios.id, id));
+    return true;
+  }
+
+  async adicionarCompartilhamento(email: string) {
+    const [usuario] = await db
+      .update(usuarios)
+      .set({ 
+        compartilhamentos: sql`${usuarios.compartilhamentos} + 1`,
+      })
+      .where(eq(usuarios.email, email))
+      .returning();
+
+    return usuario;
+  }
+
+  // Tarefa automática para desativar contas expiradas
+  async desativarContasExpiradas() {
+    const agora = new Date();
+    await db
+      .update(usuarios)
+      .set({ ativo: 'false' })
+      .where(and(
+        lt(usuarios.data_expiracao, agora),
+        eq(usuarios.ativo, 'true')
+      ));
+  }
+}
+
+export const storage = new DbStorage();
+export const storageUsuarios = new StorageUsuarios();
+
+// Executar verificação de expiração a cada hora
+setInterval(() => {
+  storageUsuarios.desativarContasExpiradas();
+}, 60 * 60 * 1000);

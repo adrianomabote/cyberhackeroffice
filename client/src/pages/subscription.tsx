@@ -119,7 +119,7 @@ export default function Subscription() {
 
       {/* Diálogo de Confirmação */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-[85%] sm:max-w-md rounded-xl mx-4">
+        <DialogContent className="bg-gray-900 border-2 border-red-800 text-white max-w-[90%] sm:max-w-md rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-center mb-2">
               Redirecionamento para Pagamento

@@ -22,6 +22,7 @@ export default function AdminUsuarios() {
     nome: '',
     email: '',
     senha: '',
+    dias_acesso: 2,
   });
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function AdminUsuarios() {
       const data = await response.json();
       if (data.success) {
         alert('Usuário criado com sucesso!');
-        setNovoUsuario({ nome: '', email: '', senha: '' });
+        setNovoUsuario({ nome: '', email: '', senha: '', dias_acesso: 2 });
         setMostrarFormulario(false);
         carregarUsuarios();
       } else {
@@ -229,6 +230,21 @@ export default function AdminUsuarios() {
                   placeholder="••••••••"
                 />
               </div>
+              <div>
+                <label className="block text-gray-300 mb-2">Dias de Acesso</label>
+                <select
+                  value={novoUsuario.dias_acesso}
+                  onChange={(e) => setNovoUsuario({ ...novoUsuario, dias_acesso: parseInt(e.target.value) })}
+                  className="w-full px-4 py-2 rounded bg-gray-800 border border-gray-700 text-white"
+                >
+                  <option value={1}>1 dia</option>
+                  <option value={2}>2 dias</option>
+                  <option value={3}>3 dias</option>
+                  <option value={7}>7 dias</option>
+                  <option value={15}>15 dias</option>
+                  <option value={30}>30 dias</option>
+                </select>
+              </div>
               <button
                 type="submit"
                 className="w-full px-6 py-3 rounded font-bold hover:opacity-80"
@@ -253,7 +269,7 @@ export default function AdminUsuarios() {
                 key={usuario.id}
                 className="rounded-xl border p-6"
                 style={{
-                  borderColor: usuario.ativo ? (usuario.aprovado ? '#00ff00' : '#ff0000') : '#666666',
+                  borderColor: usuario.ativo === 'true' ? (usuario.aprovado === 'true' ? '#00ff00' : '#ff0000') : '#666666',
                   borderWidth: '2px',
                   backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 }}
@@ -263,19 +279,29 @@ export default function AdminUsuarios() {
                     <h3 className="font-bold text-white text-lg">{usuario.nome}</h3>
                     <p className="text-gray-400">{usuario.email}</p>
                     <p className="text-sm text-gray-500 mt-1">
-                      Compartilhamentos: {usuario.compartilhamentos}
+                      Compartilhamentos: {usuario.compartilhamentos} | Dias de acesso: {usuario.dias_acesso}
                     </p>
-                    <div className="flex gap-2 mt-2">
-                      <p className="text-sm" style={{ color: usuario.aprovado ? '#00ff00' : '#ff0000' }}>
-                        {usuario.aprovado ? '✅ Aprovado' : '⏳ Pendente'}
+                    {usuario.tempoRestante && (
+                      <p className="text-sm mt-1" style={{ 
+                        color: usuario.tempoRestante.expirado ? '#ff0000' : '#00ff00' 
+                      }}>
+                        {usuario.tempoRestante.expirado 
+                          ? '⏰ Conta Expirada' 
+                          : `⏰ Tempo restante: ${usuario.tempoRestante.dias}d ${usuario.tempoRestante.horas}h`
+                        }
                       </p>
-                      <p className="text-sm" style={{ color: usuario.ativo ? '#00ff00' : '#666666' }}>
-                        {usuario.ativo ? '🟢 Ativo' : '⚫ Desativado'}
+                    )}
+                    <div className="flex gap-2 mt-2">
+                      <p className="text-sm" style={{ color: usuario.aprovado === 'true' ? '#00ff00' : '#ff0000' }}>
+                        {usuario.aprovado === 'true' ? '✅ Aprovado' : '⏳ Pendente'}
+                      </p>
+                      <p className="text-sm" style={{ color: usuario.ativo === 'true' ? '#00ff00' : '#666666' }}>
+                        {usuario.ativo === 'true' ? '🟢 Ativo' : '⚫ Desativado'}
                       </p>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {!usuario.aprovado && (
+                    {usuario.aprovado !== 'true' && (
                       <button
                         onClick={() => aprovarUsuario(usuario.id)}
                         className="px-4 py-2 rounded font-bold hover:opacity-80 flex items-center gap-2"
@@ -288,7 +314,7 @@ export default function AdminUsuarios() {
                         Aprovar
                       </button>
                     )}
-                    {usuario.ativo ? (
+                    {usuario.ativo === 'true' ? (
                       <button
                         onClick={() => desativarUsuario(usuario.id)}
                         className="px-4 py-2 rounded font-bold hover:opacity-80 flex items-center gap-2"

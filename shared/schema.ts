@@ -114,3 +114,24 @@ export const sinaisManualSchema = z.object({
 });
 
 export type SinaisManualInput = z.infer<typeof sinaisManualSchema>;
+
+// Usuários
+export const usuarios = pgTable("usuarios", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  senha: varchar("senha", { length: 255 }).notNull(),
+  aprovado: varchar("aprovado", { length: 10 }).notNull().default('false'),
+  ativo: varchar("ativo", { length: 10 }).notNull().default('true'),
+  compartilhamentos: real("compartilhamentos").notNull().default(0),
+  dias_acesso: real("dias_acesso").notNull().default(2), // Dias de acesso (pode ser 1, 2, 3, etc)
+  data_criacao: timestamp("data_criacao").notNull().defaultNow(),
+  data_expiracao: timestamp("data_expiracao"), // Calculado baseado em data_criacao + dias_acesso
+});
+
+export const insertUsuarioSchema = z.object({
+  email: z.string().email(),
+  nome: z.string().min(1),
+  senha: z.string().min(6),
+  dias_acesso: z.number().min(1).optional().default(2),
+});
