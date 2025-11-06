@@ -99,22 +99,29 @@ class DbStorage {
 // Storage de usuários com sistema de expiração
 class StorageUsuarios {
   async criarUsuario(data: { email: string; nome: string; senha: string; dias_acesso?: number }) {
-    const senhaHash = await bcrypt.hash(data.senha, 10);
-    const diasAcesso = data.dias_acesso || 2;
-    const dataExpiracao = new Date();
-    dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
+    try {
+      console.log('[STORAGE] Criando usuário:', data.email);
+      const senhaHash = await bcrypt.hash(data.senha, 10);
+      const diasAcesso = data.dias_acesso || 2;
+      const dataExpiracao = new Date();
+      dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
 
-    const [usuario] = await db.insert(usuarios).values({
-      email: data.email,
-      nome: data.nome,
-      senha: senhaHash,
-      aprovado: 'false',
-      ativo: 'true',
-      dias_acesso: diasAcesso,
-      data_expiracao: dataExpiracao,
-    }).returning();
+      const [usuario] = await db.insert(usuarios).values({
+        email: data.email,
+        nome: data.nome,
+        senha: senhaHash,
+        aprovado: 'false',
+        ativo: 'true',
+        dias_acesso: diasAcesso,
+        data_expiracao: dataExpiracao,
+      }).returning();
 
-    return usuario;
+      console.log('[STORAGE] Usuário criado:', usuario.id);
+      return usuario;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao criar usuário:', error);
+      throw error;
+    }
   }
 
   async criarUsuarioAprovado(data: { email: string; nome: string; senha: string; dias_acesso?: number }) {
@@ -146,28 +153,42 @@ class StorageUsuarios {
   }
 
   async verificarUsuario(email: string, senha: string) {
-    const [usuario] = await db
-      .select()
-      .from(usuarios)
-      .where(and(
-        eq(usuarios.email, email),
-        eq(usuarios.aprovado, 'true'),
-        eq(usuarios.ativo, 'true')
-      ));
+    try {
+      console.log('[STORAGE] Verificando usuário:', email);
+      const [usuario] = await db
+        .select()
+        .from(usuarios)
+        .where(and(
+          eq(usuarios.email, email),
+          eq(usuarios.aprovado, 'true'),
+          eq(usuarios.ativo, 'true')
+        ));
 
-    if (!usuario) return null;
+      if (!usuario) {
+        console.log('[STORAGE] Usuário não aprovado ou não ativo');
+        return null;
+      }
 
-    // Verificar expiração
-    if (usuario.data_expiracao && new Date() > new Date(usuario.data_expiracao)) {
-      // Desativar automaticamente se expirou
-      await this.desativarUsuario(usuario.id);
-      return null;
+      // Verificar expiração
+      if (usuario.data_expiracao && new Date() > new Date(usuario.data_expiracao)) {
+        console.log('[STORAGE] Conta expirada:', email);
+        // Desativar automaticamente se expirou
+        await this.desativarUsuario(usuario.id);
+        return null;
+      }
+
+      const senhaValida = await bcrypt.compare(senha, usuario.senha);
+      if (!senhaValida) {
+        console.log('[STORAGE] Senha inválida para:', email);
+        return null;
+      }
+
+      console.log('[STORAGE] Verificação bem-sucedida:', usuario.id);
+      return usuario;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao verificar usuário:', error);
+      throw error;
     }
-
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaValida) return null;
-
-    return usuario;
   }
 
   async listarUsuarios() {

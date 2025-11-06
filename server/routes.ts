@@ -629,6 +629,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, nome, senha } = req.body;
       
+      console.log('[REGISTRAR] Dados recebidos:', { email, nome });
+      
       if (!email || !nome || !senha) {
         return res.status(400).json({
           success: false,
@@ -648,15 +650,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const usuario = await storageUsuarios.criarUsuario({ email, nome, senha });
       
+      console.log('[REGISTRAR] Usuário criado com sucesso:', usuario.id);
+      
       res.json({
         success: true,
         message: "Cadastro enviado para aprovação do administrador",
         data: { id: usuario.id, email: usuario.email },
       });
     } catch (error) {
+      console.error('[REGISTRAR] Erro detalhado:', error);
       res.status(500).json({
         success: false,
-        error: "Erro ao registrar usuário",
+        error: error instanceof Error ? error.message : "Erro ao registrar usuário",
       });
     }
   });
@@ -664,17 +669,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/usuarios/login", async (req, res) => {
     try {
       const { email, senha } = req.body;
+      
+      console.log('[LOGIN] Tentativa de login:', email);
+      
+      if (!email || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Email e senha são obrigatórios",
+        });
+      }
+
       const { storageUsuarios } = await import("./storage");
       
       // Verificar se o usuário existe
       const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
       
       if (!usuarioExistente) {
+        console.log('[LOGIN] Usuário não encontrado:', email);
         return res.status(401).json({
           success: false,
           error: "Conta não registrada. Verifique se escreveu o email corretamente e tente novamente.",
         });
       }
+
+      console.log('[LOGIN] Usuário encontrado:', { id: usuarioExistente.id, aprovado: usuarioExistente.aprovado, ativo: usuarioExistente.ativo });
 
       // Verificar se está aprovado
       if (usuarioExistente.aprovado !== 'true') {
@@ -695,11 +713,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const usuario = await storageUsuarios.verificarUsuario(email, senha);
 
       if (!usuario) {
+        console.log('[LOGIN] Senha incorreta para:', email);
         return res.status(401).json({
           success: false,
           error: "Senha incorreta. Tente novamente.",
         });
       }
+
+      console.log('[LOGIN] Login bem-sucedido:', usuario.id);
 
       res.json({
         success: true,
@@ -711,10 +732,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error) {
-      console.error('[LOGIN] Erro:', error);
+      console.error('[LOGIN] Erro detalhado:', error);
       res.status(500).json({
         success: false,
-        error: "Erro ao fazer login. Tente novamente.",
+        error: error instanceof Error ? error.message : "Erro ao fazer login. Tente novamente.",
       });
     }
   });
@@ -786,6 +807,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/usuarios/admin/criar", async (req, res) => {
     try {
       const { email, nome, senha, dias_acesso } = req.body;
+      
+      console.log('[ADMIN CRIAR] Dados recebidos:', { email, nome, dias_acesso });
+      
+      if (!email || !nome || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Email, nome e senha são obrigatórios",
+        });
+      }
+
       const { storageUsuarios } = await import("./storage");
       
       const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
@@ -802,15 +833,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         senha,
         dias_acesso: dias_acesso || 2,
       });
+      
+      console.log('[ADMIN CRIAR] Usuário criado com sucesso:', usuario.id);
+      
       res.json({
         success: true,
         message: "Usuário criado e aprovado automaticamente",
         data: usuario,
       });
     } catch (error) {
+      console.error('[ADMIN CRIAR] Erro detalhado:', error);
       res.status(500).json({
         success: false,
-        error: "Erro ao criar usuário",
+        error: error instanceof Error ? error.message : "Erro ao criar usuário",
       });
     }
   });
