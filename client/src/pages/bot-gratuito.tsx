@@ -68,9 +68,6 @@ export default function BotGratuito() {
               Bot Gratuito
             </CardTitle>
           </div>
-          <CardDescription className="text-center text-gray-400 text-sm" data-testid="text-page-subtitle">
-            Compartilhe com 15 pessoas ou 5 grupos
-          </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
