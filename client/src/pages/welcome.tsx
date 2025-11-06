@@ -114,10 +114,10 @@ export default function Welcome() {
         {/* Botão Continuar */}
         <button
           onClick={handleContinuar}
-          className="w-full py-4 rounded-xl font-sans font-bold text-lg transition-all hover:opacity-80"
+          className="w-full py-3 rounded-xl font-sans font-bold text-lg transition-all hover:opacity-80"
           style={{
-            backgroundColor: '#ff0000',
-            color: '#ffffff',
+            backgroundColor: '#00bfff',
+            color: '#000000',
             border: 'none',
           }}
         >
