@@ -69,7 +69,10 @@ export default function BotGratuito() {
             </CardTitle>
           </div>
           <CardDescription className="text-center text-gray-300 text-sm px-4 leading-relaxed" data-testid="text-page-subtitle">
-            Para liberar o teu acesso do bot gratuito você deve partilhar o nosso site para 15 pessoas ou 5 grupos. Ajuda outras pessoas a entrar a nossa comunidade e ganhas acesso a um bot gratuito!
+            🎯 <span className="font-bold text-white">Partilhe até encher a barra abaixo!</span>
+            <br />
+            Compartilhe com 15 amigos ou 5 grupos de WhatsApp e libere seu acesso ao bot gratuito. 
+            Ajude outros a faturar e ganhe acesso imediato! 🚀
           </CardDescription>
         </CardHeader>
 
