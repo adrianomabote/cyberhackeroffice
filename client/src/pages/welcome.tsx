@@ -113,9 +113,9 @@ export default function Welcome() {
         {/* Botão Continuar */}
         <button
           onClick={handleContinuar}
-          className="w-full py-3 rounded-xl font-sans font-bold text-lg transition-all hover:opacity-90"
+          className="w-full py-3 rounded-xl font-sans font-bold text-lg transition-all hover:opacity-90 animate-heartbeat"
           style={{
-            backgroundColor: '#6b7280',
+            backgroundColor: '#000000',
             color: '#ffffff',
             border: '1px solid #dc2626',
             boxShadow: 'none',
