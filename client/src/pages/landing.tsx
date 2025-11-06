@@ -36,7 +36,7 @@ export default function Landing() {
               CyberHacker
             </h1>
           </div>
-          <div className="flex gap-3 ml-auto flex-shrink-0">
+          <div className="flex gap-3 ml-6 flex-shrink-0">
             <Link href="/login" className="flex-shrink-0">
               <Button
                 className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"

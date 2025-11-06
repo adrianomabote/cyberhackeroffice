@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
@@ -18,11 +17,11 @@ export default function BotGratuito() {
       '✅ Mais de 10.000 moçambicanos faturando!\n\n' +
       'Junte-se agora: ' + window.location.origin
     );
-    
+
     const urlWhatsApp = `https://wa.me/?text=${texto}`;
-    
+
     window.open(urlWhatsApp, '_blank');
-    
+
     // Registrar compartilhamento
     setCompartilhamentos(prev => prev + 1);
   };
@@ -32,7 +31,7 @@ export default function BotGratuito() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-cyan-500/5"></div>
-      
+
       <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-green-600 relative z-10">
         <CardHeader>
           <div className="flex items-center gap-3 mb-4">
@@ -49,7 +48,7 @@ export default function BotGratuito() {
         <CardContent className="space-y-6">
           <div className="text-center">
             <h3 className="text-xl font-bold text-green-400 mb-2">
-              Como Conseguir Acesso Gratuito?
+              Como Conseguir o Bot Gratuito?
             </h3>
             <p className="text-gray-300 mb-4">
               Compartilhe este robô com:
