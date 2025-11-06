@@ -37,7 +37,9 @@ Sistema completo de análise e previsão em tempo real do jogo Aviator com inter
    - **Seção "O que é"**: Explicação do robô e algoritmo ML
    - **Benefícios**: 6 cards com vantagens (Análise Real-Time, ML, Sinais, Padrões, Confiança, Interface)
    - **Como Funciona**: 4 passos (Captura → Análise → Sinais → Decisões)
-   - **Vídeos Demonstrativos**: 2 placeholders para vídeos (Como Usar + Resultados)
+   - **Vídeos Demonstrativos**: 2 vídeos importados via @assets (Como Funciona + Como Entrar)
+     - videoComoFunciona: VídeoDeComoFunciona_1762400296019.mp4
+     - videoComoEntrar: VideoDeComoEntrarNoSistema_1762406620740.mp4
    - **CTA Final**: "PRONTO PARA COMEÇAR?" + botão "Criar Conta Grátis"
    - **Footer**: Copyright
    - **Assets**: 
