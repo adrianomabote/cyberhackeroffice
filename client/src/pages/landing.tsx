@@ -271,13 +271,12 @@ export default function Landing() {
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent" data-testid="card-video-1">
               <CardHeader>
-                <CardTitle className="text-red-700">Como o sistema funciona</CardTitle>
+                <CardTitle className="text-red-700">Veja como o sistema funciona</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
                 <div className="rounded-lg overflow-hidden border border-gray-800/30">
                   <video
                     controls
-                    controlsList="nodownload"
                     className="block"
                     style={{ maxHeight: '600px', width: 'auto', height: 'auto', display: 'block' }}
                   >
@@ -291,23 +290,15 @@ export default function Landing() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-transparent" data-testid="card-video-2">
+            <Card className="bg-gradient-to-br from-gray-900 to-gray-950 border-red-800 border-2" data-testid="card-video-2">
               <CardHeader>
-                <CardTitle className="text-red-700">Como entrar no sistema</CardTitle>
+                <CardTitle className="text-white">Como Entrar no Sistema</CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col items-center">
-                <div className="rounded-lg overflow-hidden border border-gray-800/30">
-                  <video
-                    controls
-                    controlsList="nodownload"
-                    className="block"
-                    style={{ maxHeight: '600px', width: 'auto', height: 'auto', display: 'block' }}
-                  >
-                    <source src="/VideoDeComoEntrarNoSistema_1762406620740.mp4" type="video/mp4" />
-                    Seu navegador não suporta vídeos.
-                  </video>
+              <CardContent>
+                <div className="aspect-video bg-gradient-to-br from-red-900/20 to-gray-900 rounded-lg flex items-center justify-center border border-red-800">
+                  <PlayCircle className="w-20 h-20 text-red-700" />
                 </div>
-                <p className="text-gray-400 mt-4 text-center" data-testid="text-video-2-desc">
+                <p className="text-gray-400 mt-4" data-testid="text-video-2-desc">
                   Tutorial passo a passo de como criar sua conta e começar a usar
                 </p>
               </CardContent>
