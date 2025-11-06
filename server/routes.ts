@@ -755,6 +755,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/usuarios/admin/criar", async (req, res) => {
+    try {
+      const { email, nome, senha } = req.body;
+      const { storageUsuarios } = await import("./storage");
+      
+      const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
+      if (usuarioExistente) {
+        return res.status(400).json({
+          success: false,
+          error: "Email já cadastrado",
+        });
+      }
+
+      const usuario = await storageUsuarios.criarUsuarioAprovado({ email, nome, senha });
+      res.json({
+        success: true,
+        message: "Usuário criado e aprovado automaticamente",
+        data: usuario,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao criar usuário",
+      });
+    }
+  });
+
+  app.delete("/api/usuarios/eliminar/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { storageUsuarios } = await import("./storage");
+      const sucesso = await storageUsuarios.eliminarUsuario(id);
+
+      if (!sucesso) {
+        return res.status(404).json({
+          success: false,
+          error: "Usuário não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Usuário eliminado com sucesso",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao eliminar usuário",
+      });
+    }
+  });
+
+  app.post("/api/usuarios/desativar/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { storageUsuarios } = await import("./storage");
+      const usuario = await storageUsuarios.desativarUsuario(id);
+
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          error: "Usuário não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Usuário desativado com sucesso",
+        data: usuario,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao desativar usuário",
+      });
+    }
+  });
+
+  app.post("/api/usuarios/ativar/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { storageUsuarios } = await import("./storage");
+      const usuario = await storageUsuarios.ativarUsuario(id);
+
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          error: "Usuário não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Usuário ativado com sucesso",
+        data: usuario,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao ativar usuário",
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

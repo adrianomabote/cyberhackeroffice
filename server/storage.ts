@@ -200,6 +200,7 @@ interface Usuario {
   nome: string;
   senha: string;
   aprovado: boolean;
+  ativo: boolean;
   compartilhamentos: number;
   createdAt: Date;
 }
@@ -214,6 +215,22 @@ export const storageUsuarios = {
       nome: data.nome,
       senha: data.senha,
       aprovado: false,
+      ativo: true,
+      compartilhamentos: 0,
+      createdAt: new Date(),
+    };
+    usuarios.push(usuario);
+    return usuario;
+  },
+
+  async criarUsuarioAprovado(data: { email: string; nome: string; senha: string }) {
+    const usuario: Usuario = {
+      id: Math.random().toString(36).substring(7),
+      email: data.email,
+      nome: data.nome,
+      senha: data.senha,
+      aprovado: true,
+      ativo: true,
       compartilhamentos: 0,
       createdAt: new Date(),
     };
@@ -233,8 +250,33 @@ export const storageUsuarios = {
     return usuario;
   },
 
+  async desativarUsuario(id: string) {
+    const usuario = usuarios.find(u => u.id === id);
+    if (usuario) {
+      usuario.ativo = false;
+    }
+    return usuario;
+  },
+
+  async ativarUsuario(id: string) {
+    const usuario = usuarios.find(u => u.id === id);
+    if (usuario) {
+      usuario.ativo = true;
+    }
+    return usuario;
+  },
+
+  async eliminarUsuario(id: string) {
+    const index = usuarios.findIndex(u => u.id === id);
+    if (index !== -1) {
+      usuarios.splice(index, 1);
+      return true;
+    }
+    return false;
+  },
+
   async verificarUsuario(email: string, senha: string) {
-    return usuarios.find(u => u.email === email && u.senha === senha && u.aprovado);
+    return usuarios.find(u => u.email === email && u.senha === senha && u.aprovado && u.ativo);
   },
 
   async adicionarCompartilhamento(email: string) {

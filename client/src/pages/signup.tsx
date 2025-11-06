@@ -16,13 +16,9 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const [showFreeBot, setShowFreeBot] = useState(false);
-  const [compartilhamentos, setCompartilhamentos] = useState(0);
-  const compartilhamentosNecessarios = 15;
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       alert('As senhas não coincidem!');
       return;
@@ -48,47 +44,16 @@ export default function Signup() {
     }
   };
 
-  const handleCompartilhar = async () => {
-    const urlCompartilhar = window.location.origin;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'Robô Cyber Hacker - Aviator',
-          text: 'Junte-se ao melhor sistema de IA para Aviator! 🚀',
-          url: urlCompartilhar,
-        });
-        
-        // Registrar compartilhamento
-        await fetch('/api/usuarios/compartilhar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-        
-        setCompartilhamentos(prev => prev + 1);
-      } catch (error) {
-        console.log('Compartilhamento cancelado');
-      }
-    } else {
-      // Fallback: copiar link
-      navigator.clipboard.writeText(urlCompartilhar);
-      alert('Link copiado! Compartilhe com 15 pessoas para obter o bot gratuito.');
-    }
-  };
-
-  const progressoPercentual = Math.min((compartilhamentos / compartilhamentosNecessarios) * 100, 100);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-cyan-500/5"></div>
-      
+
       <Card className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-950 border-2 border-red-600 relative z-10">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-3 mb-4">
             <Link href="/">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="icon"
                 data-testid="button-back"
               >
@@ -96,12 +61,12 @@ export default function Signup() {
               </Button>
             </Link>
             <div className="flex items-center gap-2">
-              <img 
-                src={hackerImage} 
-                alt="CyberHacker" 
+              <img
+                src={hackerImage}
+                alt="CyberHacker"
                 className="w-10 h-10 rounded-lg object-cover border-2 border-red-600"
               />
-              <h1 
+              <h1
                 className="text-lg font-bold text-red-500"
                 style={{ textShadow: '0 0 10px #ff0000' }}
                 data-testid="text-title"
@@ -171,66 +136,13 @@ export default function Signup() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-black font-semibold"
               data-testid="button-submit"
             >
               Criar Conta
             </Button>
-
-            {/* Botão Bot Gratuito */}
-            <Button
-              type="button"
-              onClick={() => setShowFreeBot(!showFreeBot)}
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold animate-pulse hover:animate-none"
-            >
-              🎁 Obter Bot Gratuito
-            </Button>
-
-            {/* Modal Bot Gratuito */}
-            {showFreeBot && (
-              <div className="mt-4 p-4 bg-gray-800 rounded-lg border-2 border-green-500">
-                <h3 className="text-lg font-bold text-green-400 mb-2">
-                  Obtenha o Bot Gratuito!
-                </h3>
-                <p className="text-sm text-gray-300 mb-4">
-                  Compartilhe com {compartilhamentosNecessarios} pessoas para liberar acesso gratuito ao bot
-                </p>
-                
-                {/* Barra de Progresso */}
-                <div className="w-full bg-gray-700 rounded-full h-6 mb-4 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-green-400 to-green-600 h-full flex items-center justify-center text-xs font-bold text-white transition-all duration-500"
-                    style={{ width: `${progressoPercentual}%` }}
-                  >
-                    {compartilhamentos}/{compartilhamentosNecessarios}
-                  </div>
-                </div>
-
-                {compartilhamentos < compartilhamentosNecessarios ? (
-                  <Button
-                    type="button"
-                    onClick={handleCompartilhar}
-                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
-                  >
-                    📤 Compartilhar Agora
-                  </Button>
-                ) : (
-                  <div className="text-center">
-                    <p className="text-green-400 font-bold mb-3">✅ Parabéns! Bot liberado!</p>
-                    <a
-                      href="https://bot-aviator-cashout.onrender.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-3 px-4 rounded hover:opacity-90 transition-opacity"
-                    >
-                      🤖 Acessar Bot Gratuito
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
 
             <p className="text-sm text-gray-400 text-center" data-testid="text-login-link">
               Já tem uma conta?{' '}
