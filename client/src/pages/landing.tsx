@@ -274,13 +274,12 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como o sistema funciona</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden bg-black w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="rounded-xl overflow-hidden w-full" style={{ aspectRatio: '16/9' }}>
                   <video
                     controls
                     controlsList="nodownload"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                     style={{ 
-                      backgroundColor: '#000',
                       imageRendering: 'crisp-edges',
                       filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
                     }}
@@ -288,7 +287,6 @@ export default function Landing() {
                     playsInline
                     disablePictureInPicture
                     src="/ComoFunciona.mp4"
-                    poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='9' viewBox='0 0 16 9'%3E%3Crect fill='%23000' width='16' height='9'/%3E%3C/svg%3E"
                   >
                     Seu navegador não suporta vídeos.
                   </video>
@@ -304,13 +302,12 @@ export default function Landing() {
                 <CardTitle className="text-red-700 text-xl font-bold">Como entrar no sistema</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center p-6">
-                <div className="rounded-xl overflow-hidden bg-black w-full" style={{ aspectRatio: '16/9' }}>
+                <div className="rounded-xl overflow-hidden w-full" style={{ aspectRatio: '16/9' }}>
                   <video
                     controls
                     controlsList="nodownload"
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
                     style={{ 
-                      backgroundColor: '#000',
                       imageRendering: 'crisp-edges',
                       filter: 'contrast(1.05) brightness(1.02) saturate(1.1)',
                     }}
@@ -318,7 +315,6 @@ export default function Landing() {
                     playsInline
                     disablePictureInPicture
                     src="/ComoEntrar.mp4"
-                    poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='9' viewBox='0 0 16 9'%3E%3Crect fill='%23000' width='16' height='9'/%3E%3C/svg%3E"
                   >
                     Seu navegador não suporta vídeos.
                   </video>
