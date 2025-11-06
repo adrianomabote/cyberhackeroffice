@@ -89,21 +89,11 @@ export default function Subscription() {
           {/* Botão de Compra */}
           <Button 
             onClick={handlePurchase}
-            className="w-full text-sm py-5 font-bold bg-red-600 hover:bg-red-700 text-white"
+            className="w-full bg-red-600 hover:bg-red-700 text-white"
             data-testid="button-purchase"
           >
             Comprar Agora
           </Button>
-
-          {/* Botão Obter Bot Gratuito */}
-          <Link href="/bot-gratuito">
-            <Button 
-              variant="outline"
-              className="w-full text-sm py-5 font-bold border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-            >
-              🎁 Obter Bot Gratuito
-            </Button>
-          </Link>
 
           {/* Link para voltar */}
           <p className="text-xs text-center" data-testid="text-back-link">
@@ -113,6 +103,18 @@ export default function Subscription() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Botão Obter Bot Gratuito - Fora do Card */}
+      <div className="mt-6 text-center">
+        <a
+          href="/bot-gratuito"
+          className="inline-block"
+        >
+          <button className="bg-green-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-green-700 transition-colors animate-heartbeat flex items-center gap-2 mx-auto">
+            🎁 Obter Bot Gratuito
+          </button>
+        </a>
+      </div>
     </div>
   );
 }

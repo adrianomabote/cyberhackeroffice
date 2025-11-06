@@ -154,6 +154,15 @@ export default function Signup() {
           </CardFooter>
         </form>
       </Card>
+      {/* Botão Obter bot gratuito adicionado aqui, fora da seção de assinatura */}
+      <div className="mt-4">
+        <Button
+          className="w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-bold text-sm whitespace-nowrap animate-pulse"
+          data-testid="button-get-free-bot"
+        >
+          Obter bot gratuito
+        </Button>
+      </div>
     </div>
   );
 }
