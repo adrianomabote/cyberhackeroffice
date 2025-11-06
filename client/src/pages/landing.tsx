@@ -39,6 +39,7 @@ export default function Landing() {
           <div className="flex gap-3 flex-shrink-0" style={{ marginLeft: '60px' }}>
             <Link href="/login" className="flex-shrink-0">
               <Button
+                size="sm"
                 className="bg-white text-black hover:bg-gray-200 font-semibold whitespace-nowrap"
                 data-testid="button-login"
               >
@@ -47,6 +48,7 @@ export default function Landing() {
             </Link>
             <Link href="/signup" className="flex-shrink-0">
               <Button
+                size="sm"
                 className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap"
                 data-testid="button-signup"
               >
