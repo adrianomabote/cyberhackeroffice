@@ -105,11 +105,10 @@ export default function Login() {
           <CardFooter className="flex flex-col gap-4">
             <Button 
               type="submit" 
-              className="w-full text-white font-semibold px-8"
+              className="w-full text-white font-semibold h-7 text-xs"
               style={{
                 backgroundColor: '#ff0000',
-                boxShadow: '0 0 20px rgba(255, 0, 0, 0.3)',
-                minHeight: '44px'
+                boxShadow: '0 0 20px rgba(255, 0, 0, 0.3)'
               }}
               data-testid="button-submit"
             >
