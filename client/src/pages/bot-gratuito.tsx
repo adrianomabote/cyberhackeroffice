@@ -111,7 +111,7 @@ export default function BotGratuito() {
               Compartilhar no WhatsApp
             </button>
           ) : (
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-6">
               <div className="bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
                 <CheckCircle2 className="w-12 h-12 text-green-400 mx-auto mb-2" />
                 <p className="text-green-400 font-bold text-lg">
@@ -122,13 +122,14 @@ export default function BotGratuito() {
                 href="https://bot-aviator-cashout.onrender.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="block mt-6"
               >
-                <Button 
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3"
+                <button 
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-lg transition-colors animate-heartbeat"
                   data-testid="button-access-bot"
                 >
                   Acessar Bot Gratuito
-                </Button>
+                </button>
               </a>
             </div>
           )}
