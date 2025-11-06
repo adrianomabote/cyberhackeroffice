@@ -95,6 +95,16 @@ export default function Subscription() {
             Comprar Agora
           </Button>
 
+          {/* Botão Obter Bot Gratuito */}
+          <Link href="/bot-gratuito">
+            <Button 
+              variant="outline"
+              className="w-full text-sm py-5 font-bold border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+            >
+              🎁 Obter Bot Gratuito
+            </Button>
+          </Link>
+
           {/* Link para voltar */}
           <p className="text-xs text-center" data-testid="text-back-link">
             <Link href="/" className="text-red-700 hover:text-red-600 underline font-semibold">
