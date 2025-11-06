@@ -303,7 +303,8 @@ export default function Landing() {
                     controlsList="nodownload"
                     className="block"
                     style={{ maxHeight: '800px', width: 'auto', height: 'auto', display: 'block' }}
-                    preload="metadata"
+                    preload="auto"
+                    playsInline
                     src="/ComoEntrar.mp4"
                   >
                     Seu navegador não suporta vídeos.
