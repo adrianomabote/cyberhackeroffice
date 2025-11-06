@@ -34,7 +34,7 @@ export default function Subscription() {
             Plano de Assinatura
           </CardTitle>
           <CardDescription className="text-gray-400 text-center" data-testid="text-subscription-subtitle">
-            Acesso completo ao Robô Cyber Hacker
+            Bot Cyber Hacker Premium
           </CardDescription>
         </CardHeader>
 
@@ -44,7 +44,7 @@ export default function Subscription() {
             <div className="text-5xl font-bold text-white mb-2">
               450<span className="text-3xl">MT</span>
             </div>
-            <p className="text-gray-400">por 1 dia de acesso</p>
+            <p className="text-gray-400">por 1 dia de uso</p>
           </div>
 
           {/* Benefícios */}
@@ -52,7 +52,7 @@ export default function Subscription() {
             <div className="flex items-start gap-3">
               <Check className="w-5 h-5 text-red-700 mt-0.5 flex-shrink-0" />
               <p className="text-white">
-                Acesso completo ao sistema por <span className="text-red-700 font-bold">24 horas</span>
+                Bot funcionando por <span className="text-red-700 font-bold">24 horas</span>
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -77,7 +77,7 @@ export default function Subscription() {
 
           {/* Aviso */}
           <div className="bg-gray-800/50 rounded-lg p-4 text-sm text-gray-300">
-            Após o pagamento, você terá acesso imediato ao sistema. O período de 24 horas começa a contar a partir do momento da confirmação do pagamento.
+            Após o pagamento, você receberá o bot imediatamente. O período de 24 horas começa a contar a partir do momento da confirmação do pagamento.
           </div>
 
           {/* Botão de Compra */}
