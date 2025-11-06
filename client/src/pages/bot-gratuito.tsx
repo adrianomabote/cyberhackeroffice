@@ -51,7 +51,7 @@ export default function BotGratuito() {
               Como Conseguir o Bot Gratuito?
             </h3>
             <p className="text-gray-300 mb-4">
-              Compartilhe este robô com:
+              Compartilhe este bot com:
             </p>
             <div className="space-y-2 text-left bg-gray-800/50 p-4 rounded-lg">
               <p className="text-white">✅ <strong>15 pessoas</strong> no WhatsApp</p>
@@ -86,7 +86,7 @@ export default function BotGratuito() {
           ) : (
             <div className="text-center space-y-4">
               <p className="text-green-400 font-bold text-xl">
-                ✅ Parabéns! Bot Liberado!
+                ✅ Parabéns! Bot Gratuito Liberado!
               </p>
               <a
                 href="https://bot-aviator-cashout.onrender.com"
@@ -94,7 +94,7 @@ export default function BotGratuito() {
                 rel="noopener noreferrer"
               >
                 <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-6 text-lg">
-                  🤖 Acessar Bot Gratuito
+                  🤖 Acessar Meu Bot Gratuito
                 </Button>
               </a>
             </div>
