@@ -672,6 +672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('[LOGIN] Tentativa de login:', email);
       
+      // Validar dados de entrada
       if (!email || !senha) {
         return res.status(400).json({
           success: false,
@@ -679,44 +680,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // Validar formato do email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          error: "Formato de email inválido",
+        });
+      }
+
       const { storageUsuarios } = await import("./storage");
       
-      // Verificar se o usuário existe
-      const usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email);
+      // Buscar usuário com tratamento de erro
+      let usuarioExistente;
+      try {
+        usuarioExistente = await storageUsuarios.obterUsuarioPorEmail(email.toLowerCase().trim());
+      } catch (dbError) {
+        console.error('[LOGIN] Erro ao buscar usuário no banco:', dbError);
+        return res.status(500).json({
+          success: false,
+          error: "Erro no servidor. Tente novamente em alguns instantes.",
+        });
+      }
       
       if (!usuarioExistente) {
         console.log('[LOGIN] Usuário não encontrado:', email);
         return res.status(401).json({
           success: false,
-          error: "Conta não registrada. Verifique se escreveu o email corretamente e tente novamente.",
+          error: "Email não cadastrado. Verifique se digitou corretamente ou registre-se.",
         });
       }
 
-      console.log('[LOGIN] Usuário encontrado:', { id: usuarioExistente.id, aprovado: usuarioExistente.aprovado, ativo: usuarioExistente.ativo });
+      console.log('[LOGIN] Usuário encontrado:', { 
+        id: usuarioExistente.id, 
+        email: usuarioExistente.email,
+        aprovado: usuarioExistente.aprovado, 
+        ativo: usuarioExistente.ativo 
+      });
 
       // Verificar se está aprovado
       if (usuarioExistente.aprovado !== 'true') {
-        return res.status(401).json({
+        return res.status(403).json({
           success: false,
-          error: "Sua conta ainda não foi aprovada pelo administrador. Aguarde a aprovação.",
+          error: "Sua conta ainda não foi aprovada. Por favor, aguarde a aprovação do administrador.",
         });
       }
 
       // Verificar se está ativo
       if (usuarioExistente.ativo !== 'true') {
-        return res.status(401).json({
+        return res.status(403).json({
           success: false,
-          error: "Sua conta foi desativada. Entre em contato com o administrador.",
+          error: "Sua conta está desativada. Entre em contato com o administrador.",
         });
       }
 
-      const usuario = await storageUsuarios.verificarUsuario(email, senha);
+      // Verificar senha
+      let usuario;
+      try {
+        usuario = await storageUsuarios.verificarUsuario(email.toLowerCase().trim(), senha);
+      } catch (verifyError) {
+        console.error('[LOGIN] Erro ao verificar senha:', verifyError);
+        return res.status(500).json({
+          success: false,
+          error: "Erro ao verificar credenciais. Tente novamente.",
+        });
+      }
 
       if (!usuario) {
         console.log('[LOGIN] Senha incorreta para:', email);
         return res.status(401).json({
           success: false,
-          error: "Senha incorreta. Tente novamente.",
+          error: "Senha incorreta. Verifique e tente novamente.",
         });
       }
 
@@ -732,10 +766,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error) {
-      console.error('[LOGIN] Erro detalhado:', error);
+      console.error('[LOGIN] Erro crítico:', error);
       res.status(500).json({
         success: false,
-        error: error instanceof Error ? error.message : "Erro ao fazer login. Tente novamente.",
+        error: "Erro no sistema. Por favor, tente novamente em alguns instantes.",
       });
     }
   });

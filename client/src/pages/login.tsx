@@ -17,11 +17,19 @@ export default function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Normalizar email (remover espaços e converter para minúsculas)
+    const emailNormalizado = email.trim().toLowerCase();
+
+    if (!emailNormalizado || !password) {
+      alert('Por favor, preencha email e senha');
+      return;
+    }
+
     try {
       const response = await fetch('/api/usuarios/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, senha: password }),
+        body: JSON.stringify({ email: emailNormalizado, senha: password }),
       });
 
       const data = await response.json();
@@ -30,10 +38,11 @@ export default function Login() {
         sessionStorage.setItem('user', JSON.stringify(data.data));
         setLocation('/welcome');
       } else {
-        alert(data.error || 'Credenciais inválidas ou conta não aprovada');
+        alert(data.error || 'Erro ao fazer login');
       }
     } catch (error) {
-      alert('Erro ao fazer login. Tente novamente.');
+      console.error('Erro no login:', error);
+      alert('Erro de conexão. Verifique sua internet e tente novamente.');
     }
   };
 
