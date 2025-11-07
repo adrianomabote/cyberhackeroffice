@@ -155,6 +155,8 @@ class StorageUsuarios {
   async verificarUsuario(email: string, senha: string) {
     try {
       console.log('[STORAGE] Verificando usuário:', email);
+      
+      // Buscar usuário COM todas as validações
       const [usuario] = await db
         .select()
         .from(usuarios)
@@ -164,29 +166,55 @@ class StorageUsuarios {
           eq(usuarios.ativo, 'true')
         ));
 
+      // VALIDAÇÃO 1: Usuário DEVE existir e estar aprovado/ativo
       if (!usuario) {
-        console.log('[STORAGE] Usuário não aprovado ou não ativo');
+        console.log('[STORAGE] BLOQUEADO - Usuário não encontrado ou não aprovado/ativo:', email);
         return null;
       }
 
-      // Verificar expiração
+      // VALIDAÇÃO 2: Verificar dados essenciais
+      if (!usuario.id || !usuario.email || !usuario.nome || !usuario.senha) {
+        console.error('[STORAGE] BLOQUEADO - Dados de usuário incompletos:', email);
+        return null;
+      }
+
+      // VALIDAÇÃO 3: Verificar expiração
       if (usuario.data_expiracao && new Date() > new Date(usuario.data_expiracao)) {
-        console.log('[STORAGE] Conta expirada:', email);
+        console.log('[STORAGE] BLOQUEADO - Conta expirada:', email);
         // Desativar automaticamente se expirou
         await this.desativarUsuario(usuario.id);
         return null;
       }
 
-      const senhaValida = await bcrypt.compare(senha, usuario.senha);
-      if (!senhaValida) {
-        console.log('[STORAGE] Senha inválida para:', email);
+      // VALIDAÇÃO 4: Verificar hash de senha
+      if (usuario.senha.length < 10) {
+        console.error('[STORAGE] BLOQUEADO - Hash de senha inválido:', email);
         return null;
       }
 
-      console.log('[STORAGE] Verificação bem-sucedida:', usuario.id);
+      // VALIDAÇÃO 5: Comparar senha
+      const senhaValida = await bcrypt.compare(senha, usuario.senha);
+      if (!senhaValida) {
+        console.log('[STORAGE] BLOQUEADO - Senha incorreta:', email);
+        return null;
+      }
+
+      // VALIDAÇÃO 6: Revalidar status antes de retornar
+      if (usuario.aprovado !== 'true' || usuario.ativo !== 'true') {
+        console.error('[STORAGE] BLOQUEADO - Status inválido:', email);
+        return null;
+      }
+
+      console.log('[STORAGE] ✓ Verificação bem-sucedida:', {
+        id: usuario.id,
+        email: usuario.email,
+        aprovado: usuario.aprovado,
+        ativo: usuario.ativo
+      });
+      
       return usuario;
     } catch (error) {
-      console.error('[STORAGE] Erro ao verificar usuário:', error);
+      console.error('[STORAGE] Erro crítico ao verificar usuário:', error);
       throw error;
     }
   }

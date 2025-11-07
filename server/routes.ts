@@ -683,6 +683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validar formato do email
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
+        console.log('[LOGIN] Email com formato inválido:', email);
         return res.status(400).json({
           success: false,
           error: "Formato de email inválido",
@@ -703,34 +704,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // VALIDAÇÃO CRÍTICA: Usuário DEVE existir no banco de dados
       if (!usuarioExistente) {
-        console.log('[LOGIN] Usuário não encontrado:', email);
+        console.log('[LOGIN] BLOQUEADO - Usuário não encontrado no banco:', email);
         return res.status(401).json({
           success: false,
-          error: "Email não cadastrado. Verifique se digitou corretamente ou registre-se.",
+          error: "Conta não registrada. Registre-se primeiro.",
         });
       }
 
-      console.log('[LOGIN] Usuário encontrado:', { 
+      // VALIDAÇÃO CRÍTICA: Verificar se tem ID válido
+      if (!usuarioExistente.id || !usuarioExistente.email) {
+        console.error('[LOGIN] BLOQUEADO - Dados de usuário inválidos:', email);
+        return res.status(401).json({
+          success: false,
+          error: "Dados de conta inválidos. Entre em contato com o administrador.",
+        });
+      }
+
+      // Log detalhado do usuário encontrado
+      console.log('[LOGIN] Usuário encontrado no banco:', { 
         id: usuarioExistente.id, 
         email: usuarioExistente.email,
+        nome: usuarioExistente.nome,
         aprovado: usuarioExistente.aprovado, 
-        ativo: usuarioExistente.ativo 
+        ativo: usuarioExistente.ativo,
+        timestamp: new Date().toISOString()
       });
 
-      // Verificar se está aprovado
+      // VALIDAÇÃO CRÍTICA 1: Verificar se está aprovado
       if (usuarioExistente.aprovado !== 'true') {
+        console.log('[LOGIN] BLOQUEADO - Conta não aprovada:', email);
         return res.status(403).json({
           success: false,
-          error: "Sua conta ainda não foi aprovada. Por favor, aguarde a aprovação do administrador.",
+          error: "Sua conta ainda não foi aprovada. Aguarde a aprovação do administrador.",
         });
       }
 
-      // Verificar se está ativo
+      // VALIDAÇÃO CRÍTICA 2: Verificar se está ativo
       if (usuarioExistente.ativo !== 'true') {
+        console.log('[LOGIN] BLOQUEADO - Conta inativa:', email);
         return res.status(403).json({
           success: false,
           error: "Sua conta está desativada. Entre em contato com o administrador.",
+        });
+      }
+
+      // VALIDAÇÃO CRÍTICA 3: Verificar se tem senha cadastrada
+      if (!usuarioExistente.senha || usuarioExistente.senha.length < 10) {
+        console.error('[LOGIN] BLOQUEADO - Senha inválida ou não existe:', email);
+        return res.status(401).json({
+          success: false,
+          error: "Dados de conta corrompidos. Entre em contato com o administrador.",
         });
       }
 
@@ -747,14 +772,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       if (!usuario) {
-        console.log('[LOGIN] Senha incorreta para:', email);
+        console.log('[LOGIN] BLOQUEADO - Senha incorreta para:', email);
         return res.status(401).json({
           success: false,
           error: "Senha incorreta. Verifique e tente novamente.",
         });
       }
 
-      console.log('[LOGIN] Login bem-sucedido:', usuario.id);
+      // VALIDAÇÃO FINAL: Garantir que todos os dados estão corretos antes de permitir
+      if (!usuario.id || !usuario.email || !usuario.nome) {
+        console.error('[LOGIN] BLOQUEADO - Dados de usuário incompletos após verificação:', email);
+        return res.status(500).json({
+          success: false,
+          error: "Erro nos dados da conta. Entre em contato com o administrador.",
+        });
+      }
+
+      // VALIDAÇÃO FINAL: Revalidar aprovado e ativo
+      if (usuario.aprovado !== 'true' || usuario.ativo !== 'true') {
+        console.error('[LOGIN] BLOQUEADO - Status de conta mudou durante verificação:', email);
+        return res.status(403).json({
+          success: false,
+          error: "Conta não autorizada. Entre em contato com o administrador.",
+        });
+      }
+
+      console.log('[LOGIN] ✓ LOGIN BEM-SUCEDIDO:', {
+        id: usuario.id,
+        email: usuario.email,
+        nome: usuario.nome,
+        timestamp: new Date().toISOString()
+      });
 
       res.json({
         success: true,
