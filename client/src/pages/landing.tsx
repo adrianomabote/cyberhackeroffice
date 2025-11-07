@@ -307,7 +307,7 @@ export default function Landing() {
               <CardContent className="flex flex-col items-center p-6">
                 <div className="rounded-xl overflow-hidden w-full" style={{ position: 'relative', height: '500px' }}>
                   <iframe
-                    src="https://www.youtube.com/embed/lVkmzPwt3uE"
+                    src="https://www.youtube.com/embed/VgsrvceLFiw"
                     title="Como entrar no sistema"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
