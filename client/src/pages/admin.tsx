@@ -563,6 +563,9 @@ export default function Admin() {
             onClick={async () => {
               try {
                 const response = await fetch('/aviator-script.js');
+                if (!response.ok) {
+                  throw new Error('Falha ao carregar o script');
+                }
                 const scriptContent = await response.text();
                 await navigator.clipboard.writeText(scriptContent);
                 toast({
@@ -570,9 +573,10 @@ export default function Admin() {
                   description: "Cole no console do Aviator (F12) e pressione Enter",
                 });
               } catch (error) {
+                console.error('Erro ao copiar script:', error);
                 toast({
                   title: "❌ Erro ao Copiar",
-                  description: "Não foi possível copiar o script",
+                  description: "Não foi possível copiar o script. Verifique se o arquivo existe.",
                   variant: "destructive",
                 });
               }
