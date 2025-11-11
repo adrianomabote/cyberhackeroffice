@@ -6,132 +6,178 @@ import { z } from "zod";
 
 // Função que detecta oportunidades de entrada analisando padrões
 function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
-  if (velas.length < 5) {
+  if (velas.length < 15) {
     return {
-      multiplicador: null,
+      multiplicador: 2.00,
       sinal: "AGUARDAR",
       confianca: "baixa",
-      motivo: "Aguardando mais dados",
+      motivo: "Aguardando mais dados (mínimo 15 velas)",
+      alvos: [2.00, 3.00, 4.00, 7.00, 10.00]
     };
   }
 
-  const ultimas = velas.slice(-20);
+  // Pegar as últimas 50 velas para análise
+  const ultimas = velas.slice(-50);
   const multiplicadores = ultimas.map(v => v.multiplicador);
-  const n = multiplicadores.length;
+  
+  // Diferentes janelas de análise
+  const ultimas3 = multiplicadores.slice(-3);
   const ultimas5 = multiplicadores.slice(-5);
   const ultimas10 = multiplicadores.slice(-10);
+  const ultimas20 = multiplicadores.slice(-20);
+  const ultimas30 = multiplicadores.slice(-30);
 
-  // Calcular médias
+  // Cálculo de médias
+  const media3 = ultimas3.reduce((a, b) => a + b, 0) / ultimas3.length;
   const media5 = ultimas5.reduce((a, b) => a + b, 0) / ultimas5.length;
-  const media10 = ultimas10.reduce((a, b) => a + b, 0) / Math.min(ultimas10.length, 10);
-  const mediaGeral = multiplicadores.reduce((a, b) => a + b, 0) / n;
+  const media10 = ultimas10.reduce((a, b) => a + b, 0) / ultimas10.length;
+  const media20 = ultimas20.reduce((a, b) => a + b, 0) / ultimas20.length;
+  const media30 = ultimas30.reduce((a, b) => a + b, 0) / ultimas30.length;
+  const mediaGeral = multiplicadores.reduce((a, b) => a + b, 0) / multiplicadores.length;
 
-  // Detectar padrões favoráveis
+  // Detecção de padrões
   let pontos = 0;
   let motivos: string[] = [];
-
-  // Padrão 1: Sequência de baixos (3+ velas <2x nas últimas 5)
-  const baixosRecentes = ultimas5.filter(m => m < 2).length;
-  if (baixosRecentes >= 3) {
-    pontos += 3;
-    motivos.push(`${baixosRecentes} velas baixas consecutivas`);
-  }
-
-  // Padrão 2: Última vela baixa (<2.5x) após média razoável
   const ultimaVela = multiplicadores[multiplicadores.length - 1];
-  if (ultimaVela < 2.5 && media10 > 2.5) {
+  const penultimaVela = multiplicadores[multiplicadores.length - 2] || 0;
+  const antepenultimaVela = multiplicadores[multiplicadores.length - 3] || 0;
+
+  // 1. Análise de sequência de baixos
+  const sequenciaBaixas = ultimas5.filter(m => m < 1.8).length;
+  if (sequenciaBaixas >= 3) {
+    pontos += 4;
+    motivos.push(`Sequência de ${sequenciaBaixas} velas baixas < 1.8x`);
+  }
+
+  // 2. Tendência de baixa nas médias móveis
+  if (media3 < media5 && media5 < media10 && media10 < media20) {
+    pontos += 3;
+    motivos.push("Tendência de baixa nas médias móveis");
+  }
+
+  // 3. Volatilidade recente
+  const altosExtremos = ultimas10.filter(m => m > 5).length;
+  if (altosExtremos === 0) {
     pontos += 2;
-    motivos.push("Última vela baixa após média alta");
+    motivos.push("Sem altos extremos recentes (>5x)");
   }
 
-  // Padrão 3: Tendência de recuperação (média das 5 últimas < média geral)
-  if (media5 < mediaGeral * 0.85) {
+  // 4. Análise de variação percentual
+  const variacao1 = Math.abs((ultimaVela - penultimaVela) / (penultimaVela || 1) * 100) || 0;
+  const variacao2 = Math.abs((penultimaVela - antepenultimaVela) / (antepenultimaVela || 1) * 100) || 0;
+  
+  if (variacao1 < variacao2) {
     pontos += 2;
-    motivos.push("Tendência de recuperação detectada");
+    motivos.push(`Variação diminuindo (${variacao1.toFixed(1)}% < ${variacao2.toFixed(1)}%)`);
   }
 
-  // Padrão 4: Não houve alto recente (nenhuma vela >5x nas últimas 3)
-  const ultimas3 = multiplicadores.slice(-3);
-  const altosRecentes = ultimas3.filter(m => m > 5).length;
-  if (altosRecentes === 0) {
+  // 5. Análise de suporte e resistência
+  const abaixoDaMedia10 = ultimas3.filter(m => m < media10).length;
+  if (abaixoDaMedia10 >= 2) {
+    pontos += 2;
+    motivos.push(`${abaixoDaMedia10}/3 velas abaixo da média 10`);
+  }
+
+  // 6. Análise de força da tendência
+  if (media5 < media20) {
     pontos += 1;
-    motivos.push("Sem altos extremos recentes");
+    motivos.push(`Média 5 (${media5.toFixed(2)}x) < Média 20 (${media20.toFixed(2)}x)`);
   }
 
-  // Padrão 5: Volatilidade moderada (não muito caótico)
-  const variancia = multiplicadores.reduce((sum, m) => sum + Math.pow(m - mediaGeral, 2), 0) / n;
-  const desvioPadrao = Math.sqrt(variancia);
-  const cv = desvioPadrao / mediaGeral;
-  if (cv < 0.6) {
+  // 7. Análise de reversão
+  if (ultimaVela < 1.5) {
+    pontos += 2;
+    motivos.push(`Última vela baixa (${ultimaVela.toFixed(2)}x)`);
+  }
+
+  // 8. Sequência de baixas
+  if (ultimaVela < penultimaVela && penultimaVela < antepenultimaVela) {
+    pontos += 2;
+    motivos.push("Sequência de 3 velas de baixa");
+  }
+
+  // 9. Análise de tendência de longo prazo
+  if (media10 < media30) {
     pontos += 1;
-    motivos.push("Volatilidade controlada");
+    motivos.push(`Tendência de baixa no longo prazo (M10 < M30)`);
   }
 
-  // Calcular previsão usando EMA
-  const alpha = 0.3;
-  let ema = multiplicadores[0];
-  for (let i = 1; i < n; i++) {
-    ema = alpha * multiplicadores[i] + (1 - alpha) * ema;
+  // 10. Análise de distância da média móvel
+  const distanciaMedia = Math.abs(ultimaVela - media10) / media10 * 100;
+  if (distanciaMedia > 30) {
+    pontos += 2;
+    motivos.push(`Grande distância da média (${distanciaMedia.toFixed(1)}%)`);
   }
 
-  // Ajustar previsão baseado em padrões
-  let previsao = ema;
-  if (baixosRecentes >= 3) previsao *= 1.15;
-  if (media5 < 2.2) previsao *= 1.1;
-
-  previsao = Math.round(Math.max(1.5, Math.min(10, previsao)) * 100) / 100;
-
-  // Determinar sinal baseado nos pontos
+  // Determinar os alvos de saque baseado nos pontos
+  const alvos = [2.00, 3.00, 4.00, 7.00, 10.00];
+  let alvoRecomendado = 2.00; // Alvo padrão conservador
   let sinal = "AGUARDAR";
   let confianca = "baixa";
-  let multiplicadorSacar = previsao;
-
-  if (pontos >= 6) {
+  
+  // Ajustar estratégia baseado nos pontos
+  if (pontos >= 15) {
     sinal = "ENTRAR";
     confianca = "alta";
-    // Confiança alta: recomendar sacar baseado na média geral - MUITO CONSERVADOR
-    if (mediaGeral < 2.5) {
-      multiplicadorSacar = 2.0; // Após sequência muito baixa, sacar em 2.00x
-    } else if (mediaGeral < 3.5) {
-      multiplicadorSacar = 2.5; // Média normal, sacar em 2.50x
-    } else if (mediaGeral < 5.0) {
-      multiplicadorSacar = 3.0; // Média alta, sacar em 3.00x
-    } else if (mediaGeral < 7.0) {
-      multiplicadorSacar = 4.0; // Média muito alta, sacar em 4.00x
-    } else {
-      // MUITO RARO: só recomendar 10.00x se média geral >= 7.0
-      // e teve pelo menos 2 velas >= 8.0x nas últimas 10
-      const altosExtremos = ultimas10.filter(m => m >= 8.0).length;
-      if (altosExtremos >= 2) {
-        multiplicadorSacar = 10.0; // Apenas em condições extremamente favoráveis
-      } else {
-        multiplicadorSacar = 5.0; // Caso contrário, mais conservador
-      }
-    }
-  } else if (pontos >= 4) {
+    alvoRecomendado = 10.00; // Alvo mais alto para sinais fortes
+    motivos.push("Sinal forte para alvos altos");
+  } 
+  else if (pontos >= 12) {
+    sinal = "ENTRAR";
+    confianca = "média-alta";
+    alvoRecomendado = 7.00;
+    motivos.push("Bom sinal para alvo médio");
+  }
+  else if (pontos >= 9) {
     sinal = "ENTRAR";
     confianca = "média";
-    // Confiança média: muito conservador
-    if (mediaGeral < 2.5) {
-      multiplicadorSacar = 2.0;
-    } else {
-      multiplicadorSacar = 2.5; // Mais seguro com confiança média
-    }
-  } else if (pontos >= 2) {
-    sinal = "POSSÍVEL";
+    alvoRecomendado = 4.00;
+    motivos.push("Sinal moderado para alvo médio");
+  }
+  else if (pontos >= 6) {
+    sinal = "ENTRAR";
     confianca = "baixa";
-    multiplicadorSacar = 2.0; // Se entrar, sacar rápido
+    alvoRecomendado = 3.00;
+    motivos.push("Sinal fraco, alvo baixo");
+  }
+  else if (pontos >= 3) {
+    sinal = "AGUARDAR";
+    confianca = "muito baixa";
+    alvoRecomendado = 2.00;
+    motivos.push("Sinal muito fraco, aguardando melhores condições");
+  } else {
+    sinal = "AGUARDAR";
+    confianca = "nenhuma";
+    alvoRecomendado = 2.00;
+    motivos.push("Sem sinais claros");
   }
 
-  // Garantir que o multiplicador está arredondado corretamente
-  multiplicadorSacar = Math.round(multiplicadorSacar * 100) / 100;
+  // Ajustar alvo com base na volatilidade recente
+  const volatilidade = Math.max(...ultimas10) / Math.min(...ultimas10.filter(x => x > 0));
+  if (volatilidade > 3 && alvoRecomendado > 4.00) {
+    alvoRecomendado = Math.min(alvoRecomendado * 1.2, 10.00);
+    motivos.push(`Ajuste para cima devido à alta volatilidade (${volatilidade.toFixed(2)})`);
+  } else if (volatilidade < 1.5 && alvoRecomendado > 2.00) {
+    alvoRecomendado = Math.max(alvoRecomendado * 0.8, 2.00);
+    motivos.push(`Ajuste para baixo devido à baixa volatilidade (${volatilidade.toFixed(2)})`);
+  }
+
+  // Arredondar para o alvo mais próximo
+  alvoRecomendado = alvos.reduce((prev, curr) => 
+    Math.abs(curr - alvoRecomendado) < Math.abs(prev - alvoRecomendado) ? curr : prev
+  );
 
   return {
-    multiplicador: multiplicadorSacar,
+    multiplicador: alvoRecomendado,
     sinal,
     confianca,
     motivo: motivos.length > 0 ? motivos.join(" | ") : "Análise em andamento",
-    pontos, // Para debug
+    alvos: alvos,
+    pontos,
+    media10: parseFloat(media10.toFixed(2)),
+    media20: parseFloat(media20.toFixed(2)),
+    media30: parseFloat(media30.toFixed(2)),
+    volatilidade: parseFloat(volatilidade.toFixed(2))
   };
 }
 
