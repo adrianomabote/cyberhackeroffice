@@ -7,8 +7,13 @@ import { velas, usuarios, type InsertVela } from "@shared/schema";
 import type { ManutencaoStatus, SinaisManual } from "@shared/schema";
 import bcrypt from "bcryptjs";
 
+if (!process.env.DATABASE_URL) {
+  console.error('[DB] DATABASE_URL não configurada. Defina a variável de ambiente.');
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 });
 
 const db = drizzle(pool);
