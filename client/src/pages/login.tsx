@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
-import robotImage from '@assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png';
+// usando imagem pública existente
 
 export default function Login() {
   useProtection();
@@ -62,7 +62,7 @@ export default function Login() {
             </Link>
             <div className="flex items-center gap-3 ml-2">
               <img 
-                src={robotImage}
+                src={"/favicon.png"}
                 alt="Robô CyberHacker" 
                 className="w-10 h-10 rounded-lg object-cover"
               />

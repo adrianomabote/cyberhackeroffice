@@ -5,7 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { TrendingUp, Shield, Zap, Target, CheckCircle, PlayCircle, Brain, BarChart3, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
 import { useState } from 'react';
-import robotImage from '@assets/file_00000000de3471fbba06676b1bf33e8f_1762368543414.png';
+// usando imagem pública existente
 
 export default function Landing() {
   useProtection();
@@ -24,7 +24,7 @@ export default function Landing() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src={robotImage}
+              src={"/favicon.png"}
               alt="Robô CyberHacker"
               className="w-10 h-10 rounded-lg object-cover"
               data-testid="img-robot"

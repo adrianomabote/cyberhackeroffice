@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../client/vite.config";
+import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
@@ -68,7 +68,14 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
+  // Prefer build output at projectRoot/server/public (created by Vite build)
+  const projectRootPublic = path.resolve(process.cwd(), "server", "public");
+  // Fallback to dist/public (historical location relative to the bundled file)
+  const distRelativePublic = path.resolve(import.meta.dirname, "public");
+
+  const distPath = fs.existsSync(projectRootPublic)
+    ? projectRootPublic
+    : distRelativePublic;
 
   if (!fs.existsSync(distPath)) {
     throw new Error(
