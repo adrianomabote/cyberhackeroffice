@@ -72,11 +72,11 @@ app.use((req, res, next) => {
   // Tentar iniciar o servidor na porta especificada
   server.listen({
     port,
-    host: "127.0.0.1", // Usando localhost em vez de 0.0.0.0 para evitar problemas de firewall
+    host: "0.0.0.0", // Necessário para plataformas de hospedagem como Render
     reusePort: false,   // Desativado para evitar conflitos
   }, () => {
-    log(`Servidor rodando em: http://localhost:${port}`);
-    log(`API disponível em: http://localhost:${port}/api`);
+    log(`Servidor rodando em: http://0.0.0.0:${port}`);
+    log(`API disponível em: http://0.0.0.0:${port}/api`);
   }).on('error', (error: NodeJS.ErrnoException) => {
     if (error.code === 'EADDRINUSE') {
       log(`Erro: A porta ${port} já está em uso.`);
