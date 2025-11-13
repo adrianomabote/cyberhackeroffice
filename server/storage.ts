@@ -11,9 +11,11 @@ if (!process.env.DATABASE_URL) {
   console.error('[DB] DATABASE_URL não configurada. Defina a variável de ambiente.');
 }
 
+const needsSSL = /\bsslmode=require\b/i.test(process.env.DATABASE_URL || '') || /render\.com|neon\.tech/i.test(process.env.DATABASE_URL || '');
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+  ssl: needsSSL ? { rejectUnauthorized: false } : undefined,
 });
 
 const db = drizzle(pool);
