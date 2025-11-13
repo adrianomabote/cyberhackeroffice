@@ -74,6 +74,18 @@
         totalEnviados++;
         errosConsecutivos = 0;
         console.log(`✅ CYBER HACKER: Enviado ${multiplicador.toFixed(2)}x para servidor (Total: ${totalEnviados})`);
+
+        // Imediatamente após enviar uma vela real, envie o marcador de "três pontinhos"
+        try {
+          await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ multiplicador: -1 })
+          });
+          console.log('⋯ CYBER HACKER: Marcador de três pontinhos enviado');
+        } catch (e) {
+          console.warn('⚠️ CYBER HACKER: Falha ao enviar marcador de três pontinhos');
+        }
       } else {
         errosConsecutivos++;
         console.error(`❌ CYBER HACKER: Erro ao enviar ${multiplicador.toFixed(2)}x - Status: ${response.status}`);
