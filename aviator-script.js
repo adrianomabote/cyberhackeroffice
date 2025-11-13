@@ -57,7 +57,7 @@
       totalCapturados++;
       ultimoMultiplicador = multiplicador;
       
-      console.log(`🎯 CYBER HACKER: Capturado ${multiplicador.toFixed(2)}x (#${totalCapturados})`);
+      console.log(🎯 CYBER HACKER: Capturado ${multiplicador.toFixed(2)}x (#${totalCapturados}));
       
       // Envia para a API
       const response = await fetch(API_URL, {
@@ -73,22 +73,10 @@
       if (response.ok) {
         totalEnviados++;
         errosConsecutivos = 0;
-        console.log(`✅ CYBER HACKER: Enviado ${multiplicador.toFixed(2)}x para servidor (Total: ${totalEnviados})`);
-
-        // Imediatamente após enviar uma vela real, envie o marcador de "três pontinhos"
-        try {
-          await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ multiplicador: -1 })
-          });
-          console.log('⋯ CYBER HACKER: Marcador de três pontinhos enviado');
-        } catch (e) {
-          console.warn('⚠️ CYBER HACKER: Falha ao enviar marcador de três pontinhos');
-        }
+        console.log(✅ CYBER HACKER: Enviado ${multiplicador.toFixed(2)}x para servidor (Total: ${totalEnviados}));
       } else {
         errosConsecutivos++;
-        console.error(`❌ CYBER HACKER: Erro ao enviar ${multiplicador.toFixed(2)}x - Status: ${response.status}`);
+        console.error(❌ CYBER HACKER: Erro ao enviar ${multiplicador.toFixed(2)}x - Status: ${response.status});
         
         if (errosConsecutivos >= 5) {
           console.error('🚨 CYBER HACKER: Muitos erros consecutivos. Verifique a conexão com o servidor.');
@@ -109,8 +97,8 @@
     }
     
     console.log('🚀 CYBER HACKER: Iniciando captura automática...');
-    console.log(`📡 Servidor: ${API_URL}`);
-    console.log(`⏱️  Intervalo: ${INTERVALO_CAPTURA}ms`);
+    console.log(📡 Servidor: ${API_URL});
+    console.log(⏱️  Intervalo: ${INTERVALO_CAPTURA}ms);
     console.log('');
     console.log('💡 Para parar: stopCyberCapture()');
     console.log('💡 Para reiniciar: startCyberCapture()');
@@ -130,20 +118,20 @@
     intervalId = null;
     
     console.log('🛑 CYBER HACKER: Captura pausada!');
-    console.log(`📊 Estatísticas:`);
-    console.log(`   - Total capturados: ${totalCapturados}`);
-    console.log(`   - Total enviados: ${totalEnviados}`);
-    console.log(`   - Último multiplicador: ${ultimoMultiplicador ? ultimoMultiplicador.toFixed(2) : 'N/A'}x`);
+    console.log(📊 Estatísticas:);
+    console.log(   - Total capturados: ${totalCapturados});
+    console.log(   - Total enviados: ${totalEnviados});
+    console.log(   - Último multiplicador: ${ultimoMultiplicador ? ultimoMultiplicador.toFixed(2) : 'N/A'}x);
   }
   
   // ========== FUNÇÃO DE STATUS ==========
   function mostrarStatus() {
     console.log('📊 CYBER HACKER - STATUS:');
-    console.log(`   - Ativo: ${intervalId ? 'SIM ✅' : 'NÃO ❌'}`);
-    console.log(`   - Total capturados: ${totalCapturados}`);
-    console.log(`   - Total enviados: ${totalEnviados}`);
-    console.log(`   - Último multiplicador: ${ultimoMultiplicador ? ultimoMultiplicador.toFixed(2) : 'N/A'}x`);
-    console.log(`   - Erros consecutivos: ${errosConsecutivos}`);
+    console.log(   - Ativo: ${intervalId ? 'SIM ✅' : 'NÃO ❌'});
+    console.log(   - Total capturados: ${totalCapturados});
+    console.log(   - Total enviados: ${totalEnviados});
+    console.log(   - Último multiplicador: ${ultimoMultiplicador ? ultimoMultiplicador.toFixed(2) : 'N/A'}x);
+    console.log(   - Erros consecutivos: ${errosConsecutivos});
   }
   
   // ========== EXPOR FUNÇÕES GLOBALMENTE ==========
