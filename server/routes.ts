@@ -181,6 +181,13 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   };
 }
 
+// Estado curto para controlar reenvio de sinais (máx. 2 tentativas)
+const signalState: { baseId: string | null; attempts: number; expiresAt: number } = {
+  baseId: null,
+  attempts: 0,
+  expiresAt: 0,
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Habilitar CORS para permitir chamadas do script externo
   app.use((req, res, next) => {
@@ -359,21 +366,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada
+  // GET /api/sacar/cyber - Retorna análise em tempo real e adaptativa (sempre para a PRÓXIMA rodada)
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
-      // Buscar mais velas para análise mais precisa
       const historico = await storage.getHistorico(20);
+      if (!historico || historico.length === 0) {
+        return res.json({ multiplicador: 2.0, sinal: "AGUARDAR", confianca: "baixa" });
+      }
+
+      // Base sempre é a vela mais recente (analisar para a PRÓXIMA rodada)
+      const base = historico[0]; // getHistorico retorna em ordem desc
+      const ultimas = historico.map(v => v.multiplicador).slice(0, 20);
+
+      // Análise existente (conservadora)
       const analise = analisarOportunidadeEntrada(historico);
 
-      res.json({
+      // Ajuste adaptativo: cenário "pagando" (muitas >= 2.0x) e últimas 3 fortes
+      const acima2 = ultimas.filter(x => x >= 2.0).length;
+      const proporcao2 = acima2 / Math.max(ultimas.length, 1);
+      const last3 = ultimas.slice(0, 3);
+      const last5 = ultimas.slice(0, 5);
+      let bonus = 0;
+      // Proporção de velas positivas
+      if (proporcao2 >= 0.6) bonus += 4; // muito forte
+      else if (proporcao2 >= 0.45) bonus += 2; // forte
+      else if (proporcao2 >= 0.35) bonus += 1; // moderado
+      // Últimas 3 todas positivas
+      if (last3.length === 3 && last3.every(x => x >= 2.0)) bonus += 3;
+      // Tendência curtíssima em alta
+      if (last3.length === 3 && last3[0] >= last3[1] && last3[1] >= last3[2]) bonus += 1;
+
+      // Converter confiança em pontos aproximados para reclassificação leve
+      const conf2pts: Record<string, number> = { "alta": 12, "média-alta": 10, "média": 8, "baixa": 6, "muito baixa": 4, "nenhuma": 2 };
+      const pontosAjustados = (conf2pts[analise.confianca] || 4) + bonus;
+
+      // Mapeamento final de decisão, sempre mirando a PRÓXIMA rodada (limiares levemente reduzidos)
+      let sinalFinal: "ENTRAR" | "AGUARDAR" = analise.sinal as any;
+      let confiancaFinal = analise.confianca as string;
+      if (pontosAjustados >= 13) { sinalFinal = "ENTRAR"; confiancaFinal = "alta"; }
+      else if (pontosAjustados >= 10) { sinalFinal = "ENTRAR"; confiancaFinal = "média-alta"; }
+      else if (pontosAjustados >= 7) { sinalFinal = "ENTRAR"; confiancaFinal = "média"; }
+      else if (pontosAjustados >= 5) { sinalFinal = "ENTRAR"; confiancaFinal = "baixa"; }
+      else { sinalFinal = "AGUARDAR"; }
+
+      // Controle de reenvio: máx. 2 tentativas por baseVela
+      const agora = Date.now();
+      const janelaMs = 6000; // expira rápido para não usar entrada atrasada
+      if (signalState.baseId !== String(base.id)) {
+        // nova vela base → resetar tentativas
+        signalState.baseId = String(base.id);
+        signalState.attempts = 0;
+        signalState.expiresAt = agora + janelaMs;
+      }
+
+      // Se já expirou a janela desta base, não force entrada
+      if (agora > signalState.expiresAt) {
+        sinalFinal = "AGUARDAR";
+      }
+
+      // Garantir no máx. 2 tentativas por base
+      if (sinalFinal === "ENTRAR") {
+        if (signalState.attempts >= 2) {
+          sinalFinal = "AGUARDAR";
+        } else {
+          signalState.attempts += 1;
+        }
+      }
+
+      return res.json({
         multiplicador: analise.multiplicador,
-        sinal: analise.sinal,
-        confianca: analise.confianca,
+        sinal: sinalFinal,
+        confianca: confiancaFinal,
         motivo: analise.motivo,
+        pontos: pontosAjustados,
+        baseVelaId: base.id,
+        baseTimestamp: base.timestamp?.toISOString?.() ?? base.timestamp,
+        expiresAt: signalState.expiresAt,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         multiplicador: null,
         sinal: "AGUARDAR",
         confianca: "baixa",
