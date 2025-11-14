@@ -4,6 +4,13 @@ import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "@shared/schema";
 import { z } from "zod";
 
+// Estado para controle de sinais
+const signalState = {
+  baseId: null as string | null,
+  attempts: 0,
+  expiresAt: 0
+};
+
 // Função que detecta oportunidades de entrada analisando padrões
 function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   if (velas.length < 15) {
