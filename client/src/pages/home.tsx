@@ -37,37 +37,34 @@ export default function Home() {
     staleTime: 0,
   });
 
-  // Buscar última vela (APÓS:) - sempre dados frescos sem cache
+  // Buscar última vela (APÓS:)
   const { data: aposData } = useQuery<UltimaVelaResponse>({
     queryKey: ['/api/apos/cyber'],
     queryFn: async () => {
       const res = await fetch('/api/apos/cyber', {
-        cache: 'no-store', // Força buscar sem cache
         headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
+          'Cache-Control': 'no-cache',
         },
       });
-      if (!res.ok) throw new Error('Failed to fetch');
-      const data = await res.json();
-      console.log('[FRONTEND APÓS] Dados recebidos:', data);
-      return data;
+      return res.json();
     },
-    refetchInterval: 1000,
-    staleTime: 0,
-    gcTime: 0, // Não manter em cache
+    refetchInterval: 2000, // Atualiza a cada 2 segundos
+    staleTime: 1000,
   });
 
   // Buscar previsão (SACAR:)
   const { data: sacarData } = useQuery<PrevisaoResponse>({
     queryKey: ['/api/sacar/cyber'],
     queryFn: async () => {
-      const res = await fetch('/api/sacar/cyber');
-      if (!res.ok) throw new Error('Failed to fetch');
+      const res = await fetch('/api/sacar/cyber', {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       return res.json();
     },
-    refetchInterval: 1000,
-    staleTime: 0,
+    refetchInterval: 2000, // Atualiza a cada 2 segundos
+    staleTime: 1000,
   });
 
   // Função para retornar cor baseada no multiplicador (cores da foto)
@@ -105,12 +102,10 @@ export default function Home() {
   useEffect(() => {
     if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
       // Verificar se é uma entrada NOVA (diferente da última mostrada)
-      const isNovaEntrada = !ultimoMultiplicador || 
-        ultimoMultiplicador !== aposData.multiplicador;
+      const isNovaEntrada = !ultimaEntradaMostrada || 
+        ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador;
 
       if (isNovaEntrada) {
-        // Mostrar entrada e salvar valores
-        setUltimoMultiplicador(aposData.multiplicador);
         setMostrandoEntrada(true);
         setUltimaEntradaMostrada({
           multiplicadorApos: aposData.multiplicador,
@@ -120,13 +115,10 @@ export default function Home() {
     }
   }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador]);
 
-  // Resetar APENAS quando uma NOVA vela chegar (multiplicador de APÓS mudar)
+  // Limpar apenas quando receber -1 (sinal de três pontinhos)
   useEffect(() => {
-    if (mostrandoEntrada && aposData?.multiplicador) {
-      if (ultimaEntradaMostrada && ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador) {
-        // Nova vela chegou, resetar para mostrar os três pontinhos
-        setMostrandoEntrada(false);
-      }
+    if (aposData?.multiplicador === -1) {
+      setMostrandoEntrada(false);
     }
   }, [aposData?.multiplicador]);
 

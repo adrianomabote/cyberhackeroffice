@@ -371,11 +371,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const historico = await storage.getHistorico(20);
       if (!historico || historico.length === 0) {
-        return res.json({ multiplicador: 2.0, sinal: "AGUARDAR", confianca: "baixa" });
+        return res.json({ 
+          multiplicador: 2.0, 
+          sinal: "AGUARDAR", 
+          confianca: "baixa",
+          motivo: "Aguardando histórico de velas"
+        });
       }
 
       // Base sempre é a vela mais recente (analisar para a PRÓXIMA rodada)
       const base = historico[0]; // getHistorico retorna em ordem desc
+      const agora = Date.now();
+      const janelaMs = 6000; // 6 segundos de janela para cada sinal
+
+      // Se já passou mais de 6 segundos desde o último sinal, resetar estado
+      if (agora > signalState.expiresAt) {
+        signalState.baseId = null;
+        signalState.attempts = 0;
+      }
+
+      // Se já tentamos 2 vezes com esta base, aguardar próxima vela
+      if (signalState.baseId === String(base.id) && signalState.attempts >= 2) {
+        return res.json({
+          multiplicador: 2.0,
+          sinal: "AGUARDAR",
+          confianca: "baixa",
+          motivo: "Máximo de tentativas para esta vela"
+        });
+      }
+
+      // Se é uma nova base, atualizar estado
+      if (signalState.baseId !== String(base.id)) {
+        signalState.baseId = String(base.id);
+        signalState.attempts = 0;
+        signalState.expiresAt = agora + janelaMs;
+      }
+
       const ultimas = historico.map(v => v.multiplicador).slice(0, 20);
 
       // Análise existente (conservadora)
@@ -387,14 +418,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const last3 = ultimas.slice(0, 3);
       const last5 = ultimas.slice(0, 5);
       let bonus = 0;
+      
       // Proporção de velas positivas
       if (proporcao2 >= 0.6) bonus += 4; // muito forte
       else if (proporcao2 >= 0.45) bonus += 2; // forte
       else if (proporcao2 >= 0.35) bonus += 1; // moderado
+      
       // Últimas 3 todas positivas
       if (last3.length === 3 && last3.every(x => x >= 2.0)) bonus += 3;
+      
       // Tendência curtíssima em alta
       if (last3.length === 3 && last3[0] >= last3[1] && last3[1] >= last3[2]) bonus += 1;
+
+      // Incrementar contador de tentativas
+      signalState.attempts += 1;
 
       // Converter confiança em pontos aproximados para reclassificação leve
       const conf2pts: Record<string, number> = { "alta": 12, "média-alta": 10, "média": 8, "baixa": 6, "muito baixa": 4, "nenhuma": 2 };
