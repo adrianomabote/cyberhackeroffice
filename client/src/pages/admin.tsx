@@ -397,7 +397,7 @@ export default function Admin() {
             </p>
             {sinaisData?.ativo && (
               <p className="font-sans mt-2" style={{ color: '#ffffff', fontSize: '1rem' }}>
-                APÓS: {sinaisData.apos?.toFixed(2)}X | SACAR: {sinaisData.sacar?.toFixed(2)}X
+                APÓS: {sinaisData.apos != null ? `${sinaisData.apos.toFixed(2)}X` : '⋯'} | SACAR: {sinaisData.sacar != null ? `${sinaisData.sacar.toFixed(2)}X` : '⋯'}
               </p>
             )}
           </div>
