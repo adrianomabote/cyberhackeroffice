@@ -303,12 +303,12 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: deveMostrarValores && valorAposExibir ? getMultiplicadorColor(valorAposExibir) : '#888888',
+                      color: mostrandoEntrada && valorAposExibir ? getMultiplicadorColor(valorAposExibir) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-apos-value"
                   >
-                    {deveMostrarValores && valorAposExibir ? `${valorAposExibir.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && valorAposExibir ? `${valorAposExibir.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
@@ -330,12 +330,12 @@ export default function Home() {
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: deveMostrarValores && valorSacarExibir ? getMultiplicadorColor(valorSacarExibir) : '#888888',
+                      color: mostrandoEntrada && valorSacarExibir ? getMultiplicadorColor(valorSacarExibir) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-sacar-value"
                   >
-                    {deveMostrarValores && valorSacarExibir ? `${valorSacarExibir.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && valorSacarExibir ? `${valorSacarExibir.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
