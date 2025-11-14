@@ -109,8 +109,7 @@ export default function Home() {
     if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
       // Verificar se é uma entrada NOVA (diferente da última mostrada)
       const isNovaEntrada = !ultimaEntradaMostrada || 
-        ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador ||
-        ultimaEntradaMostrada.multiplicadorSacar !== sacarData.multiplicador;
+        ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador;
 
       if (isNovaEntrada) {
         // Mostrar entrada e salvar valores
@@ -120,21 +119,20 @@ export default function Home() {
           multiplicadorSacar: sacarData.multiplicador,
         });
       }
-    } else if (mostrandoEntrada) {
-      // Se não é mais hora de entrar OU recebeu nova vela, resetar
-      setMostrandoEntrada(false);
     }
+    // Não remover mais a entrada automaticamente aqui
+    // Apenas será removida quando uma nova vela chegar (useEffect abaixo)
   }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador]);
 
-  // Resetar quando nova vela chegar (multiplicador de APÓS mudou)
+  // Resetar APENAS quando uma NOVA vela chegar (multiplicador de APÓS mudou)
   useEffect(() => {
     if (mostrandoEntrada && aposData?.multiplicador) {
       if (ultimaEntradaMostrada && ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador) {
-        // Nova vela chegou, resetar
+        // Nova vela chegou, resetar para mostrar os três pontinhos
         setMostrandoEntrada(false);
       }
     }
-  }, [aposData?.multiplicador, mostrandoEntrada, ultimaEntradaMostrada]);
+  }, [aposData?.multiplicador]);
 
   // Efeito de pulso quando valores mudam
   useEffect(() => {
