@@ -86,33 +86,31 @@ export default function Home() {
   // Determinar valores a exibir baseado na prioridade
   let valorAposExibir = null;
   let valorSacarExibir = null;
-  let deveMostrarValores = false;
+  const recebeuTresPontinhos = aposData?.multiplicador === -1;
 
   if (usarSinaisManual) {
     // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
     valorAposExibir = sinaisManualData?.apos ?? null;
     valorSacarExibir = sinaisManualData?.sacar ?? null;
-    deveMostrarValores = true;
-  } else {
+  } else if (!recebeuTresPontinhos && isHoraDeEntrar && mostrandoEntrada) {
     // Prioridade 2: Sistema automático (requer script rodando)
-    const recebeuTresPontinhos = aposData?.multiplicador === -1;
-    
-    if (!recebeuTresPontinhos && isHoraDeEntrar && mostrandoEntrada) {
-      valorAposExibir = aposData?.multiplicador ?? null;
-      valorSacarExibir = sacarData?.multiplicador ?? null;
-      deveMostrarValores = true;
-    }
+    valorAposExibir = aposData?.multiplicador ?? null;
+    valorSacarExibir = sacarData?.multiplicador ?? null;
   }
+
+  // Estado para controlar o último multiplicador processado
+  const [ultimoMultiplicador, setUltimoMultiplicador] = useState<number | null>(null);
 
   // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
     if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
       // Verificar se é uma entrada NOVA (diferente da última mostrada)
-      const isNovaEntrada = !ultimaEntradaMostrada || 
-        ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador;
+      const isNovaEntrada = !ultimoMultiplicador || 
+        ultimoMultiplicador !== aposData.multiplicador;
 
       if (isNovaEntrada) {
         // Mostrar entrada e salvar valores
+        setUltimoMultiplicador(aposData.multiplicador);
         setMostrandoEntrada(true);
         setUltimaEntradaMostrada({
           multiplicadorApos: aposData.multiplicador,
@@ -120,11 +118,9 @@ export default function Home() {
         });
       }
     }
-    // Não remover mais a entrada automaticamente aqui
-    // Apenas será removida quando uma nova vela chegar (useEffect abaixo)
   }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador]);
 
-  // Resetar APENAS quando uma NOVA vela chegar (multiplicador de APÓS mudou)
+  // Resetar APENAS quando uma NOVA vela chegar (multiplicador de APÓS mudar)
   useEffect(() => {
     if (mostrandoEntrada && aposData?.multiplicador) {
       if (ultimaEntradaMostrada && ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador) {
