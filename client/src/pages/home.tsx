@@ -83,16 +83,15 @@ export default function Home() {
   // Determinar valores a exibir baseado na prioridade
   let valorAposExibir = null;
   let valorSacarExibir = null;
-  const recebeuTresPontinhos = aposData?.multiplicador === -1;
 
   if (usarSinaisManual) {
     // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
     valorAposExibir = sinaisManualData?.apos ?? null;
     valorSacarExibir = sinaisManualData?.sacar ?? null;
-  } else if (!recebeuTresPontinhos && isHoraDeEntrar && mostrandoEntrada) {
-    // Prioridade 2: Sistema automático (requer script rodando)
-    valorAposExibir = aposData?.multiplicador ?? null;
-    valorSacarExibir = sacarData?.multiplicador ?? null;
+  } else if (mostrandoEntrada && ultimaEntradaMostrada) {
+    // Prioridade 2: Sistema automático: manter último sinal mostrado
+    valorAposExibir = ultimaEntradaMostrada.multiplicadorApos;
+    valorSacarExibir = ultimaEntradaMostrada.multiplicadorSacar;
   }
 
   // Estado para controlar o último multiplicador processado
