@@ -38,10 +38,23 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/usuarios" component={AdminUsuarios} />
 
-      {/* 404 */}
+            {/* 404 */}
       <Route>
         <NotFound />
       </Route>
     </Switch>
   );
 }
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
