@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
-import hackerImage from '@assets/IMG-20251105-WA0139_1762343129352.jpg';
 
 export default function Signup() {
   useProtection();
@@ -63,7 +62,7 @@ export default function Signup() {
             </Link>
             <div className="flex items-center gap-1.5">
               <img
-                src={hackerImage}
+                src={"/favicon.png"}
                 alt="CyberHacker"
                 className="w-5 h-5 rounded-lg object-cover border-2 border-red-600"
               />
