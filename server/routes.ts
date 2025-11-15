@@ -4,13 +4,6 @@ import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "@shared/schema";
 import { z } from "zod";
 
-// Estado para controle de sinais
-const signalState = {
-  baseId: null as string | null,
-  attempts: 0,
-  expiresAt: 0
-};
-
 // Função que detecta oportunidades de entrada analisando padrões
 function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   if (velas.length < 15) {
@@ -452,30 +445,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       else if (pontosAjustados >= 7) { sinalFinal = "ENTRAR"; confiancaFinal = "média"; }
       else if (pontosAjustados >= 5) { sinalFinal = "ENTRAR"; confiancaFinal = "baixa"; }
       else { sinalFinal = "AGUARDAR"; }
-
-      // Controle de reenvio: máx. 2 tentativas por baseVela
-      const agora = Date.now();
-      const janelaMs = 6000; // expira rápido para não usar entrada atrasada
-      if (signalState.baseId !== String(base.id)) {
-        // nova vela base → resetar tentativas
-        signalState.baseId = String(base.id);
-        signalState.attempts = 0;
-        signalState.expiresAt = agora + janelaMs;
-      }
-
-      // Se já expirou a janela desta base, não force entrada
-      if (agora > signalState.expiresAt) {
-        sinalFinal = "AGUARDAR";
-      }
-
-      // Garantir no máx. 2 tentativas por base
-      if (sinalFinal === "ENTRAR") {
-        if (signalState.attempts >= 2) {
-          sinalFinal = "AGUARDAR";
-        } else {
-          signalState.attempts += 1;
-        }
-      }
 
       return res.json({
         multiplicador: analise.multiplicador,

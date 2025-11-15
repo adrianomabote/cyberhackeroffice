@@ -132,7 +132,7 @@ export default function Subscription() {
                 Lá será <span className="font-bold text-white">obrigatório escrever o seu número do WhatsApp</span>.
               </p>
               <p>
-                Após o pagamento, você receberá o teu acesso diretamente no teu WhatsApp em <span className="font-bold text-green-400">menos de 5 minutos</span>.
+                Após o pagamento, você receberá o teu acesso diretamente no teu WhatsApp em <span className="font-bold text-green-400">menos de 1 minutos</span>.
               </p>
             </DialogDescription>
           </DialogHeader>
