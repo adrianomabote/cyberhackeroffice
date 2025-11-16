@@ -1,25 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'wouter';
+import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useProtection } from '@/hooks/use-protection';
 import { Sparkles, TrendingUp, Shield } from 'lucide-react';
 
 export default function Welcome() {
   useProtection();
-  const navigate = useNavigate();
-  const [location] = useLocation();
-
-  // Verifica se já viu as boas-vindas
-  useEffect(() => {
-    const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome');
-    if (hasSeenWelcome === 'true' && location === '/welcome') {
-      navigate('/home', { replace: true });
-    }
-  }, [location, navigate]);
+  const [, setLocation] = useLocation();
 
   const handleContinuar = () => {
+    // Marcar como já viu a mensagem de boas-vindas nesta sessão
     sessionStorage.setItem('hasSeenWelcome', 'true');
-    navigate('/home');
+    setLocation('/app');
   };
 
   return (
