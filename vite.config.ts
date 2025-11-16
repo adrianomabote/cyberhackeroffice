@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(process.cwd(), "client", "src"),
       "@assets": path.resolve(process.cwd(), "client", "src", "assets"),
+      "@shared": path.resolve(process.cwd(), "shared"),
     },
   },
   build: {
