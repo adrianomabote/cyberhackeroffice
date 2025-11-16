@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useProtection } from '@/hooks/use-protection';
 import { Sparkles, TrendingUp, Shield } from 'lucide-react';
 
 export default function Welcome() {
   useProtection();
-  const navigate = useNavigate();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
 
   // Verifica se já viu as boas-vindas
   useEffect(() => {
