@@ -181,8 +181,14 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   };
 }
 
-// Estado curto para controlar reenvio de sinais (máx. 2 tentativas)
-const signalState: { baseId: string | null; attempts: number; expiresAt: number } = {
+// Estado para controlar o envio de sinais
+const signalState: { 
+  lastSignalId: string | null;    // ID da última vela que gerou sinal
+  baseId: string | null;          // ID da base atual
+  attempts: number;               // Tentativas atuais
+  expiresAt: number;              // Timestamp de expiração
+} = {
+  lastSignalId: null,
   baseId: null,
   attempts: 0,
   expiresAt: 0,
@@ -405,6 +411,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         signalState.baseId = String(base.id);
         signalState.attempts = 0;
         signalState.expiresAt = agora + janelaMs;
+        signalState.lastSignalId = null; // Resetar o último sinal quando muda a base
       }
 
       const ultimas = historico.map(v => v.multiplicador).slice(0, 20);
@@ -440,11 +447,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Mapeamento final de decisão, sempre mirando a PRÓXIMA rodada (limiares levemente reduzidos)
       let sinalFinal: "ENTRAR" | "AGUARDAR" = analise.sinal as any;
       let confiancaFinal = analise.confianca as string;
+      
+      // Aplicar a lógica de pontos para determinar o sinal
       if (pontosAjustados >= 13) { sinalFinal = "ENTRAR"; confiancaFinal = "alta"; }
       else if (pontosAjustados >= 10) { sinalFinal = "ENTRAR"; confiancaFinal = "média-alta"; }
       else if (pontosAjustados >= 7) { sinalFinal = "ENTRAR"; confiancaFinal = "média"; }
       else if (pontosAjustados >= 5) { sinalFinal = "ENTRAR"; confiancaFinal = "baixa"; }
       else { sinalFinal = "AGUARDAR"; }
+      
+      // Evitar sinal duplicado para a mesma vela
+      if (sinalFinal === "ENTRAR" && signalState.lastSignalId === base.id) {
+        sinalFinal = "AGUARDAR";
+        confiancaFinal = "baixa";
+        analise.motivo = "Sinal já enviado para esta vela";
+      } else if (sinalFinal === "ENTRAR") {
+        // Registrar que enviamos um sinal para esta vela
+        signalState.lastSignalId = base.id;
+      }
 
       return res.json({
         multiplicador: analise.multiplicador,
