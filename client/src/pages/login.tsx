@@ -125,9 +125,9 @@ export default function Login() {
             </Button>
             <p className="text-sm text-gray-400 text-center" data-testid="text-signup-link">
               Não tem uma conta?{' '}
-              <Link href="/signup" className="underline font-semibold" style={{ color: '#ff0000' }}>
-                Registre-se
-              </Link>
+         <Link href="/subscription" className="underline font-semibold" style={{ color: '#ff0000' }}>
+  Registre-se
+</Link>
             </p>
           </CardFooter>
         </form>
