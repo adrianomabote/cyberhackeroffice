@@ -46,7 +46,7 @@ export default function Landing() {
                 Entrar
               </Button>
             </Link>
-            <Link href="/signup" className="flex-shrink-0">
+            <Link href="/subscription" className="flex-shrink-0">
               <Button
                 size="sm"
                 className="bg-red-800 text-white hover:bg-red-900 font-semibold whitespace-nowrap"
@@ -78,7 +78,7 @@ export default function Landing() {
             O robô mostra onde o Aviator vai cair com <span className="font-semibold text-red-700">100% de acerto</span> usando IA avançada em tempo real
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/signup">
+            <Link href="/subscription">
               <Button
                 size="lg"
                 className="bg-red-800 text-white text-lg px-8 py-3 font-bold hover:bg-red-900 h-auto min-h-0"
@@ -349,7 +349,7 @@ export default function Landing() {
           <p className="text-base text-gray-300 mb-6 max-w-2xl mx-auto" data-testid="text-cta-subtitle">
             Junte-se a centenas de jogadores que já estão maximizando seus ganhos no Aviator com IA
           </p>
-          <Link href="/signup">
+          <Link href="/subscription">
             <Button
               size="default"
               className="bg-red-800 text-white text-base px-6 py-2 font-bold hover:bg-red-900"
