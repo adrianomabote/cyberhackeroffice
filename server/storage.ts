@@ -3,8 +3,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
 import { eq, desc, sql, and, lt } from "drizzle-orm";
-import { velas, usuarios, type InsertVela } from "@shared/schema";
-import type { ManutencaoStatus, SinaisManual } from "@shared/schema";
+import { velas, usuarios, type InsertVela } from "../shared/schema";
+import type { ManutencaoStatus, SinaisManual } from "../shared/schema";
 import bcrypt from "bcryptjs";
 
 if (!process.env.DATABASE_URL) {
