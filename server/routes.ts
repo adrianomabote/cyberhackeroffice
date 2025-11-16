@@ -426,16 +426,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const last5 = ultimas.slice(0, 5);
       let bonus = 0;
       
-      // Proporção de velas positivas
-      if (proporcao2 >= 0.6) bonus += 4; // muito forte
-      else if (proporcao2 >= 0.45) bonus += 2; // forte
-      else if (proporcao2 >= 0.35) bonus += 1; // moderado
-      
-      // Últimas 3 todas positivas
-      if (last3.length === 3 && last3.every(x => x >= 2.0)) bonus += 3;
-      
-      // Tendência curtíssima em alta
-      if (last3.length === 3 && last3[0] >= last3[1] && last3[1] >= last3[2]) bonus += 1;
+      // Apenas aplicar bônus se a análise já for de média para cima
+      if (analise.confianca === 'média' || analise.confianca === 'média-alta' || analise.confianca === 'alta') {
+        // Proporção de velas positivas
+        if (proporcao2 >= 0.6) bonus += 2; // muito forte
+        else if (proporcao2 >= 0.45) bonus += 1; // forte
+        
+        // Últimas 3 todas positivas
+        if (last3.length === 3 && last3.every(x => x >= 2.0)) bonus += 2;
+        
+        // Tendência curtíssima em alta
+        if (last3.length === 3 && last3[0] >= last3[1] && last3[1] >= last3[2]) bonus += 1;
+      }
 
       // Incrementar contador de tentativas
       signalState.attempts += 1;
@@ -444,16 +446,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const conf2pts: Record<string, number> = { "alta": 12, "média-alta": 10, "média": 8, "baixa": 6, "muito baixa": 4, "nenhuma": 2 };
       const pontosAjustados = (conf2pts[analise.confianca] || 4) + bonus;
 
-      // Mapeamento final de decisão, sempre mirando a PRÓXIMA rodada (limiares levemente reduzidos)
-      let sinalFinal: "ENTRAR" | "AGUARDAR" = analise.sinal as any;
-      let confiancaFinal = analise.confianca as string;
+      // Mapeamento final de decisão - apenas ENTRAR para sinais fortes
+      let sinalFinal: "ENTRAR" | "..." = "...";
+      let confiancaFinal = "baixa";
       
-      // Aplicar a lógica de pontos para determinar o sinal
-      if (pontosAjustados >= 13) { sinalFinal = "ENTRAR"; confiancaFinal = "alta"; }
-      else if (pontosAjustados >= 10) { sinalFinal = "ENTRAR"; confiancaFinal = "média-alta"; }
-      else if (pontosAjustados >= 7) { sinalFinal = "ENTRAR"; confiancaFinal = "média"; }
-      else if (pontosAjustados >= 5) { sinalFinal = "ENTRAR"; confiancaFinal = "baixa"; }
-      else { sinalFinal = "..."; }
+      // Apenas considerar ENTRAR se a análise for de média para cima E pontos ajustados forem altos
+      if ((analise.confianca === 'média' || analise.confianca === 'média-alta' || analise.confianca === 'alta') && 
+          pontosAjustados >= 10) {
+        sinalFinal = "ENTRAR";
+        confiancaFinal = analise.confianca;
+      }
       
       // Evitar sinal duplicado para a mesma vela
       if (sinalFinal === "ENTRAR" && signalState.lastSignalId === base.id) {
