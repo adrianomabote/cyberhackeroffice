@@ -453,13 +453,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       else if (pontosAjustados >= 10) { sinalFinal = "ENTRAR"; confiancaFinal = "média-alta"; }
       else if (pontosAjustados >= 7) { sinalFinal = "ENTRAR"; confiancaFinal = "média"; }
       else if (pontosAjustados >= 5) { sinalFinal = "ENTRAR"; confiancaFinal = "baixa"; }
-      else { sinalFinal = "AGUARDAR"; }
+      else { sinalFinal = "..."; }
       
       // Evitar sinal duplicado para a mesma vela
       if (sinalFinal === "ENTRAR" && signalState.lastSignalId === base.id) {
-        sinalFinal = "AGUARDAR";
+        sinalFinal = "...";
         confiancaFinal = "baixa";
-        analise.motivo = "Sinal já enviado para esta vela";
+        analise.motivo = "...";
       } else if (sinalFinal === "ENTRAR") {
         // Registrar que enviamos um sinal para esta vela
         signalState.lastSignalId = base.id;
