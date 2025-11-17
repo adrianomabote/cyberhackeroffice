@@ -187,11 +187,15 @@ const signalState: {
   baseId: string | null;          // ID da base atual
   attempts: number;               // Tentativas atuais
   expiresAt: number;              // Timestamp de expiração
+  lastSignalTime: number | null;  // Timestamp do último sinal ENTRAR
+  velasAposUltimoSinal: number;   // Contador de velas após o último sinal
 } = {
   lastSignalId: null,
   baseId: null,
   attempts: 0,
   expiresAt: 0,
+  lastSignalTime: null,
+  velasAposUltimoSinal: 0
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -411,7 +415,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         signalState.baseId = String(base.id);
         signalState.attempts = 0;
         signalState.expiresAt = agora + janelaMs;
-        signalState.lastSignalId = null; // Resetar o último sinal quando muda a base
+        // Incrementar contador de velas após o último sinal
+        if (signalState.lastSignalTime !== null) {
+          signalState.velasAposUltimoSinal += 1;
+        }
       }
 
       const ultimas = historico.map(v => v.multiplicador).slice(0, 20);
@@ -450,21 +457,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let sinalFinal: "ENTRAR" | "..." = "...";
       let confiancaFinal = "baixa";
       
-      // Apenas considerar ENTRAR se a análise for de média para cima E pontos ajustados forem altos
+      // Verificar se já se passaram pelo menos 3 velas desde o último sinal
+      const minimoVelasAposSinal = 3;
+      const podeEnviarSinal = signalState.lastSignalTime === null || 
+                             signalState.velasAposUltimoSinal >= minimoVelasAposSinal;
+      
+      // Apenas considerar ENTRAR se a análise for de média para cima, pontos ajustados forem altos
+      // E já tiver se passado o número mínimo de velas desde o último sinal
       if ((analise.confianca === 'média' || analise.confianca === 'média-alta' || analise.confianca === 'alta') && 
-          pontosAjustados >= 10) {
+          pontosAjustados >= 10 && podeEnviarSinal) {
         sinalFinal = "ENTRAR";
         confiancaFinal = analise.confianca;
       }
       
-      // Evitar sinal duplicado para a mesma vela
-      if (sinalFinal === "ENTRAR" && signalState.lastSignalId === base.id) {
+      // Se não for para ENTRAR, sempre retornar "..."
+      if (sinalFinal !== "ENTRAR") {
         sinalFinal = "...";
         confiancaFinal = "baixa";
-        analise.motivo = "...";
-      } else if (sinalFinal === "ENTRAR") {
-        // Registrar que enviamos um sinal para esta vela
-        signalState.lastSignalId = base.id;
+        analise.motivo = podeEnviarSinal 
+          ? "Aguardando próxima oportunidade" 
+          : `Aguardando ${minimoVelasAposSinal - signalState.velasAposUltimoSinal} velas após o último sinal`;
+      }
+      
+      // Evitar sinal duplicado para a mesma vela
+      if (sinalFinal === "ENTRAR") {
+        if (signalState.lastSignalId === base.id) {
+          sinalFinal = "...";
+          confiancaFinal = "baixa";
+          analise.motivo = "Aguardando próxima oportunidade";
+        } else {
+          // Registrar que enviamos um sinal para esta vela
+          signalState.lastSignalId = base.id;
+          signalState.lastSignalTime = agora;
+          signalState.velasAposUltimoSinal = 0;
+          signalState.attempts = 0; // Resetar tentativas ao enviar um sinal
+        }
       }
 
       return res.json({

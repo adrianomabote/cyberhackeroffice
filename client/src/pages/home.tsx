@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useProtection } from "@/hooks/use-protection";
 import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus, SinaisManual } from "@shared/schema";
+import { api } from "@/lib/api";
 
 export default function Home() {
   useProtection();
@@ -26,6 +27,7 @@ export default function Home() {
   // Verificar status de manutenção
   const { data: manutencaoData } = useQuery<ManutencaoStatus>({
     queryKey: ['/api/manutencao/cyber'],
+    queryFn: () => api.get<ManutencaoStatus>('/api/manutencao/cyber'),
     refetchInterval: 5000, // Verifica a cada 5 segundos
     staleTime: 0,
   });
@@ -33,6 +35,7 @@ export default function Home() {
   // Buscar sinais manuais
   const { data: sinaisManualData } = useQuery<SinaisManual>({
     queryKey: ['/api/sinais-manual/cyber'],
+    queryFn: () => api.get<SinaisManual>('/api/sinais-manual/cyber'),
     refetchInterval: 1000,
     staleTime: 0,
   });
@@ -40,14 +43,7 @@ export default function Home() {
   // Buscar última vela (APÓS:)
   const { data: aposData } = useQuery<UltimaVelaResponse>({
     queryKey: ['/api/apos/cyber'],
-    queryFn: async () => {
-      const res = await fetch('/api/apos/cyber', {
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-      return res.json();
-    },
+    queryFn: () => api.get<UltimaVelaResponse>('/api/apos/cyber'),
     refetchInterval: 2000, // Atualiza a cada 2 segundos
     staleTime: 1000,
   });
@@ -55,14 +51,7 @@ export default function Home() {
   // Buscar previsão (SACAR:)
   const { data: sacarData } = useQuery<PrevisaoResponse>({
     queryKey: ['/api/sacar/cyber'],
-    queryFn: async () => {
-      const res = await fetch('/api/sacar/cyber', {
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-      return res.json();
-    },
+    queryFn: () => api.get<PrevisaoResponse>('/api/sacar/cyber'),
     refetchInterval: 2000, // Atualiza a cada 2 segundos
     staleTime: 1000,
   });
