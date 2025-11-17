@@ -66,21 +66,43 @@ export default function Home() {
   // Verificar se é hora de entrar
   const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
 
-  // Usar sinais manuais se estiverem ativos, senão usar automáticos
+  // Determinar se devemos usar sinais manuais
   const usarSinaisManual = sinaisManualData?.ativo === true;
-
+  
   // Determinar valores a exibir baseado na prioridade
   let valorAposExibir = null;
   let valorSacarExibir = null;
+  let mostrarTresPontos = true; // Por padrão, mostra os três pontos
 
-  if (usarSinaisManual) {
+  // Verificar se há sinal manual ativo e com valores válidos
+  const temSinalManualValido = usarSinaisManual && 
+    (sinaisManualData?.apos !== null && sinaisManualData?.apos !== undefined) && 
+    (sinaisManualData?.sacar !== null && sinaisManualData?.sacar !== undefined);
+
+  if (temSinalManualValido) {
     // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
-    valorAposExibir = sinaisManualData?.apos ?? null;
-    valorSacarExibir = sinaisManualData?.sacar ?? null;
+    valorAposExibir = sinaisManualData.apos;
+    valorSacarExibir = sinaisManualData.sacar;
+    mostrarTresPontos = false; // Não mostrar os três pontos quando houver sinal manual
+    
+    // Atualizar o estado para mostrar a entrada
+    if (!mostrandoEntrada) {
+      setMostrandoEntrada(true);
+    }
+    
+    // Atualizar a última entrada mostrada para os valores manuais
+    if (ultimaEntradaMostrada?.multiplicadorApos !== valorAposExibir || 
+        ultimaEntradaMostrada?.multiplicadorSacar !== valorSacarExibir) {
+      setUltimaEntradaMostrada({
+        multiplicadorApos: valorAposExibir,
+        multiplicadorSacar: valorSacarExibir
+      });
+    }
   } else if (mostrandoEntrada && ultimaEntradaMostrada) {
     // Prioridade 2: Sistema automático: manter último sinal mostrado
     valorAposExibir = ultimaEntradaMostrada.multiplicadorApos;
     valorSacarExibir = ultimaEntradaMostrada.multiplicadorSacar;
+    mostrarTresPontos = false; // Não mostrar os três pontos quando houver entrada válida
   }
 
   // Estado para controlar o último multiplicador processado
@@ -88,6 +110,16 @@ export default function Home() {
 
   // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
+    // Se houver sinal manual ativo, não atualizar com dados automáticos
+    if (temSinalManualValido) {
+      // Garantir que estamos mostrando a entrada para sinais manuais
+      if (!mostrandoEntrada) {
+        setMostrandoEntrada(true);
+      }
+      return;
+    }
+
+    // Se não houver sinal manual ativo, verificar se há sinal automático
     if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
       // Verificar se é uma entrada NOVA (diferente da última mostrada)
       const isNovaEntrada = !ultimaEntradaMostrada || 
@@ -288,7 +320,7 @@ export default function Home() {
                     }}
                     data-testid="text-apos-value"
                   >
-                    {mostrandoEntrada && valorAposExibir ? `${valorAposExibir.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && valorAposExibir && !mostrarTresPontos ? `${valorAposExibir.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
@@ -315,7 +347,7 @@ export default function Home() {
                     }}
                     data-testid="text-sacar-value"
                   >
-                    {mostrandoEntrada && valorSacarExibir ? `${valorSacarExibir.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && valorSacarExibir && !mostrarTresPontos ? `${valorSacarExibir.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
