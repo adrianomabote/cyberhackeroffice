@@ -149,7 +149,7 @@ export default function BotGratuito() {
             <p className="text-gray-400 text-xs mb-3">
               Quer acesso imediato?
             </p>
-            <Link href="/signup">
+            <Link href="/subscription">
               <Button 
                 variant="outline" 
                 className="w-full text-white border-gray-600 hover:border-green-600 hover:bg-green-600/10"
