@@ -8,6 +8,10 @@ import { api } from "@/lib/api";
 export default function Home() {
   useProtection();
   const [, setLocation] = useLocation();
+  const [mostrandoEntrada, setMostrandoEntrada] = useState(false);
+  const [ultimaEntrada, setUltimaEntrada] = useState<{ apos: number; sacar: number } | null>(null);
+  const [pulseApos, setPulseApos] = useState(false);
+  const [pulseSacar, setPulseSacar] = useState(false);
 
   // Verificar se já viu a mensagem de boas-vindas
   useEffect(() => {
@@ -16,20 +20,12 @@ export default function Home() {
       setLocation('/welcome');
     }
   }, [setLocation]);
-  const [pulseApos, setPulseApos] = useState(false);
-  const [pulseSacar, setPulseSacar] = useState(false);
-  const [ultimaEntradaMostrada, setUltimaEntradaMostrada] = useState<{
-    multiplicadorApos: number;
-    multiplicadorSacar: number;
-  } | null>(null);
-  const [mostrandoEntrada, setMostrandoEntrada] = useState(false);
 
   // Verificar status de manutenção
   const { data: manutencaoData } = useQuery<ManutencaoStatus>({
     queryKey: ['/api/manutencao/cyber'],
     queryFn: () => api.get<ManutencaoStatus>('/api/manutencao/cyber'),
-    refetchInterval: 5000, // Verifica a cada 5 segundos
-    staleTime: 0,
+    refetchInterval: 5000,
   });
 
   // Buscar sinais manuais
@@ -37,129 +33,85 @@ export default function Home() {
     queryKey: ['/api/sinais-manual/cyber'],
     queryFn: () => api.get<SinaisManual>('/api/sinais-manual/cyber'),
     refetchInterval: 1000,
-    staleTime: 0,
   });
 
   // Buscar última vela (APÓS:)
   const { data: aposData } = useQuery<UltimaVelaResponse>({
     queryKey: ['/api/apos/cyber'],
     queryFn: () => api.get<UltimaVelaResponse>('/api/apos/cyber'),
-    refetchInterval: 2000, // Atualiza a cada 2 segundos
-    staleTime: 1000,
+    refetchInterval: 2000,
   });
 
   // Buscar previsão (SACAR:)
   const { data: sacarData } = useQuery<PrevisaoResponse>({
     queryKey: ['/api/sacar/cyber'],
     queryFn: () => api.get<PrevisaoResponse>('/api/sacar/cyber'),
-    refetchInterval: 2000, // Atualiza a cada 2 segundos
-    staleTime: 1000,
+    refetchInterval: 2000,
   });
 
-  // Função para retornar cor baseada no multiplicador (cores da foto)
-  const getMultiplicadorColor = (valor: number): string => {
-    if (valor >= 10.0) return '#ff1493'; // Rosa vibrante (10.00x+) - como na foto
-    if (valor >= 2.0) return '#9d4edd';  // Roxo (2.00x - 9.99x)
-    return '#00bfff';                     // Azul cyan (1.00x - 1.99x)
+  // Função para arredondar para os valores específicos
+  const arredondarValor = (valor: number): number => {
+    const valoresPossiveis = [2, 3, 4, 7, 10];
+    return valoresPossiveis.reduce((prev, curr) => 
+      Math.abs(curr - valor) < Math.abs(prev - valor) ? curr : prev
+    );
   };
 
-  // Verificar se é hora de entrar
-  const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
-
-  // Determinar se devemos usar sinais manuais
-  const usarSinaisManual = sinaisManualData?.ativo === true;
-  
-  // Determinar valores a exibir baseado na prioridade
-  let valorAposExibir = null;
-  let valorSacarExibir = null;
-  let mostrarTresPontos = true; // Por padrão, mostra os três pontos
-
-  // Verificar se há sinal manual ativo e com valores válidos
-  const temSinalManualValido = usarSinaisManual && 
-    (sinaisManualData?.apos !== null && sinaisManualData?.apos !== undefined) && 
-    (sinaisManualData?.sacar !== null && sinaisManualData?.sacar !== undefined);
-
-  if (temSinalManualValido) {
-    // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
-    valorAposExibir = sinaisManualData.apos;
-    valorSacarExibir = sinaisManualData.sacar;
-    mostrarTresPontos = false; // Não mostrar os três pontos quando houver sinal manual
-    
-    // Atualizar o estado para mostrar a entrada
-    if (!mostrandoEntrada) {
+  // Determinar o que mostrar
+  useEffect(() => {
+    // Se houver sinal manual ativo
+    if (sinaisManualData?.ativo && sinaisManualData.apos && sinaisManualData.sacar) {
+      const novoApos = arredondarValor(sinaisManualData.apos);
+      const novoSacar = arredondarValor(sinaisManualData.sacar);
+      
+      setUltimaEntrada({ apos: novoApos, sacar: novoSacar });
       setMostrandoEntrada(true);
-    }
-    
-    // Atualizar a última entrada mostrada para os valores manuais
-    if (ultimaEntradaMostrada?.multiplicadorApos !== valorAposExibir || 
-        ultimaEntradaMostrada?.multiplicadorSacar !== valorSacarExibir) {
-      setUltimaEntradaMostrada({
-        multiplicadorApos: valorAposExibir,
-        multiplicadorSacar: valorSacarExibir
-      });
-    }
-  } else if (mostrandoEntrada && ultimaEntradaMostrada) {
-    // Prioridade 2: Sistema automático: manter último sinal mostrado
-    valorAposExibir = ultimaEntradaMostrada.multiplicadorApos;
-    valorSacarExibir = ultimaEntradaMostrada.multiplicadorSacar;
-    mostrarTresPontos = false; // Não mostrar os três pontos quando houver entrada válida
-  }
-
-  // Estado para controlar o último multiplicador processado
-  const [ultimoMultiplicador, setUltimoMultiplicador] = useState<number | null>(null);
-
-  // Lógica: mostrar entrada até receber nova vela
-  useEffect(() => {
-    // Se houver sinal manual ativo, não atualizar com dados automáticos
-    if (temSinalManualValido) {
-      // Garantir que estamos mostrando a entrada para sinais manuais
-      if (!mostrandoEntrada) {
-        setMostrandoEntrada(true);
-      }
-      return;
+      setPulseApos(true);
+      setPulseSacar(true);
+      
+      const timer = setTimeout(() => {
+        setPulseApos(false);
+        setPulseSacar(false);
+      }, 300);
+      
+      return () => clearTimeout(timer);
     }
 
-    // Se não houver sinal manual ativo, verificar se há sinal automático
-    if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
-      // Verificar se é uma entrada NOVA (diferente da última mostrada)
-      const isNovaEntrada = !ultimaEntradaMostrada || 
-        ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador;
-
-      if (isNovaEntrada) {
-        setMostrandoEntrada(true);
-        setUltimaEntradaMostrada({
-          multiplicadorApos: aposData.multiplicador,
-          multiplicadorSacar: sacarData.multiplicador,
-        });
-      }
-    }
-  }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador]);
-
-  // Limpar apenas quando receber -1 (sinal de três pontinhos)
-  useEffect(() => {
-    if (aposData?.multiplicador === -1) {
+    // Se for hora de entrar e tivermos dados válidos
+    if (sacarData?.sinal === 'ENTRAR' && aposData?.multiplicador && sacarData?.multiplicador) {
+      const novoApos = arredondarValor(aposData.multiplicador);
+      const novoSacar = arredondarValor(sacarData.multiplicador);
+      
+      setUltimaEntrada({ apos: novoApos, sacar: novoSacar });
+      setMostrandoEntrada(true);
+      setPulseApos(true);
+      setPulseSacar(true);
+      
+      const timer = setTimeout(() => {
+        setPulseApos(false);
+        setPulseSacar(false);
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // Se não for hora de entrar, mostrar os três pontos
       setMostrandoEntrada(false);
     }
-  }, [aposData?.multiplicador]);
+  }, [sinaisManualData, sacarData, aposData]);
 
-  // Efeito de pulso quando valores mudam
-  useEffect(() => {
-    setPulseApos(true);
-    const timer = setTimeout(() => setPulseApos(false), 300);
-    return () => clearTimeout(timer);
-  }, [aposData?.multiplicador]);
-
-  useEffect(() => {
-    setPulseSacar(true);
-    const timer = setTimeout(() => setPulseSacar(false), 300);
-    return () => clearTimeout(timer);
-  }, [sacarData?.multiplicador]);
+  // Função para retornar cor baseada no multiplicador
+  const getMultiplicadorColor = (valor: number): string => {
+    if (valor >= 10) return '#ff1493';  // Rosa
+    if (valor >= 7) return '#9d4edd';   // Roxo
+    if (valor >= 4) return '#00bfff';   // Azul
+    if (valor >= 3) return '#00ff00';   // Verde
+    return '#ff0000';                   // Vermelho
+  };
 
   // Se sistema em manutenção, mostrar tela de manutenção
   if (manutencaoData?.ativo) {
     return (
       <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
-        {/* Background effects */}
         <div className="fixed inset-0 pointer-events-none z-10 opacity-5"
           style={{
             backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px)',
@@ -172,9 +124,7 @@ export default function Home() {
         />
 
         <div className="relative z-20 w-full max-w-3xl mx-auto p-8">
-          {/* Header MANUTENÇÃO */}
-          <div
-            className="rounded-xl border py-8 mb-6"
+          <div className="rounded-xl border py-8 mb-6"
             style={{
               borderColor: '#ff0000',
               borderWidth: '2px',
@@ -200,9 +150,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Card com informações */}
-          <div
-            className="rounded-xl border p-8 mb-6"
+          <div className="rounded-xl border p-8 mb-6"
             style={{
               borderColor: '#444444',
               borderWidth: '1px',
@@ -241,7 +189,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     );
@@ -298,56 +245,64 @@ export default function Home() {
             data-testid="card-multipliers"
           >
             <div className="flex items-center justify-around gap-4">
-              {/* APÓS: mostra apenas quando é hora de entrar E está mostrandoEntrada */}
+              {/* APÓS */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
                   fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
                 }}>APÓS:</span>
                 <div
-                  className="px-3 py-1 rounded border"
+                  className={`px-3 py-1 rounded border ${pulseApos ? 'animate-pulse' : ''}`}
                   style={{
                     borderColor: '#333333',
                     borderWidth: '1px',
                     backgroundColor: '#000000',
+                    minWidth: '100px',
+                    textAlign: 'center'
                   }}
                 >
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: mostrandoEntrada && valorAposExibir ? getMultiplicadorColor(valorAposExibir) : '#888888',
+                      color: mostrandoEntrada && ultimaEntrada ? 
+                        getMultiplicadorColor(ultimaEntrada.apos) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-apos-value"
                   >
-                    {mostrandoEntrada && valorAposExibir && !mostrarTresPontos ? `${valorAposExibir.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && ultimaEntrada ? 
+                      `${ultimaEntrada.apos.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
 
-              {/* SACAR: mostra apenas quando é hora de entrar E está mostrandoEntrada */}
+              {/* SACAR */}
               <div className="flex items-center gap-2">
                 <span className="font-sans font-normal" style={{ 
                   color: '#ffffff',
                   fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
                 }}>SACAR:</span>
                 <div
-                  className="px-3 py-1 rounded border"
+                  className={`px-3 py-1 rounded border ${pulseSacar ? 'animate-pulse' : ''}`}
                   style={{
                     borderColor: '#333333',
                     borderWidth: '1px',
                     backgroundColor: '#000000',
+                    minWidth: '100px',
+                    textAlign: 'center'
                   }}
                 >
                   <span
                     className="font-sans font-semibold"
                     style={{
-                      color: mostrandoEntrada && valorSacarExibir ? getMultiplicadorColor(valorSacarExibir) : '#888888',
+                      color: mostrandoEntrada && ultimaEntrada ? 
+                        getMultiplicadorColor(ultimaEntrada.sacar) : '#888888',
                       fontSize: 'clamp(1rem, 3vw, 2.25rem)',
                     }}
                     data-testid="text-sacar-value"
                   >
-                    {mostrandoEntrada && valorSacarExibir && !mostrarTresPontos ? `${valorSacarExibir.toFixed(2)}X` : '...'}
+                    {mostrandoEntrada && ultimaEntrada ? 
+                      `${ultimaEntrada.sacar.toFixed(2)}X` : '...'}
                   </span>
                 </div>
               </div>
