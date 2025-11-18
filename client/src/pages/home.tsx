@@ -8,48 +8,42 @@ import { api } from "@/lib/api";
 export default function Home() {
   useProtection();
   const [, setLocation] = useLocation();
-  const [mostrandoEntrada, setMostrandoEntrada] = useState(false);
-  const [ultimaEntrada, setUltimaEntrada] = useState<{ apos: number; sacar: number } | null>(null);
+  const [ultimaEntrada, setUltimaEntrada] = useState<{ 
+    apos: number; 
+    sacar: number;
+    isManual: boolean;
+  } | null>(null);
   const [pulseApos, setPulseApos] = useState(false);
   const [pulseSacar, setPulseSacar] = useState(false);
 
-  // Verificar se já viu a mensagem de boas-vindas
-  useEffect(() => {
-    const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome');
-    if (!hasSeenWelcome) {
-      setLocation('/welcome');
-    }
-  }, [setLocation]);
-
-  // Verificar status de manutenção
+  // Buscar dados da API
   const { data: manutencaoData } = useQuery<ManutencaoStatus>({
-    queryKey: ['/api/manutencao/cyber'],
-    queryFn: () => api.get<ManutencaoStatus>('/api/manutencao/cyber'),
-    refetchInterval: 5000,
+    queryKey: ["manutencao"],
+    queryFn: () => api.get("/api/manutencao/cyber").then(res => res.data),
+    refetchInterval: 10000,
   });
 
-  // Buscar sinais manuais
   const { data: sinaisManualData } = useQuery<SinaisManual>({
-    queryKey: ['/api/sinais-manual/cyber'],
-    queryFn: () => api.get<SinaisManual>('/api/sinais-manual/cyber'),
+    queryKey: ["sinais-manual"],
+    queryFn: () => api.get("/api/sinais-manual/cyber").then(res => res.data),
     refetchInterval: 1000,
   });
 
-  // Buscar última vela (APÓS:)
   const { data: aposData } = useQuery<UltimaVelaResponse>({
-    queryKey: ['/api/apos/cyber'],
-    queryFn: () => api.get<UltimaVelaResponse>('/api/apos/cyber'),
-    refetchInterval: 2000,
+    queryKey: ["apos"],
+    queryFn: () => api.get("/api/apos/cyber").then(res => res.data),
+    refetchInterval: 1000,
+    enabled: !sinaisManualData?.ativo, // Só busca se não houver sinal manual ativo
   });
 
-  // Buscar previsão (SACAR:)
   const { data: sacarData } = useQuery<PrevisaoResponse>({
-    queryKey: ['/api/sacar/cyber'],
-    queryFn: () => api.get<PrevisaoResponse>('/api/sacar/cyber'),
-    refetchInterval: 2000,
+    queryKey: ["sacar"],
+    queryFn: () => api.get("/api/sacar/cyber").then(res => res.data),
+    refetchInterval: 1000,
+    enabled: !sinaisManualData?.ativo, // Só busca se não houver sinal manual ativo
   });
 
-  // Função para arredondar para os valores específicos
+  // Função para arredondar valores para os mais próximos (2, 3, 4, 7, 10)
   const arredondarValor = (valor: number): number => {
     const valoresPossiveis = [2, 3, 4, 7, 10];
     return valoresPossiveis.reduce((prev, curr) => 
@@ -57,15 +51,27 @@ export default function Home() {
     );
   };
 
-  // Determinar o que mostrar
+  // Função para obter a cor com base no valor do multiplicador
+  const getMultiplicadorColor = (valor: number): string => {
+  if (valor >= 10) return '#ff1493';  // Rosa para 10.00x ou mais
+  if (valor >= 2) return '#9d4edd';   // Roxo para 2.00x a 9.99x
+  if (valor >= 1) return '#00bfff';   // Azul para 1.00x a 1.99x
+  return '#ff0000';                   // Vermelho para menos de 1.00x (caso ocorra)
+};
+
+  // Efeito para controlar a exibição dos valores
   useEffect(() => {
     // Se houver sinal manual ativo
     if (sinaisManualData?.ativo && sinaisManualData.apos && sinaisManualData.sacar) {
       const novoApos = arredondarValor(sinaisManualData.apos);
       const novoSacar = arredondarValor(sinaisManualData.sacar);
       
-      setUltimaEntrada({ apos: novoApos, sacar: novoSacar });
-      setMostrandoEntrada(true);
+      setUltimaEntrada({ 
+        apos: novoApos, 
+        sacar: novoSacar,
+        isManual: true 
+      });
+      
       setPulseApos(true);
       setPulseSacar(true);
       
@@ -75,15 +81,18 @@ export default function Home() {
       }, 300);
       
       return () => clearTimeout(timer);
-    }
-
-    // Se for hora de entrar e tivermos dados válidos
-    if (sacarData?.sinal === 'ENTRAR' && aposData?.multiplicador && sacarData?.multiplicador) {
+    } 
+    // Se não houver sinal manual, verificar sinal automático
+    else if (sacarData?.sinal === 'ENTRAR' && aposData?.multiplicador && sacarData?.multiplicador) {
       const novoApos = arredondarValor(aposData.multiplicador);
       const novoSacar = arredondarValor(sacarData.multiplicador);
       
-      setUltimaEntrada({ apos: novoApos, sacar: novoSacar });
-      setMostrandoEntrada(true);
+      setUltimaEntrada({ 
+        apos: novoApos, 
+        sacar: novoSacar,
+        isManual: false
+      });
+      
       setPulseApos(true);
       setPulseSacar(true);
       
@@ -93,236 +102,132 @@ export default function Home() {
       }, 300);
       
       return () => clearTimeout(timer);
-    } else {
-      // Se não for hora de entrar, mostrar os três pontos
-      setMostrandoEntrada(false);
+    }
+    // Se desativou o sinal manual ou não há sinal automático
+    else if (!sinaisManualData?.ativo) {
+      setUltimaEntrada(null);
     }
   }, [sinaisManualData, sacarData, aposData]);
 
-  // Função para retornar cor baseada no multiplicador
-  const getMultiplicadorColor = (valor: number): string => {
-    if (valor >= 10) return '#ff1493';  // Rosa
-    if (valor >= 7) return '#9d4edd';   // Roxo
-    if (valor >= 4) return '#00bfff';   // Azul
-    if (valor >= 3) return '#00ff00';   // Verde
-    return '#ff0000';                   // Vermelho
-  };
-
-  // Se sistema em manutenção, mostrar tela de manutenção
-  if (manutencaoData?.ativo) {
+  // Se estiver em manutenção, mostrar aviso
+  if (manutencaoData?.manutencao) {
     return (
-      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
-        <div className="fixed inset-0 pointer-events-none z-10 opacity-5"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px)',
-          }}
-        />
-        <div className="fixed inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle at center, rgba(157, 78, 221, 0.05) 0%, rgba(0, 0, 0, 1) 70%)',
-          }}
-        />
-
-        <div className="relative z-20 w-full max-w-3xl mx-auto p-8">
-          <div className="rounded-xl border py-8 mb-6"
-            style={{
-              borderColor: '#ff0000',
-              borderWidth: '2px',
-              backgroundColor: 'transparent',
-            }}
-          >
-            <h1 className="text-center font-display font-bold tracking-wide mb-4"
-              style={{
-                color: '#ff0000',
-                fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-                textShadow: '0 0 30px rgba(255, 0, 0, 0.7)',
-              }}
-            >
-              MANUTENÇÃO
-            </h1>
-            <p className="text-center font-sans font-normal"
-              style={{
-                color: '#ffffff',
-                fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-              }}
-            >
-              Sistema temporariamente indisponível
-            </p>
-          </div>
-
-          <div className="rounded-xl border p-8 mb-6"
-            style={{
-              borderColor: '#444444',
-              borderWidth: '1px',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            }}
-          >
-            <div className="text-center space-y-6">
-              <div>
-                <p className="font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '1rem' }}>
-                  Horário de Retorno
-                </p>
-                <p className="font-mono font-bold"
-                  style={{
-                    color: '#ff0000',
-                    fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-                  }}
-                  data-testid="text-mensagem-manutencao"
-                >
-                  {manutencaoData.mensagem}
-                </p>
-              </div>
-
-              <div className="border-t pt-6" style={{ borderColor: '#333333' }}>
-                <p className="font-sans font-normal mb-2" style={{ color: '#888888', fontSize: '1rem' }}>
-                  Motivo
-                </p>
-                <p className="font-sans font-normal"
-                  style={{
-                    color: '#ffffff',
-                    fontSize: 'clamp(1rem, 2.5vw, 1.5rem)',
-                  }}
-                  data-testid="text-motivo-manutencao"
-                >
-                  {manutencaoData.motivo}
-                </p>
-              </div>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4">
+        <div className="bg-gray-800 p-6 rounded-lg max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold mb-4">🔧 Em Manutenção</h2>
+          <p className="mb-4">Estamos realizando manutenções para melhorar nosso serviço.</p>
+          <p className="text-sm text-gray-400">Voltaremos em breve!</p>
         </div>
       </div>
     );
   }
 
-  // Tela normal
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      {/* Scanline effect overlay */}
-      <div className="fixed inset-0 pointer-events-none z-10 opacity-5"
-        style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 255, 255, 0.03) 2px, rgba(255, 255, 255, 0.03) 4px)',
-        }}
-      />
-
-      {/* Radial gradient background */}
-      <div className="fixed inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at center, rgba(157, 78, 221, 0.05) 0%, rgba(0, 0, 0, 1) 70%)',
-        }}
-      />
-
-      <div className="relative z-20 w-full">
-        {/* Header CYBER HACKER */}
-        <div className="w-full px-4 pt-4 pb-2">
-          <div
-            className="rounded-xl border py-4 w-full"
-            style={{
-              borderColor: '#ff0000',
-              borderWidth: '1px',
-              backgroundColor: 'transparent',
+    <div className="min-h-screen bg-gray-900 text-white p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Cabeçalho */}
+        <header className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold">CyberHacker</h1>
+          <button 
+            onClick={() => {
+              localStorage.removeItem("token");
+              setLocation("/login");
             }}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
           >
-            <h1 className="text-center font-display font-bold tracking-wide"
-              style={{
-                color: '#ff0000',
-                fontSize: 'clamp(1rem, 3vw, 2rem)',
-              }}
-            >
-              CYBER HACKER
-            </h1>
-          </div>
-        </div>
+            Sair
+          </button>
+        </header>
 
-        {/* Card único com ambos valores */}
-        <div className="w-full px-4 py-2">
-          <div
-            className="relative rounded-xl p-6 border w-full"
-            style={{
-              borderColor: '#444444',
-              borderWidth: '1px',
-              backgroundColor: 'transparent',
-            }}
-            data-testid="card-multipliers"
-          >
-            <div className="flex items-center justify-around gap-4">
-              {/* APÓS */}
-              <div className="flex items-center gap-2">
-                <span className="font-sans font-normal" style={{ 
-                  color: '#ffffff',
-                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
-                }}>APÓS:</span>
-                <div
-                  className={`px-3 py-1 rounded border ${pulseApos ? 'animate-pulse' : ''}`}
-                  style={{
-                    borderColor: '#333333',
-                    borderWidth: '1px',
-                    backgroundColor: '#000000',
-                    minWidth: '100px',
-                    textAlign: 'center'
-                  }}
-                >
-                  <span
-                    className="font-sans font-semibold"
-                    style={{
-                      color: mostrandoEntrada && ultimaEntrada ? 
-                        getMultiplicadorColor(ultimaEntrada.apos) : '#888888',
-                      fontSize: 'clamp(1rem, 3vw, 2.25rem)',
-                    }}
-                    data-testid="text-apos-value"
-                  >
-                    {mostrandoEntrada && ultimaEntrada ? 
-                      `${ultimaEntrada.apos.toFixed(2)}X` : '...'}
-                  </span>
+        {/* Card Principal */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Coluna Esquerda */}
+            <div className="space-y-6">
+              <div className="bg-gray-900 p-6 rounded-lg">
+                <h2 className="text-xl font-semibold mb-4">Sinais</h2>
+                
+                <div className="space-y-4">
+                  {/* APÓS */}
+                  <div className="flex items-center gap-2">
+                    <span className="font-sans font-normal" style={{ 
+                      color: '#ffffff',
+                      fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                    }}>APÓS:</span>
+                    <div
+                      className={`px-3 py-1 rounded border ${pulseApos ? 'animate-pulse' : ''}`}
+                      style={{
+                        borderColor: '#333333',
+                        borderWidth: '1px',
+                        backgroundColor: '#000000',
+                        minWidth: '100px',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <span
+                        className="font-sans font-semibold"
+                        style={{
+                          color: ultimaEntrada ? getMultiplicadorColor(ultimaEntrada.apos) : '#888888',
+                          fontSize: 'clamp(1rem, 3vw, 2.25rem)',
+                        }}
+                        data-testid="text-apos-value"
+                      >
+                        {ultimaEntrada ? `${ultimaEntrada.apos.toFixed(2)}X` : '...'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* SACAR */}
+                  <div className="flex items-center gap-2">
+                    <span className="font-sans font-normal" style={{ 
+                      color: '#ffffff',
+                      fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
+                    }}>SACAR:</span>
+                    <div
+                      className={`px-3 py-1 rounded border ${pulseSacar ? 'animate-pulse' : ''}`}
+                      style={{
+                        borderColor: '#333333',
+                        borderWidth: '1px',
+                        backgroundColor: '#000000',
+                        minWidth: '100px',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <span
+                        className="font-sans font-semibold"
+                        style={{
+                          color: ultimaEntrada ? getMultiplicadorColor(ultimaEntrada.sacar) : '#888888',
+                          fontSize: 'clamp(1rem, 3vw, 2.25rem)',
+                        }}
+                        data-testid="text-sacar-value"
+                      >
+                        {ultimaEntrada ? `${ultimaEntrada.sacar.toFixed(2)}X` : '...'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* SACAR */}
-              <div className="flex items-center gap-2">
-                <span className="font-sans font-normal" style={{ 
-                  color: '#ffffff',
-                  fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' 
-                }}>SACAR:</span>
-                <div
-                  className={`px-3 py-1 rounded border ${pulseSacar ? 'animate-pulse' : ''}`}
-                  style={{
-                    borderColor: '#333333',
-                    borderWidth: '1px',
-                    backgroundColor: '#000000',
-                    minWidth: '100px',
-                    textAlign: 'center'
-                  }}
-                >
-                  <span
-                    className="font-sans font-semibold"
-                    style={{
-                      color: mostrandoEntrada && ultimaEntrada ? 
-                        getMultiplicadorColor(ultimaEntrada.sacar) : '#888888',
-                      fontSize: 'clamp(1rem, 3vw, 2.25rem)',
-                    }}
-                    data-testid="text-sacar-value"
-                  >
-                    {mostrandoEntrada && ultimaEntrada ? 
-                      `${ultimaEntrada.sacar.toFixed(2)}X` : '...'}
-                  </span>
-                </div>
+            {/* Coluna Direita */}
+            <div className="bg-gray-900 p-6 rounded-lg">
+              <h2 className="text-xl font-semibold mb-4">Aviator</h2>
+              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                <iframe
+                  src="https://www.aviator.bet"
+                  className="w-full h-full"
+                  title="Aviator Game"
+                  allowFullScreen
+                ></iframe>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Iframe Casa de Apostas */}
-        <div className="w-full px-4 py-2">
-          <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor: '#444444', borderWidth: '1px' }}>
-            <iframe
-              src="https://go.aff.betvivo.partners/epkorle4"
-              className="w-full"
-              style={{ height: '800px', minHeight: '600px' }}
-              title="Casa de Apostas"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            />
-          </div>
-        </div>
+        {/* Rodapé */}
+        <footer className="text-center text-sm text-gray-500 mt-8">
+          <p>© {new Date().getFullYear()} CyberHacker. Todos os direitos reservados.</p>
+        </footer>
       </div>
     </div>
   );
