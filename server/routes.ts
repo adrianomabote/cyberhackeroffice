@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POST /api/velas/cyber - Recebe multiplicadores do Aviator
+  // POST /api/velas/cyber - Recebe multiplicadores do Aviator e executa análise automática
   app.post("/api/velas/cyber", async (req, res) => {
     try {
       // Permitir -1 como sinal especial para três pontinhos
@@ -306,6 +306,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (multiplicador === -1) {
         // Três pontinhos enviado manualmente
         const vela = await storage.addVela({ multiplicador: -1 });
+        
+        // Atualizar cache de vela
+        storage.setCachedVela(vela);
+        
         return res.json({
           success: true,
           data: {
@@ -319,6 +323,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const validatedData = insertVelaSchema.parse(req.body);
       const vela = await storage.addVela(validatedData);
+
+      // Atualizar cache de vela
+      storage.setCachedVela(vela);
+
+      // Executar análise automática (apenas se sinais manuais não estiverem ativos)
+      const sinaisManual = await storage.getSinaisManual();
+      if (!sinaisManual.ativo) {
+        try {
+          // Buscar histórico para análise
+          const historico = await storage.getHistorico(50);
+          
+          if (historico && historico.length >= 15) {
+            // Executar análise ML
+            const analise = analisarOportunidadeEntrada(historico);
+            
+            // Armazenar resultado no cache
+            storage.setCachedAnalysis(analise);
+            
+            console.log('[POST VELAS] Análise automática executada:', {
+              velaId: vela.id,
+              multiplicador: vela.multiplicador,
+              resultado: {
+                sinal: analise.sinal,
+                multiplicador: analise.multiplicador,
+                confianca: analise.confianca,
+                pontos: analise.pontos
+              }
+            });
+          } else {
+            console.log('[POST VELAS] Histórico insuficiente para análise (mínimo 15 velas)');
+          }
+        } catch (analysisError) {
+          console.error('[POST VELAS] Erro ao executar análise automática:', analysisError);
+          // Não falhar o request se a análise falhar
+        }
+      } else {
+        console.log('[POST VELAS] Sinais manuais ativos, análise automática ignorada');
+      }
 
       res.json({
         success: true,
