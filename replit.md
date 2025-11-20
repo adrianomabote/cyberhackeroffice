@@ -247,9 +247,31 @@ Servidor roda na porta 5000.
 - GET /api/sinais-manual/cyber - Retorna sinais manuais
 - POST /api/sinais-manual/cyber - Define sinais com { ativo, apos, sacar }
 
-## Sistema de Proteção de Código
+## Sistema de Autenticação e Proteção
 
-### Proteções Implementadas (SEM BLOQUEIO DE USUÁRIOS):
+### Sistema de Autenticação (use-auth.tsx):
+
+✅ **Proteção de Rotas** - Usuários NÃO logados são redirecionados para landing page
+✅ **Validação de Sessão** - Verifica sessionStorage a cada carregamento
+✅ **Botão de Logout** - Disponível no header da página /home
+✅ **Funções auxiliares**:
+  - `isAuthenticated()` - Verifica se está logado
+  - `getUser()` - Retorna dados do usuário
+  - `logout()` - Limpa sessão e redireciona para /
+
+**Páginas Protegidas (requerem login):**
+- `/home` - Dashboard de sinais
+- `/welcome` - Tela de boas-vindas após login
+- `/subscription` - Assinatura premium
+
+**Páginas Públicas (acesso livre):**
+- `/` - Landing page
+- `/login` - Tela de login
+- `/signup` - Tela de cadastro
+- `/bot-gratuito` - Obter bot compartilhando
+- `/admin/login` - Login administrativo
+
+### Sistema de Proteção de Código (use-protection.tsx):
 
 1. **Desabilitar clique direito** - Previne "Inspecionar elemento"
 2. **Desabilitar seleção de texto** - Impede copiar conteúdo

@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { useProtection } from '@/hooks/use-protection';
+import { useAuth } from '@/hooks/use-auth';
 import { Sparkles, TrendingUp, Shield } from 'lucide-react';
 
 export default function Welcome() {
-  useProtection();
+  useProtection(); // Proteção de código
+  useAuth(); // Proteção de autenticação - REDIRECIONA SE NÃO LOGADO
   const [location, navigate] = useLocation();
 
   // Verifica se já viu as boas-vindas

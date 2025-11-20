@@ -2,10 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useProtection } from "@/hooks/use-protection";
+import { useAuth, logout } from "@/hooks/use-auth";
+import { LogOut } from "lucide-react";
 import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus, SinaisManual } from "@shared/schema";
 
 export default function Home() {
-  useProtection();
+  useProtection(); // Proteção de código
+  useAuth(); // Proteção de autenticação - REDIRECIONA SE NÃO LOGADO
   const [, setLocation] = useLocation();
 
   // Verificar se já viu a mensagem de boas-vindas
@@ -259,10 +262,10 @@ export default function Home() {
       />
 
       <div className="relative z-20 w-full">
-        {/* Header CYBER HACKER */}
+        {/* Header CYBER HACKER com Botão Sair */}
         <div className="w-full px-4 pt-4 pb-2">
           <div
-            className="rounded-xl border py-4 w-full"
+            className="rounded-xl border py-4 w-full relative"
             style={{
               borderColor: '#ff0000',
               borderWidth: '1px',
@@ -277,6 +280,27 @@ export default function Home() {
             >
               CYBER HACKER
             </h1>
+            
+            {/* Botão Sair - Canto superior direito */}
+            <button
+              onClick={logout}
+              className="absolute top-2 right-2 p-2 rounded-lg transition-colors"
+              style={{
+                backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                borderColor: '#ff0000',
+                borderWidth: '1px',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 0, 0, 0.2)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+              }}
+              title="Sair"
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4" style={{ color: '#ff0000' }} />
+            </button>
           </div>
         </div>
 
