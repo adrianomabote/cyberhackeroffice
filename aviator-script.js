@@ -14,7 +14,7 @@
 
 (function () {
   // ========== CONFIGURAÇÕES ==========
-  const API_URL = 'https://robo-cyber-hacker.onrender.com/api/velas/cyber';
+  const API_URL = 'https://e1f022d7-32c0-4ec8-b553-24a963ff6795-00-332y5p5zgrxlq.picard.replit.dev/api/velas/cyber';
   const INTERVALO_CAPTURA = 1000; // 1 segundo
 
   // ========== VARIÁVEIS GLOBAIS ==========
