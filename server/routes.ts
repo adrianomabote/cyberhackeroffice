@@ -386,10 +386,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/apos/cyber - Retorna última vela registrada
+  // GET /api/apos/cyber - Retorna última vela registrada (com cache)
   app.get("/api/apos/cyber", async (req, res) => {
     try {
-      const ultimaVela = await storage.getUltimaVela();
+      // Tentar usar cache primeiro
+      let ultimaVela = storage.getCachedVela();
+      let fromCache = false;
+
+      // Se não houver cache, buscar do banco
+      if (!ultimaVela) {
+        ultimaVela = await storage.getUltimaVela();
+        if (ultimaVela) {
+          storage.setCachedVela(ultimaVela);
+        }
+      } else {
+        fromCache = true;
+      }
 
       const response: UltimaVelaResponse = {
         multiplicador: ultimaVela ? ultimaVela.multiplicador : null,
@@ -397,10 +409,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Log para debug - ver exatamente o que está sendo retornado
-      console.log('[APÓS] Última vela do DB:', {
+      console.log('[APÓS] Última vela:', {
         multiplicador: response.multiplicador,
         timestamp: response.timestamp,
         id: ultimaVela?.id,
+        fromCache
       });
 
       // Headers para evitar cache
@@ -418,9 +431,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/sacar/cyber - Retorna análise em tempo real e adaptativa (sempre para a PRÓXIMA rodada)
+  // GET /api/sacar/cyber - Retorna análise em tempo real (com cache)
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
+      // Verificar se sinais manuais estão ativos
+      const sinaisManual = await storage.getSinaisManual();
+      if (sinaisManual.ativo && sinaisManual.sacar !== null) {
+        console.log('[SACAR] Retornando sinal manual:', sinaisManual.sacar);
+        return res.json({
+          multiplicador: sinaisManual.sacar,
+          sinal: "ENTRAR",
+          confianca: "manual",
+          motivo: "Sinal manual do administrador"
+        });
+      }
+
+      // Tentar usar cache se disponível e fresco (menos de 10 segundos)
+      const { analysis: cachedAnalysis, timestamp: cacheTimestamp } = storage.getCachedAnalysis();
+      const agora = Date.now();
+      const cacheFreshMs = 10000; // 10 segundos de validade do cache
+
+      if (cachedAnalysis && (agora - cacheTimestamp) < cacheFreshMs) {
+        console.log('[SACAR] Retornando análise do cache:', {
+          idade: agora - cacheTimestamp,
+          sinal: cachedAnalysis.sinal,
+          multiplicador: cachedAnalysis.multiplicador
+        });
+        
+        return res.json({
+          ...cachedAnalysis,
+          fromCache: true,
+          cacheAge: agora - cacheTimestamp
+        });
+      }
+
+      // Cache não disponível ou expirado - calcular ao vivo
+      console.log('[SACAR] Cache indisponível ou expirado, calculando ao vivo');
+      
       const historico = await storage.getHistorico(20);
       if (!historico || historico.length === 0) {
         return res.json({ 
@@ -433,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Base sempre é a vela mais recente (analisar para a PRÓXIMA rodada)
       const base = historico[0]; // getHistorico retorna em ordem desc
-      const agora = Date.now();
+      // Reutilizar variável agora já definida acima
       const janelaMs = 6000; // 6 segundos de janela para cada sinal
 
       // Se já passou mais de 6 segundos desde o último sinal, resetar estado
