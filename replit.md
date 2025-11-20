@@ -189,8 +189,8 @@ Analisa constantemente as últimas 20 velas e detecta **5 padrões favoráveis**
 ### Fluxo de Navegação:
 1. **Primeira visita** → Splash screen (3s) → Landing page
 2. **Landing page** → Usuário lê sobre o robô → Clica "CRIAR CONTA"
-3. **Cadastro** → Preenche dados → Redireciona para `/app`
-4. **Dashboard `/app`** → Interface cyberpunk com sinais em tempo real
+3. **Cadastro** → Preenche dados → Redireciona para `/home`
+4. **Dashboard `/home`** → Interface cyberpunk com sinais em tempo real
 
 ### Fluxo de Dados:
 1. **Usuário acessa `/app`** → Dashboard de sinais carrega
