@@ -5,11 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, Check } from 'lucide-react';
 import { useProtection } from '@/hooks/use-protection';
-import { useAuth } from '@/hooks/use-auth';
 
 export default function Subscription() {
   useProtection(); // Proteção de código
-  useAuth(); // Proteção de autenticação - REDIRECIONA SE NÃO LOGADO
   const [, setLocation] = useLocation();
   const [showDialog, setShowDialog] = useState(false);
 

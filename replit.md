@@ -262,12 +262,12 @@ Servidor roda na porta 5000.
 **Páginas Protegidas (requerem login):**
 - `/home` - Dashboard de sinais
 - `/welcome` - Tela de boas-vindas após login
-- `/subscription` - Assinatura premium
 
 **Páginas Públicas (acesso livre):**
 - `/` - Landing page
 - `/login` - Tela de login
 - `/signup` - Tela de cadastro
+- `/subscription` - Assinatura premium (PÚBLICA para aumentar conversões)
 - `/bot-gratuito` - Obter bot compartilhando
 - `/admin/login` - Login administrativo
 
