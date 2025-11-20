@@ -3,8 +3,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
 import { eq, desc, sql, and, lt } from "drizzle-orm";
-import { velas, usuarios, type InsertVela } from "../shared/schema";
-import type { ManutencaoStatus, SinaisManual } from "../shared/schema";
+import { velas, usuarios, type InsertVela, type Vela } from "../shared/schema";
+import type { ManutencaoStatus, SinaisManual, PrevisaoResponse, UltimaVelaResponse } from "../shared/schema";
 import bcrypt from "bcryptjs";
 
 if (!process.env.DATABASE_URL) {
@@ -23,6 +23,11 @@ const db = drizzle(pool);
 // Storage principal de velas
 class DbStorage {
   private lastMultiplicador: number | null = null;
+  
+  // Cache de análise em tempo real
+  private cachedAnalysis: PrevisaoResponse | null = null;
+  private cachedAnalysisTimestamp: number = 0;
+  private cachedVela: Vela | null = null;
 
   async addVela(data: InsertVela) {
     if (data.multiplicador !== -1 && data.multiplicador === this.lastMultiplicador) {
@@ -100,6 +105,47 @@ class DbStorage {
   async setSinaisManual(sinais: SinaisManual): Promise<SinaisManual> {
     this.sinaisManual = sinais;
     return this.sinaisManual;
+  }
+
+  // Cache de análise - armazena o resultado da última análise ML
+  getCachedAnalysis(): { analysis: PrevisaoResponse | null; timestamp: number } {
+    return {
+      analysis: this.cachedAnalysis,
+      timestamp: this.cachedAnalysisTimestamp
+    };
+  }
+
+  setCachedAnalysis(analysis: PrevisaoResponse): void {
+    this.cachedAnalysis = analysis;
+    this.cachedAnalysisTimestamp = Date.now();
+    console.log('[STORAGE] Análise atualizada no cache:', {
+      multiplicador: analysis.multiplicador,
+      sinal: analysis.sinal,
+      confianca: analysis.confianca,
+      timestamp: new Date(this.cachedAnalysisTimestamp).toISOString()
+    });
+  }
+
+  // Cache de vela - armazena a última vela para evitar queries repetidas
+  getCachedVela(): Vela | null {
+    return this.cachedVela;
+  }
+
+  setCachedVela(vela: Vela): void {
+    this.cachedVela = vela;
+    console.log('[STORAGE] Vela atualizada no cache:', {
+      id: vela.id,
+      multiplicador: vela.multiplicador,
+      timestamp: vela.timestamp
+    });
+  }
+
+  // Limpar cache (útil para resetar estado)
+  clearCache(): void {
+    this.cachedAnalysis = null;
+    this.cachedAnalysisTimestamp = 0;
+    this.cachedVela = null;
+    console.log('[STORAGE] Cache limpo');
   }
 }
 
