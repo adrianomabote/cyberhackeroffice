@@ -31,9 +31,15 @@ export interface UltimaVelaResponse {
 // Resposta da API para previsão e análise de entrada
 export interface PrevisaoResponse {
   multiplicador: number | null;
-  sinal?: string; // "ENTRAR", "AGUARDAR", "POSSÍVEL"
-  confianca?: string; // "alta", "média", "baixa"
+  sinal?: string; // "ENTRAR", "AGUARDAR", "POSSÍVEL", "..."
+  confianca?: string; // "alta", "média", "baixa", "manual"
   motivo?: string; // Descrição dos padrões detectados
+  pontos?: number; // Pontuação da análise
+  baseVelaId?: string; // ID da vela base usada na análise
+  baseTimestamp?: string | Date; // Timestamp da vela base
+  expiresAt?: number; // Timestamp de expiração do sinal
+  fromCache?: boolean; // Se veio do cache
+  cacheAge?: number; // Idade do cache em milissegundos
 }
 
 // Resposta da API para histórico

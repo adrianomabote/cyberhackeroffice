@@ -583,7 +583,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      return res.json({
+      // Preparar resultado final
+      const resultado: PrevisaoResponse = {
         multiplicador: analise.multiplicador,
         sinal: sinalFinal,
         confianca: confiancaFinal,
@@ -592,7 +593,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         baseVelaId: base.id,
         baseTimestamp: base.timestamp?.toISOString?.() ?? base.timestamp,
         expiresAt: signalState.expiresAt,
-      });
+      };
+
+      // Armazenar resultado no cache para futuras requisições
+      storage.setCachedAnalysis(resultado);
+
+      return res.json(resultado);
     } catch (error) {
       return res.status(500).json({
         multiplicador: null,
