@@ -488,8 +488,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const janelaMs = 6000; // 6 segundos de janela para cada sinal
 
       // VERIFICAR SE ENTRADA ANTERIOR FALHOU (não atingiu 2.00x)
-      if (signalState.multiplicadorAnterior !== null && base.multiplicador < 2.00) {
-        console.log(`[SACAR] Entrada anterior falhou! Vela caiu para ${base.multiplicador.toFixed(2)}x (recomendava ${signalState.multiplicadorAnterior.toFixed(2)}x). Próxima entrada usará 2.00x como segunda tentativa`);
+      // Só verifica se uma vela NOVA chegou após a entrada anterior
+      if (signalState.lastSignalId !== null && signalState.lastSignalId !== base.id && signalState.multiplicadorAnterior !== null && base.multiplicador < 2.00) {
+        console.log(`[SACAR] Entrada anterior falhou! Vela caiu para ${base.multiplicador.toFixed(2)}x (recomendava ${signalState.multiplicadorAnterior.toFixed(2)}x). SEGUNDA TENTATIVA: Próxima entrada usará 2.00x`);
         signalState.falhouAnterior = true;
         signalState.multiplicadorAnterior = null;
       }
