@@ -4,6 +4,12 @@ import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "../shared/schema";
 import { z } from "zod";
 
+// Estado global para controlar entradas consecutivas
+const entradasConsecutivas = {
+  contador: 0,
+  ultimaVelaId: null as string | null,
+};
+
 // Função que detecta oportunidades de entrada analisando padrões
 function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   if (velas.length < 5) {
@@ -67,71 +73,42 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
     motivos.push("Volatilidade controlada");
   }
 
-  // Calcular previsão usando EMA
-  const alpha = 0.3;
-  let ema = multiplicadores[0];
-  for (let i = 1; i < n; i++) {
-    ema = alpha * multiplicadores[i] + (1 - alpha) * ema;
-  }
-
-  // Ajustar previsão baseado em padrões
-  let previsao = ema;
-  if (baixosRecentes >= 3) previsao *= 1.15;
-  if (media5 < 2.2) previsao *= 1.1;
-
-  previsao = Math.round(Math.max(1.5, Math.min(10, previsao)) * 100) / 100;
-
-  // Determinar sinal baseado nos pontos
+  // Determinar sinal e multiplicador APENAS: 2.00x, 4.00x, 10.00x
   let sinal = "AGUARDAR";
   let confianca = "baixa";
-  let multiplicadorSacar = previsao;
+  let multiplicadorSacar: number | null = null;
 
-  if (pontos >= 6) {
+  if (pontos >= 8) {
+    // Grande oportunidade = 10.00x
     sinal = "ENTRAR";
     confianca = "alta";
-    // Confiança alta: recomendar sacar baseado na média geral - MUITO CONSERVADOR
-    if (mediaGeral < 2.5) {
-      multiplicadorSacar = 2.0; // Após sequência muito baixa, sacar em 2.00x
-    } else if (mediaGeral < 3.5) {
-      multiplicadorSacar = 2.5; // Média normal, sacar em 2.50x
-    } else if (mediaGeral < 5.0) {
-      multiplicadorSacar = 3.0; // Média alta, sacar em 3.00x
-    } else if (mediaGeral < 7.0) {
-      multiplicadorSacar = 4.0; // Média muito alta, sacar em 4.00x
-    } else {
-      // MUITO RARO: só recomendar 10.00x se média geral >= 7.0
-      // e teve pelo menos 2 velas >= 8.0x nas últimas 10
-      const altosExtremos = ultimas10.filter(m => m >= 8.0).length;
-      if (altosExtremos >= 2) {
-        multiplicadorSacar = 10.0; // Apenas em condições extremamente favoráveis
-      } else {
-        multiplicadorSacar = 5.0; // Caso contrário, mais conservador
-      }
-    }
+    multiplicadorSacar = 10.0;
+    motivos.push("GRANDE OPORTUNIDADE - 10.00x");
+  } else if (pontos >= 6) {
+    // Boa oportunidade = 4.00x
+    sinal = "ENTRAR";
+    confianca = "alta";
+    multiplicadorSacar = 4.0;
+    motivos.push("BOA OPORTUNIDADE - 4.00x");
   } else if (pontos >= 4) {
+    // Oportunidade normal = 2.00x
     sinal = "ENTRAR";
     confianca = "média";
-    // Confiança média: muito conservador
-    if (mediaGeral < 2.5) {
-      multiplicadorSacar = 2.0;
-    } else {
-      multiplicadorSacar = 2.5; // Mais seguro com confiança média
-    }
+    multiplicadorSacar = 2.0;
+    motivos.push("OPORTUNIDADE - 2.00x");
   } else if (pontos >= 2) {
+    // Possível = 2.00x
     sinal = "POSSÍVEL";
     confianca = "baixa";
-    multiplicadorSacar = 2.0; // Se entrar, sacar rápido
+    multiplicadorSacar = 2.0;
   }
-
-  // Garantir que o multiplicador está arredondado corretamente
-  multiplicadorSacar = Math.round(multiplicadorSacar * 100) / 100;
 
   return {
     multiplicador: multiplicadorSacar,
     sinal,
     confianca,
     motivo: motivos.length > 0 ? motivos.join(" | ") : "Análise em andamento",
-    pontos, // Para debug
+    pontos,
   };
 }
 
@@ -318,7 +295,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Buscar mais velas para análise mais precisa
       const historico = await storage.getHistorico(20);
+      const velaAtual = historico[0];
       const analise = analisarOportunidadeEntrada(historico);
+
+      // Resetar contador se mudou de vela
+      if (velaAtual && velaAtual.id && entradasConsecutivas.ultimaVelaId !== String(velaAtual.id)) {
+        console.log(`[ENTRADAS] Nova vela detectada. Resetando contador de 3.`);
+        entradasConsecutivas.ultimaVelaId = String(velaAtual.id);
+        entradasConsecutivas.contador = 0;
+      }
+
+      // Se análise diz ENTRAR e já enviou 3 seguidas, bloquear
+      if (analise.sinal === "ENTRAR" && entradasConsecutivas.contador >= 3) {
+        console.log(`[ENTRADAS] BLOQUEADO - Já foram 3 entradas seguidas.`);
+        return res.json({
+          multiplicador: -1,
+          sinal: "...",
+          confianca: "baixa",
+          motivo: "Limite de 3 entradas consecutivas atingido",
+        });
+      }
+
+      // Se vai ENTRAR, incrementar contador
+      if (analise.sinal === "ENTRAR") {
+        entradasConsecutivas.contador += 1;
+        console.log(`[ENTRADAS] ENTRAR enviado. Contador: ${entradasConsecutivas.contador}/3`);
+      }
 
       res.json({
         multiplicador: analise.multiplicador,
