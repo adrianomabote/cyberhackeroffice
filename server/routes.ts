@@ -513,11 +513,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Se é uma nova base, atualizar estado
       if (signalState.baseId !== String(base.id)) {
+        console.log(`[SACAR] Nova vela detectada! Base anterior: ${signalState.baseId}, Base atual: ${String(base.id)}`);
         signalState.baseId = String(base.id);
         signalState.attempts = 0;
         signalState.expiresAt = agora + janelaMs;
-        // Incrementar contador de velas após o último sinal
-        if (signalState.lastSignalTime !== null) {
+        
+        // IMPORTANTE: Resetar lastSignalId para permitir novo sinal na nova vela
+        // Mas manter o histórico para saber se passaram 3 velas
+        if (signalState.lastSignalId !== null) {
           signalState.velasAposUltimoSinal += 1;
         }
       }
@@ -564,55 +567,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const podeEnviarSinal = signalState.lastSignalTime === null || 
                              signalState.velasAposUltimoSinal >= minimoVelasAposSinal;
       
-      // SE FALHOU NA ENTRADA ANTERIOR, USAR 2.00x NA SEGUNDA TENTATIVA
-      if (signalState.falhouAnterior) {
-        console.log('[SACAR] SEGUNDA TENTATIVA ATIVADA - Forçando 2.00x como multiplicador de segurança');
-        multiplicadorFinal = 2.00;
-        analise.motivo = "Segunda tentativa com multiplicador de segurança (2.00x)";
-      }
+      // VERIFICAR SE JÁ ENVIAMOS SINAL PARA ESTA VELA
+      const baseIdStr = String(base.id);
+      const jaEnviouSinalParaEstaVela = signalState.lastSignalId === baseIdStr;
       
-      // Apenas considerar ENTRAR se a análise for de média para cima, pontos ajustados forem altos
-      // E já tiver se passado o número mínimo de velas desde o último sinal
-      if ((analise.confianca === 'média' || analise.confianca === 'média-alta' || analise.confianca === 'alta') && 
-          pontosAjustados >= 10 && podeEnviarSinal) {
+      console.log('[SACAR] Estado:', {
+        baseAtual: baseIdStr,
+        ultimoSignal: signalState.lastSignalId,
+        jaEnviou: jaEnviouSinalParaEstaVela,
+        velasApos: signalState.velasAposUltimoSinal,
+        podeEnviar: podeEnviarSinal,
+        analiseConf: analise.confianca,
+        pontosAjustados
+      });
+      
+      // Apenas enviar ENTRAR se:
+      // 1. Análise for forte
+      // 2. Pontos forem altos
+      // 3. Já passou tempo mínimo desde último sinal
+      // 4. NÃO enviamos sinal ainda para esta vela
+      if (!jaEnviouSinalParaEstaVela &&
+          (analise.confianca === 'média' || analise.confianca === 'média-alta' || analise.confianca === 'alta') && 
+          pontosAjustados >= 10 && 
+          podeEnviarSinal) {
+        
+        // SE FALHOU NA ENTRADA ANTERIOR, USAR 2.00x NA SEGUNDA TENTATIVA
+        if (signalState.falhouAnterior) {
+          console.log('[SACAR] SEGUNDA TENTATIVA ATIVADA - Forçando 2.00x como multiplicador de segurança');
+          multiplicadorFinal = 2.00;
+          analise.motivo = "Segunda tentativa com multiplicador de segurança (2.00x)";
+        }
+        
+        // Enviar ENTRAR
         sinalFinal = "ENTRAR";
         confiancaFinal = analise.confianca;
-      }
-      
-      // Se não for para ENTRAR, sempre retornar "..."
-      if (sinalFinal !== "ENTRAR") {
+        
+        // Registrar que enviamos sinal para esta vela
+        signalState.lastSignalId = baseIdStr;
+        signalState.lastSignalTime = agora;
+        signalState.velasAposUltimoSinal = 0;
+        signalState.multiplicadorAnterior = multiplicadorFinal;
+        
+        console.log(`[SACAR] ✅ NOVO SINAL ENTRAR para vela ${baseIdStr} com multiplicador ${multiplicadorFinal.toFixed(2)}x`);
+        
+        // Limpar flag de falha após usar segunda tentativa
+        if (signalState.falhouAnterior) {
+          signalState.falhouAnterior = false;
+          console.log('[SACAR] Limpando flag de falha - segunda tentativa enviada');
+        }
+      } else {
+        // Explicar por que não está enviando ENTRAR
         sinalFinal = "...";
         confiancaFinal = "baixa";
-        analise.motivo = podeEnviarSinal 
-          ? "Aguardando próxima oportunidade" 
-          : `Aguardando ${minimoVelasAposSinal - signalState.velasAposUltimoSinal} velas após o último sinal`;
-      }
-      
-      // Evitar sinal duplicado para a mesma vela
-      if (sinalFinal === "ENTRAR") {
-        const baseIdStr = String(base.id);
-        if (signalState.lastSignalId === baseIdStr) {
-          console.log(`[SACAR] Evitando sinal duplicado para vela ${baseIdStr}`);
-          sinalFinal = "...";
-          confiancaFinal = "baixa";
-          analise.motivo = "Aguardando próxima oportunidade";
+        
+        if (jaEnviouSinalParaEstaVela) {
+          analise.motivo = "Aguardando nova vela (sinal já enviado)";
+          console.log(`[SACAR] ⏸️ Aguardando nova vela - já enviou para ${baseIdStr}`);
+        } else if (!(analise.confianca === 'média' || analise.confianca === 'média-alta' || analise.confianca === 'alta')) {
+          analise.motivo = `Confiança baixa (${analise.confianca})`;
+          console.log('[SACAR] ⚠️ Confiança baixa');
+        } else if (pontosAjustados < 10) {
+          analise.motivo = `Pontos baixos (${pontosAjustados}/10)`;
+          console.log('[SACAR] ⚠️ Pontos insuficientes');
+        } else if (!podeEnviarSinal) {
+          const velasFaltam = minimoVelasAposSinal - signalState.velasAposUltimoSinal;
+          analise.motivo = `Aguardando ${velasFaltam} velas após último sinal`;
+          console.log(`[SACAR] ⏱️ Aguardando ${velasFaltam} velas`);
         } else {
-          // Registrar que enviamos um sinal para esta vela
-          signalState.lastSignalId = baseIdStr;
-          signalState.lastSignalTime = agora;
-          signalState.velasAposUltimoSinal = 0;
-          signalState.attempts = 0; // Resetar tentativas ao enviar um sinal
-          
-          console.log(`[SACAR] Novo sinal ENTRAR para vela ${baseIdStr} com multiplicador ${multiplicadorFinal.toFixed(2)}x`);
-          
-          // GUARDAR MULTIPLICADOR PARA VERIFICAR SE FALHOU DEPOIS
-          signalState.multiplicadorAnterior = multiplicadorFinal;
-          
-          // Limpar flag de falha após usar segunda tentativa
-          if (signalState.falhouAnterior) {
-            signalState.falhouAnterior = false;
-            console.log('[SACAR] Limpando flag de falha - segunda tentativa enviada');
-          }
+          analise.motivo = "Aguardando próxima oportunidade";
+          console.log('[SACAR] ⏳ Aguardando oportunidade');
         }
       }
 
