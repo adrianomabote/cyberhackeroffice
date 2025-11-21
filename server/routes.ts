@@ -4,10 +4,12 @@ import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "../shared/schema";
 import { z } from "zod";
 
-// Estado global para controlar entradas consecutivas
+// Estado global para controlar entradas consecutivas e segunda tentativa
 const entradasConsecutivas = {
   contador: 0,
   ultimaVelaId: null as string | null,
+  multiplicadorRecomendado: null as number | null,
+  tentativaNumero: 0, // 1ª ou 2ª tentativa
 };
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -296,38 +298,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Buscar mais velas para análise mais precisa
       const historico = await storage.getHistorico(20);
       const velaAtual = historico[0];
+      const velaPosterior = historico[1]; // Próxima vela (anterior no histórico)
       const analise = analisarOportunidadeEntrada(historico);
 
-      // Resetar contador se mudou de vela
+      // Verificar se mudou de vela
       if (velaAtual && velaAtual.id && entradasConsecutivas.ultimaVelaId !== String(velaAtual.id)) {
-        console.log(`[ENTRADAS] Nova vela detectada. Resetando contador de 3.`);
+        console.log(`[ENTRADAS] Nova vela detectada (${velaAtual.multiplicador}x).`);
+        
+        // Verificar se a vela anterior NÃO atingiu o multiplicador recomendado
+        const velaAnteriorAtingiu = velaPosterior ? velaPosterior.multiplicador >= (entradasConsecutivas.multiplicadorRecomendado || 0) : true;
+        
+        if (!velaAnteriorAtingiu && entradasConsecutivas.multiplicadorRecomendado && entradasConsecutivas.tentativaNumero < 2) {
+          console.log(`[ENTRADAS] Vela anterior NÃO atingiu ${entradasConsecutivas.multiplicadorRecomendado}x. Ativando 2ª tentativa.`);
+          entradasConsecutivas.tentativaNumero = 2; // 2ª tentativa
+        } else {
+          // Resetar para nova rodada
+          console.log(`[ENTRADAS] Resetando para nova vela.`);
+          entradasConsecutivas.contador = 0;
+          entradasConsecutivas.tentativaNumero = 0;
+          entradasConsecutivas.multiplicadorRecomendado = null;
+        }
+
         entradasConsecutivas.ultimaVelaId = String(velaAtual.id);
-        entradasConsecutivas.contador = 0;
       }
 
-      // Se análise diz ENTRAR e já enviou 3 seguidas, bloquear
-      if (analise.sinal === "ENTRAR" && entradasConsecutivas.contador >= 3) {
-        console.log(`[ENTRADAS] BLOQUEADO - Já foram 3 entradas seguidas.`);
+      // Determinar se pode ENTRAR
+      let podeEntrar = analise.sinal === "ENTRAR";
+      
+      // Se é 2ª tentativa, mandar com multiplicador reduzido (mais conservador)
+      let multiplicadorFinal = analise.multiplicador;
+      
+      if (entradasConsecutivas.tentativaNumero === 2) {
+        console.log(`[ENTRADAS] Enviando 2ª TENTATIVA (multiplicador reduzido).`);
+        // 2ª tentativa: sempre 2.00x (mais seguro)
+        multiplicadorFinal = 2.0;
+        podeEntrar = true; // Forçar a 2ª tentativa mesmo que análise diga AGUARDAR
+        entradasConsecutivas.contador += 1;
+      } else if (podeEntrar) {
+        // 1ª tentativa: seguir análise normal
+        entradasConsecutivas.contador += 1;
+        entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
+        entradasConsecutivas.tentativaNumero = 1;
+        console.log(`[ENTRADAS] 1ª TENTATIVA enviada com ${analise.multiplicador}x. Contador: ${entradasConsecutivas.contador}/2`);
+      }
+
+      // Se já foram 2 tentativas, bloquear
+      if (entradasConsecutivas.contador >= 2 && podeEntrar && entradasConsecutivas.tentativaNumero !== 2) {
+        console.log(`[ENTRADAS] BLOQUEADO - Já foram 2 entradas nesta vela.`);
         return res.json({
           multiplicador: -1,
           sinal: "...",
           confianca: "baixa",
-          motivo: "Limite de 3 entradas consecutivas atingido",
+          motivo: "Limite de 2 entradas consecutivas atingido",
         });
       }
 
-      // Se vai ENTRAR, incrementar contador
-      if (analise.sinal === "ENTRAR") {
-        entradasConsecutivas.contador += 1;
-        console.log(`[ENTRADAS] ENTRAR enviado. Contador: ${entradasConsecutivas.contador}/3`);
+      // Retornar resposta
+      if (podeEntrar) {
+        res.json({
+          multiplicador: multiplicadorFinal,
+          sinal: "ENTRAR",
+          confianca: entradasConsecutivas.tentativaNumero === 2 ? "média" : analise.confianca,
+          motivo: entradasConsecutivas.tentativaNumero === 2 ? "2ª TENTATIVA - Entrada anterior não atingiu" : analise.motivo,
+        });
+      } else {
+        res.json({
+          multiplicador: null,
+          sinal: analise.sinal,
+          confianca: analise.confianca,
+          motivo: analise.motivo,
+        });
       }
-
-      res.json({
-        multiplicador: analise.multiplicador,
-        sinal: analise.sinal,
-        confianca: analise.confianca,
-        motivo: analise.motivo,
-      });
     } catch (error) {
       res.status(500).json({
         multiplicador: null,
