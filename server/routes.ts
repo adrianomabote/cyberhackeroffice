@@ -4,14 +4,11 @@ import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "../shared/schema";
 import { z } from "zod";
 
-// Estado global para controlar entradas consecutivas e segunda tentativa
+// Estado global para controlar segunda tentativa
 const entradasConsecutivas = {
-  contador: 0,
   ultimaVelaId: null as string | null,
   multiplicadorRecomendado: null as number | null,
-  tentativaNumero: 0, // 1ª ou 2ª tentativa
-  tempoUltimaEntrada: 0, // Timestamp para evitar reset muito rápido
-  velaFinalizada: false, // Se vela foi finalizada
+  tentativaNumero: 0, // 0 = normal, 1 = 1ª entrada, 2 = 2ª tentativa
 };
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -294,41 +291,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada
+  // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada (1 entrada por vela + 2ª tentativa automática)
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
       // Buscar mais velas para análise mais precisa
       const historico = await storage.getHistorico(20);
       const velaAtual = historico[0];
-      const velaPosterior = historico[1]; // Próxima vela (anterior no histórico)
+      const velaPosterior = historico[1]; // Vela anterior (para verificar se atingiu multiplicador)
       const analise = analisarOportunidadeEntrada(historico);
-      const agora = Date.now();
 
-      // Verificar se mudou de vela - com proteção para não resetar muito rápido
+      // Verificar se mudou de vela
       if (velaAtual && velaAtual.id) {
         const mudouDeVela = entradasConsecutivas.ultimaVelaId !== String(velaAtual.id);
         
         if (mudouDeVela) {
           console.log(`[ENTRADAS] Nova vela detectada (${velaAtual.multiplicador}x).`);
           
-          // Só verificar 2ª tentativa se já mandou a 1ª entrada
+          // Verificar se a vela anterior atingiu o multiplicador recomendado
           if (entradasConsecutivas.tentativaNumero === 1 && entradasConsecutivas.multiplicadorRecomendado) {
             const velaAnteriorAtingiu = velaPosterior ? velaPosterior.multiplicador >= entradasConsecutivas.multiplicadorRecomendado : true;
             
             if (!velaAnteriorAtingiu) {
-              console.log(`[ENTRADAS] Vela anterior NÃO atingiu ${entradasConsecutivas.multiplicadorRecomendado}x. Ativando 2ª tentativa.`);
-              entradasConsecutivas.tentativaNumero = 2; // 2ª tentativa
-              entradasConsecutivas.contador = 1; // Reinicia contador em 1 para 2ª tentativa
+              console.log(`[ENTRADAS] Vela anterior NÃO atingiu ${entradasConsecutivas.multiplicadorRecomendado}x. Ativando 2ª TENTATIVA automática.`);
+              entradasConsecutivas.tentativaNumero = 2; // Ativar 2ª tentativa
             } else {
-              console.log(`[ENTRADAS] Vela anterior atingiu ${entradasConsecutivas.multiplicadorRecomendado}x. Rodada completa.`);
-              entradasConsecutivas.contador = 0;
+              console.log(`[ENTRADAS] Vela anterior atingiu ${entradasConsecutivas.multiplicadorRecomendado}x. Sucesso! Resetando.`);
               entradasConsecutivas.tentativaNumero = 0;
               entradasConsecutivas.multiplicadorRecomendado = null;
             }
           } else {
-            // Não teve 1ª tentativa ou já teve 2ª, resetar normal
-            console.log(`[ENTRADAS] Resetando para nova vela (tentativa anterior: ${entradasConsecutivas.tentativaNumero}).`);
-            entradasConsecutivas.contador = 0;
+            // Resetar se não teve 1ª tentativa ou já completou 2ª
+            console.log(`[ENTRADAS] Resetando (tentativa anterior: ${entradasConsecutivas.tentativaNumero}).`);
             entradasConsecutivas.tentativaNumero = 0;
             entradasConsecutivas.multiplicadorRecomendado = null;
           }
@@ -337,28 +330,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Determinar se pode ENTRAR
-      let podeEntrar = analise.sinal === "ENTRAR";
-      let multiplicadorFinal = analise.multiplicador;
-      
+      // Determinar resposta baseado no estado
+      let podeEntrar = false;
+      let multiplicadorFinal = null;
+      let confiancaFinal = analise.confianca;
+      let motivoFinal = analise.motivo;
+
       if (entradasConsecutivas.tentativaNumero === 2) {
-        // 2ª tentativa: enviar com 2.00x (mais seguro)
-        console.log(`[ENTRADAS] Enviando 2ª TENTATIVA com 2.00x.`);
-        multiplicadorFinal = 2.0;
+        // 2ª TENTATIVA: enviar com 2.00x (mais conservador)
+        if (analise.sinal === "ENTRAR" || analise.sinal === "POSSÍVEL") {
+          console.log(`[ENTRADAS] Enviando 2ª TENTATIVA com 2.00x.`);
+          podeEntrar = true;
+          multiplicadorFinal = 2.0;
+          confiancaFinal = "média";
+          motivoFinal = "2ª TENTATIVA - Entrada anterior não atingiu multiplicador";
+          entradasConsecutivas.tentativaNumero = 0; // Limpar para próxima rodada
+          entradasConsecutivas.multiplicadorRecomendado = null;
+        } else {
+          console.log(`[ENTRADAS] 2ª tentativa em espera (análise: AGUARDAR).`);
+        }
+      } else if (analise.sinal === "ENTRAR" && entradasConsecutivas.tentativaNumero === 0) {
+        // 1ª ENTRADA: seguir análise normal
+        console.log(`[ENTRADAS] Enviando 1ª ENTRADA com ${analise.multiplicador}x.`);
         podeEntrar = true;
-        entradasConsecutivas.contador += 1;
-        entradasConsecutivas.tempoUltimaEntrada = agora;
-      } else if (podeEntrar && entradasConsecutivas.contador < 2) {
-        // 1ª tentativa: seguir análise normal
-        entradasConsecutivas.contador += 1;
+        multiplicadorFinal = analise.multiplicador;
+        entradasConsecutivas.tentativaNumero = 1; // Marcar que já mandou 1ª entrada
         entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
-        entradasConsecutivas.tentativaNumero = 1;
-        entradasConsecutivas.tempoUltimaEntrada = agora;
-        console.log(`[ENTRADAS] 1ª TENTATIVA enviada com ${analise.multiplicador}x. Contador: ${entradasConsecutivas.contador}/2`);
-      } else if (podeEntrar && entradasConsecutivas.contador >= 2) {
-        // Já enviou 2, bloquear
-        console.log(`[ENTRADAS] BLOQUEADO - Já foram 2 entradas nesta vela.`);
-        podeEntrar = false;
       }
 
       // Retornar resposta
@@ -366,8 +363,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({
           multiplicador: multiplicadorFinal,
           sinal: "ENTRAR",
-          confianca: entradasConsecutivas.tentativaNumero === 2 ? "média" : analise.confianca,
-          motivo: entradasConsecutivas.tentativaNumero === 2 ? "2ª TENTATIVA - Entrada anterior não atingiu" : analise.motivo,
+          confianca: confiancaFinal,
+          motivo: motivoFinal,
         });
       } else {
         res.json({
