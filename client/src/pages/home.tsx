@@ -109,7 +109,7 @@ export default function Home() {
 
   // Lógica: mostrar entrada até receber nova vela
   useEffect(() => {
-    if (isHoraDeEntrar && aposData?.multiplicador && sacarData?.multiplicador) {
+    if (isHoraDeEntrar && aposData?.multiplicador && aposData.multiplicador !== -1 && sacarData?.multiplicador) {
       // Verificar se é uma entrada NOVA (diferente da última mostrada)
       const isNovaEntrada = !ultimaEntradaMostrada || 
         ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador ||
@@ -124,20 +124,21 @@ export default function Home() {
         });
       }
     } else if (mostrandoEntrada) {
-      // Se não é mais hora de entrar OU recebeu nova vela, resetar
+      // Se recebeu nova vela (ou três pontinhos), resetar
       setMostrandoEntrada(false);
     }
   }, [isHoraDeEntrar, aposData?.multiplicador, sacarData?.multiplicador]);
 
-  // Resetar quando nova vela chegar (multiplicador de APÓS mudou)
+  // Resetar quando nova vela chegar (IMPORTANTE: mostrar ... após vela cair)
   useEffect(() => {
-    if (mostrandoEntrada && aposData?.multiplicador) {
-      if (ultimaEntradaMostrada && ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador) {
-        // Nova vela chegou, resetar
+    if (ultimaEntradaMostrada && aposData?.multiplicador && aposData.multiplicador !== -1) {
+      if (ultimaEntradaMostrada.multiplicadorApos !== aposData.multiplicador) {
+        // Nova vela chegou - limpar e mostrar pontinhos
         setMostrandoEntrada(false);
+        setUltimaEntradaMostrada(null);
       }
     }
-  }, [aposData?.multiplicador, mostrandoEntrada, ultimaEntradaMostrada]);
+  }, [aposData?.multiplicador, ultimaEntradaMostrada]);
 
   // Efeito de pulso quando valores mudam
   useEffect(() => {

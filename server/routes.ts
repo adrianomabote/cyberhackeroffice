@@ -110,7 +110,7 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   }
 
   // Determinar os alvos de saque baseado nos pontos
-  const alvos = [2.00, 3.00, 4.00, 7.00, 10.00];
+  const alvos = [2.00, 3.00, 4.00, 6.00, 10.00];
   let alvoRecomendado = 2.00; // Alvo padrão conservador
   let sinal = "AGUARDAR";
   let confianca = "baixa";
@@ -125,8 +125,8 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   else if (pontos >= 12) {
     sinal = "ENTRAR";
     confianca = "média-alta";
-    alvoRecomendado = 7.00;
-    motivos.push("Bom sinal para alvo médio");
+    alvoRecomendado = 6.00;
+    motivos.push("Bom sinal para alvo médio-alto");
   }
   else if (pontos >= 9) {
     sinal = "ENTRAR";
@@ -154,8 +154,8 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
 
   // Ajustar alvo com base na volatilidade recente
   const volatilidade = Math.max(...ultimas10) / Math.min(...ultimas10.filter(x => x > 0));
-  if (volatilidade > 3 && alvoRecomendado > 4.00) {
-    alvoRecomendado = Math.min(alvoRecomendado * 1.2, 10.00);
+  if (volatilidade > 3 && alvoRecomendado > 3.00) {
+    alvoRecomendado = Math.min(alvoRecomendado * 1.3, 10.00);
     motivos.push(`Ajuste para cima devido à alta volatilidade (${volatilidade.toFixed(2)})`);
   } else if (volatilidade < 1.5 && alvoRecomendado > 2.00) {
     alvoRecomendado = Math.max(alvoRecomendado * 0.8, 2.00);
