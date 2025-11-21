@@ -135,6 +135,16 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   };
 }
 
+// ESTADO GLOBAL - Controlar entradas consecutivas
+const signalState = {
+  lastSignalId: null as string | null,
+  lastSignalTime: null as number | null,
+  velasAposUltimoSinal: 0,
+  falhouAnterior: false,
+  multiplicadorAnterior: 0,
+  attempts: 0,
+};
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Habilitar CORS para permitir chamadas do script externo
   app.use((req, res, next) => {
@@ -317,12 +327,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
       // Buscar mais velas para análise mais precisa
-      const historico = await storage.getHistorico(20);
+      const historico = await storage.getHistorico(50);
+      const base = historico[0];
       const analise = analisarOportunidadeEntrada(historico);
 
+      // Contar velas após último sinal
+      if (signalState.lastSignalTime) {
+        const agora = Date.now();
+        const tempoDecorrido = agora - signalState.lastSignalTime;
+        signalState.velasAposUltimoSinal = Math.floor(tempoDecorrido / 1000); // Aproximadamente
+      }
+
+      // Incrementar contador de tentativas
+      signalState.attempts += 1;
+
+      // Verificar se já enviamos sinal para esta vela
+      const baseIdStr = base?.id ? String(base.id) : null;
+      const jaEnviouSinalParaEstaVela = signalState.lastSignalId === baseIdStr;
+
+      console.log('[SACAR] Estado:', {
+        baseAtual: baseIdStr,
+        ultimoSignal: signalState.lastSignalId,
+        jaEnviou: jaEnviouSinalParaEstaVela,
+        velasApos: signalState.velasAposUltimoSinal,
+        analiseConf: analise.confianca,
+        tentativas: signalState.attempts
+      });
+
+      // Se já enviou sinal para essa vela, retornar "..."
+      if (jaEnviouSinalParaEstaVela && analise.sinal === "ENTRAR") {
+        console.log('[SACAR] BLOQUEANDO - Já enviou ENTRAR para vela', baseIdStr);
+        return res.json({
+          multiplicador: -1,
+          sinal: "...",
+          confianca: "baixa",
+          motivo: "Aguardando nova vela",
+        });
+      }
+
+      // Se sinal é ENTRAR e ainda não enviou para essa vela
+      if (analise.sinal === "ENTRAR" && !jaEnviouSinalParaEstaVela) {
+        // Registrar que enviamos sinal para esta vela
+        signalState.lastSignalId = baseIdStr;
+        signalState.lastSignalTime = Date.now();
+        signalState.velasAposUltimoSinal = 0;
+        signalState.multiplicadorAnterior = analise.multiplicador || 0;
+
+        console.log(`[SACAR] ✅ NOVO SINAL ENTRAR para vela ${baseIdStr} com multiplicador ${analise.multiplicador?.toFixed(2)}x`);
+      }
+
       res.json({
-        multiplicador: analise.multiplicador,
-        sinal: analise.sinal,
+        multiplicador: analise.sinal === "ENTRAR" ? analise.multiplicador : -1,
+        sinal: analise.sinal === "ENTRAR" ? "ENTRAR" : "...",
         confianca: analise.confianca,
         motivo: analise.motivo,
       });
