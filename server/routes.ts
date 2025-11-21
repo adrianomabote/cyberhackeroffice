@@ -189,13 +189,17 @@ const signalState: {
   expiresAt: number;              // Timestamp de expiração
   lastSignalTime: number | null;  // Timestamp do último sinal ENTRAR
   velasAposUltimoSinal: number;   // Contador de velas após o último sinal
+  falhouAnterior: boolean;        // Indica se entrada anterior falhou (não atingiu 2.00x)
+  multiplicadorAnterior: number | null; // Multiplicador recomendado na entrada anterior
 } = {
   lastSignalId: null,
   baseId: null,
   attempts: 0,
   expiresAt: 0,
   lastSignalTime: null,
-  velasAposUltimoSinal: 0
+  velasAposUltimoSinal: 0,
+  falhouAnterior: false,
+  multiplicadorAnterior: null
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -483,6 +487,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Reutilizar variável agora já definida acima
       const janelaMs = 6000; // 6 segundos de janela para cada sinal
 
+      // VERIFICAR SE ENTRADA ANTERIOR FALHOU (não atingiu 2.00x)
+      if (signalState.multiplicadorAnterior !== null && base.multiplicador < 2.00) {
+        console.log(`[SACAR] Entrada anterior falhou! Vela caiu para ${base.multiplicador.toFixed(2)}x (recomendava ${signalState.multiplicadorAnterior.toFixed(2)}x). Próxima entrada usará 2.00x como segunda tentativa`);
+        signalState.falhouAnterior = true;
+        signalState.multiplicadorAnterior = null;
+      }
+
       // Se já passou mais de 6 segundos desde o último sinal, resetar estado
       if (agora > signalState.expiresAt) {
         signalState.baseId = null;
@@ -545,11 +556,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Mapeamento final de decisão - apenas ENTRAR para sinais fortes
       let sinalFinal: "ENTRAR" | "..." = "...";
       let confiancaFinal = "baixa";
+      let multiplicadorFinal = analise.multiplicador;
       
       // Verificar se já se passaram pelo menos 3 velas desde o último sinal
       const minimoVelasAposSinal = 3;
       const podeEnviarSinal = signalState.lastSignalTime === null || 
                              signalState.velasAposUltimoSinal >= minimoVelasAposSinal;
+      
+      // SE FALHOU NA ENTRADA ANTERIOR, USAR 2.00x NA SEGUNDA TENTATIVA
+      if (signalState.falhouAnterior) {
+        console.log('[SACAR] SEGUNDA TENTATIVA ATIVADA - Forçando 2.00x como multiplicador de segurança');
+        multiplicadorFinal = 2.00;
+        analise.motivo = "Segunda tentativa com multiplicador de segurança (2.00x)";
+      }
       
       // Apenas considerar ENTRAR se a análise for de média para cima, pontos ajustados forem altos
       // E já tiver se passado o número mínimo de velas desde o último sinal
@@ -580,12 +599,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           signalState.lastSignalTime = agora;
           signalState.velasAposUltimoSinal = 0;
           signalState.attempts = 0; // Resetar tentativas ao enviar um sinal
+          
+          // GUARDAR MULTIPLICADOR PARA VERIFICAR SE FALHOU DEPOIS
+          signalState.multiplicadorAnterior = multiplicadorFinal;
+          
+          // Limpar flag de falha após usar segunda tentativa
+          if (signalState.falhouAnterior) {
+            signalState.falhouAnterior = false;
+            console.log('[SACAR] Limpando flag de falha - segunda tentativa enviada');
+          }
         }
       }
 
       // Preparar resultado final
       const resultado: PrevisaoResponse = {
-        multiplicador: analise.multiplicador,
+        multiplicador: multiplicadorFinal,
         sinal: sinalFinal,
         confianca: confiancaFinal,
         motivo: analise.motivo,
