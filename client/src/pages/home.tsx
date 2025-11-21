@@ -95,15 +95,17 @@ export default function Home() {
     // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
     valorAposExibir = sinaisManualData?.apos ?? null;
     valorSacarExibir = sinaisManualData?.sacar ?? null;
-    deveMostrarValores = true;
+    deveMostrarValores = valorAposExibir !== null && valorSacarExibir !== null;
   } else {
     // Prioridade 2: Sistema automático (requer script rodando)
-    const recebeuTresPontinhos = aposData?.multiplicador === -1;
-    
-    if (!recebeuTresPontinhos && isHoraDeEntrar && mostrandoEntrada) {
-      valorAposExibir = aposData?.multiplicador ?? null;
-      valorSacarExibir = sacarData?.multiplicador ?? null;
+    // Mostrar valores SÓ quando: é hora de entrar + está mostrando entrada + tem dados válidos
+    if (isHoraDeEntrar && mostrandoEntrada && aposData?.multiplicador && aposData.multiplicador !== -1 && sacarData?.multiplicador) {
+      valorAposExibir = aposData.multiplicador;
+      valorSacarExibir = sacarData.multiplicador;
       deveMostrarValores = true;
+    } else {
+      // Em todos os outros casos, mostrar "..."
+      deveMostrarValores = false;
     }
   }
 
