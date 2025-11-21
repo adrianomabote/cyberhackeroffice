@@ -590,16 +590,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Evitar sinal duplicado para a mesma vela
       if (sinalFinal === "ENTRAR") {
-        if (signalState.lastSignalId === base.id) {
+        const baseIdStr = String(base.id);
+        if (signalState.lastSignalId === baseIdStr) {
+          console.log(`[SACAR] Evitando sinal duplicado para vela ${baseIdStr}`);
           sinalFinal = "...";
           confiancaFinal = "baixa";
           analise.motivo = "Aguardando próxima oportunidade";
         } else {
           // Registrar que enviamos um sinal para esta vela
-          signalState.lastSignalId = base.id;
+          signalState.lastSignalId = baseIdStr;
           signalState.lastSignalTime = agora;
           signalState.velasAposUltimoSinal = 0;
           signalState.attempts = 0; // Resetar tentativas ao enviar um sinal
+          
+          console.log(`[SACAR] Novo sinal ENTRAR para vela ${baseIdStr} com multiplicador ${multiplicadorFinal.toFixed(2)}x`);
           
           // GUARDAR MULTIPLICADOR PARA VERIFICAR SE FALHOU DEPOIS
           signalState.multiplicadorAnterior = multiplicadorFinal;
