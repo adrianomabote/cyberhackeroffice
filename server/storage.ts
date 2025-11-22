@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
 import { eq, desc, sql, and, lt } from "drizzle-orm";
-import { velas, usuarios, type InsertVela, type Vela } from "../shared/schema";
+import { velas, usuarios, feedbacks, type InsertVela, type Vela, type InsertFeedback, type Feedback } from "../shared/schema";
 import type { ManutencaoStatus, SinaisManual, PrevisaoResponse, UltimaVelaResponse } from "../shared/schema";
 import bcrypt from "bcryptjs";
 
@@ -146,6 +146,53 @@ class DbStorage {
     this.cachedAnalysisTimestamp = 0;
     this.cachedVela = null;
     console.log('[STORAGE] Cache limpo');
+  }
+
+  // Feedback de experiência do usuário
+  async adicionarFeedback(usuarioId: string | null, resposta: string): Promise<Feedback> {
+    try {
+      const [feedback] = await db.insert(feedbacks).values({
+        usuario_id: usuarioId,
+        resposta: resposta,
+      }).returning();
+
+      console.log('[STORAGE] Feedback registrado:', {
+        id: feedback.id,
+        usuario_id: feedback.usuario_id,
+        resposta: feedback.resposta,
+        timestamp: feedback.timestamp,
+      });
+
+      return feedback;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao registrar feedback:', error);
+      throw error;
+    }
+  }
+
+  async listarFeedbacks(limit: number = 100): Promise<Feedback[]> {
+    const feedbackList = await db
+      .select()
+      .from(feedbacks)
+      .orderBy(desc(feedbacks.timestamp))
+      .limit(limit);
+
+    return feedbackList;
+  }
+
+  async contarFeedbacksPorResposta(): Promise<{ resposta: string; total: number }[]> {
+    const result = await db
+      .select({
+        resposta: feedbacks.resposta,
+        total: sql<number>`count(*)`,
+      })
+      .from(feedbacks)
+      .groupBy(feedbacks.resposta);
+
+    return result.map(r => ({
+      resposta: r.resposta,
+      total: Number(r.total),
+    }));
   }
 }
 

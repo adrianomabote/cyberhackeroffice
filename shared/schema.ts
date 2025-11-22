@@ -141,3 +141,20 @@ export const insertUsuarioSchema = z.object({
   senha: z.string().min(6),
   dias_acesso: z.number().min(1).optional().default(2),
 });
+
+// Feedback de experiência do usuário
+export const feedbacks = pgTable("feedbacks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuario_id: varchar("usuario_id").references(() => usuarios.id),
+  resposta: varchar("resposta", { length: 50 }).notNull(), // "excelente", "bom", "testando", "precisa_melhorar"
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const insertFeedbackSchema = createInsertSchema(feedbacks).pick({
+  resposta: true,
+}).extend({
+  resposta: z.enum(["excelente", "bom", "testando", "precisa_melhorar"]),
+});
+
+export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
+export type Feedback = typeof feedbacks.$inferSelect;

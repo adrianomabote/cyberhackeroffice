@@ -1183,6 +1183,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/feedback - Registrar feedback de experiência do usuário
+  app.post("/api/feedback", async (req, res) => {
+    try {
+      const { resposta } = req.body;
+      const { insertFeedbackSchema } = await import("../shared/schema");
+      
+      // Validar entrada
+      const validacao = insertFeedbackSchema.safeParse({ resposta });
+      if (!validacao.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Resposta inválida. Use: excelente, bom, testando ou precisa_melhorar",
+        });
+      }
+
+      // Obter ID do usuário logado (se houver)
+      const usuarioId = req.session?.user?.id || null;
+
+      // Salvar feedback
+      const feedback = await storage.adicionarFeedback(usuarioId, resposta);
+
+      res.json({
+        success: true,
+        message: "Feedback registrado com sucesso!",
+        data: feedback,
+      });
+    } catch (error) {
+      console.error('[FEEDBACK] Erro ao registrar:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao registrar feedback",
+      });
+    }
+  });
+
+  // GET /api/feedback/lista - Listar todos os feedbacks (apenas admin)
+  app.get("/api/feedback/lista", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const feedbacks = await storage.listarFeedbacks(limit);
+
+      res.json({
+        success: true,
+        data: feedbacks,
+        total: feedbacks.length,
+      });
+    } catch (error) {
+      console.error('[FEEDBACK] Erro ao listar:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao listar feedbacks",
+      });
+    }
+  });
+
+  // GET /api/feedback/estatisticas - Estatísticas de feedbacks (apenas admin)
+  app.get("/api/feedback/estatisticas", async (req, res) => {
+    try {
+      const estatisticas = await storage.contarFeedbacksPorResposta();
+
+      res.json({
+        success: true,
+        data: estatisticas,
+      });
+    } catch (error) {
+      console.error('[FEEDBACK] Erro ao gerar estatísticas:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao gerar estatísticas",
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
