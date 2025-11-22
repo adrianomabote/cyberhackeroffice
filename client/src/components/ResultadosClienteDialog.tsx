@@ -82,7 +82,11 @@ export function ResultadosClienteDialog() {
   });
 
   const enviarResultado = () => {
-    // Enviar sem validação local - deixar backend validar
+    // Não enviar se campos estiverem vazios
+    if (!valorApos.trim() || !valorSacar.trim()) {
+      return;
+    }
+    
     const apos = parseFloat(valorApos);
     enviarMutation.mutate({ apos, sacar: valorSacar });
   };
