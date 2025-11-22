@@ -40,6 +40,7 @@ export function ResultadosClienteDialog() {
   const [valorApos, setValorApos] = useState("");
   const [valorSacar, setValorSacar] = useState("");
   const [errosValidacao, setErrosValidacao] = useState<{ apos?: boolean; sacar?: boolean }>({});
+  const [sacarMaximoAtingido, setSacarMaximoAtingido] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -119,6 +120,7 @@ export function ResultadosClienteDialog() {
     setValorApos("");
     setValorSacar("");
     setErrosValidacao({});
+    setSacarMaximoAtingido(false);
   };
 
   return (
@@ -237,7 +239,19 @@ export function ResultadosClienteDialog() {
                 placeholder="Ex: 3.20 ou 3.20L"
                 value={valorSacar}
                 onChange={(e) => {
-                  setValorSacar(e.target.value);
+                  const novoValor = e.target.value;
+                  const apenasDigitos = novoValor.replace(/\D/g, '');
+                  
+                  // Limitar a 4 dígitos
+                  if (apenasDigitos.length > 4) {
+                    setSacarMaximoAtingido(true);
+                    // Mostrar notificação e voltar ao estado anterior
+                    return;
+                  }
+                  
+                  setSacarMaximoAtingido(false);
+                  setValorSacar(novoValor);
+                  
                   // Limpar erro individual ao digitar
                   if (errosValidacao.sacar) {
                     setErrosValidacao(prev => ({ ...prev, sacar: false }));
@@ -251,6 +265,9 @@ export function ResultadosClienteDialog() {
               />
               {errosValidacao.sacar && (
                 <p className="text-xs text-red-600">Mínimo deve ser 4 dígitos</p>
+              )}
+              {sacarMaximoAtingido && (
+                <p className="text-xs text-red-600">Máximo 4 dígitos</p>
               )}
             </div>
 
