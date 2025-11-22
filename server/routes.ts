@@ -364,9 +364,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           confiancaFinal = "entrando";
           motivoFinal = "1ª entrada";
         } else if (entradasConsecutivas.jaEntregouMultiplicador) {
-          // JÁ ENTREGOU: aguardar nova vela
-          console.log(`[ENTRADAS] ⏳ 1ª entrada aguardando confirmação de nova vela...`);
-          podeEntrar = false; // Não manda mais nada até nova vela
+          // JÁ ENTREGOU: MANTER RETORNANDO o multiplicador até confirmação de nova vela
+          console.log(`[ENTRADAS] 🔁 Aguardando confirmação de nova vela... Multiplicador: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x`);
+          podeEntrar = true;
+          multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
+          confiancaFinal = "processando";
+          motivoFinal = "Aguardando confirmação de nova vela";
         }
       } else if (entradasConsecutivas.tentativaNumero === 2) {
         // 2ª TENTATIVA: enviar com 2.00x (mais conservador)
