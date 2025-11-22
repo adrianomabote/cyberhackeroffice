@@ -38,12 +38,18 @@ Not specified in the original document. The AI should infer these preferences ba
 ### Feature Specifications
 - **Real-time Signals Dashboard**: Displays predicted "APÓS" and "SACAR" values based on an advanced ML algorithm.
 - **Opportunity Detection Algorithm**: Analyzes the last 50 candles for 10 favorable patterns, scoring them to recommend entry multipliers (2.00x, 3.00x, 4.00x, 6.00x, 10.00x).
+- **Advanced Vela Analyzer** (NEW): Endpoint `/api/analisar-velas-cyber` analyzes the latest 10 velas automatically:
+  - Detects 5 pattern types: Sequência de baixos, Última vela baixa, Tendência de recuperação, Sem altos extremos, Volatilidade controlada
+  - Scores patterns with point-based system (0-9 points)
+  - Returns entry opportunities with APENAS 2.00x, 4.00x, or 10.00x multipliers
+  - Continuous polling at 1 second intervals from frontend
+  - Returns: apos (last vela), sacar (recommended multiplier), sinal (ENTRAR/POSSÍVEL/AGUARDAR), confianca (alta/média/baixa), pontos, motivo
 - **Statistics System**: Provides moving averages (MA5, MA10, MA20), trend analysis, volatility assessment, and extreme values.
 - **Notification System**: Detects 4 types of patterns (Low Sequence, High Volatility, Strong Trend, Opportunity) and provides toast notifications with deduplication.
 - **Manual Maintenance System**: Admin panel (`/admin/cyber`) to activate/deactivate maintenance mode with custom messages and enable/disable manual signal inputs.
 - **Automatic Capture Script**: `aviator-script.js` captures multipliers every second and sends them to the backend, with protection against consecutive duplicates.
 - **Schema Validation**: Zod schemas for all data inputs and outputs, defining models like Vela, HistoricoResponse, EstatisticasResponse, and PadroesResponse.
-- **Client Results Collection**: Every 2 minutes, dialog asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality.
+- **Client Results Collection**: Every 2 minutes, dialog asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality (with duplicate detection and visual badges).
 
 ## External Dependencies
 - **PostgreSQL**: Relational database for data persistence.

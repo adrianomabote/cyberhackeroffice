@@ -206,7 +206,7 @@ export function ResultadosClienteDialog() {
                 className="flex-1 bg-red-700 hover:bg-red-800 text-white"
                 data-testid="button-enviar-agora"
               >
-                Enviar agora
+                Conectar agora
               </Button>
             </div>
           </div>

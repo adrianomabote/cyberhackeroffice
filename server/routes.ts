@@ -23,6 +23,118 @@ const entradasConsecutivas = {
 };
 
 // Função que detecta oportunidades de entrada analisando padrões
+// Analisar APENAS as últimas 10 velas para gerar sinais automáticos
+function analisarUltimas10Velas(velas: Array<{ multiplicador: number }>) {
+  if (velas.length < 5) {
+    return {
+      apos: null,
+      sacar: null,
+      sinal: "AGUARDAR",
+      confianca: "baixa",
+      motivo: "Aguardando mais velas (mínimo 5)",
+      pontos: 0,
+    };
+  }
+
+  // Pegar EXATAMENTE as últimas 10 velas ou menos se não houver 10
+  const ultimas10 = velas.slice(-10);
+  const multiplicadores = ultimas10.map(v => v.multiplicador).filter(m => m > 0); // Filtrar -1 (três pontinhos)
+
+  if (multiplicadores.length === 0) {
+    return {
+      apos: null,
+      sacar: null,
+      sinal: "AGUARDAR",
+      confianca: "baixa",
+      motivo: "Sem dados válidos nas últimas 10 velas",
+      pontos: 0,
+    };
+  }
+
+  const n = multiplicadores.length;
+  const ultimas5 = multiplicadores.slice(-5);
+  const media5 = ultimas5.reduce((a, b) => a + b, 0) / ultimas5.length;
+  const media10 = multiplicadores.reduce((a, b) => a + b, 0) / n;
+  
+  // Detectar padrões favoráveis
+  let pontos = 0;
+  let motivos: string[] = [];
+
+  // Padrão 1: Sequência de baixos (3+ velas <2x nas últimas 5)
+  const baixosRecentes = ultimas5.filter(m => m < 2).length;
+  if (baixosRecentes >= 3) {
+    pontos += 3;
+    motivos.push(`${baixosRecentes} baixas seguidas`);
+  }
+
+  // Padrão 2: Última vela baixa (<2.5x) após média razoável
+  const ultimaVela = multiplicadores[n - 1];
+  if (ultimaVela < 2.5 && media10 > 2.5) {
+    pontos += 2;
+    motivos.push("Última baixa após média alta");
+  }
+
+  // Padrão 3: Tendência de recuperação
+  if (media5 < media10 * 0.85) {
+    pontos += 2;
+    motivos.push("Recuperação detectada");
+  }
+
+  // Padrão 4: Sem altos extremos (<5x nas últimas 3 velas)
+  const ultimas3 = multiplicadores.slice(-3);
+  const altosRecentes = ultimas3.filter(m => m > 5).length;
+  if (altosRecentes === 0) {
+    pontos += 1;
+    motivos.push("Sem extremos recentes");
+  }
+
+  // Padrão 5: Volatilidade controlada
+  const variancia = multiplicadores.reduce((sum, m) => sum + Math.pow(m - media10, 2), 0) / n;
+  const desvioPadrao = Math.sqrt(variancia);
+  const cv = (desvioPadrao / media10);
+  if (cv < 0.7) {
+    pontos += 1;
+    motivos.push("Volatilidade estável");
+  }
+
+  // Determinar sinais: APENAS 2.00x, 4.00x, 10.00x
+  let sinal = "AGUARDAR";
+  let confianca = "baixa";
+  let sacar: number | null = null;
+
+  if (pontos >= 8) {
+    sinal = "ENTRAR";
+    confianca = "alta";
+    sacar = 10.0;
+    motivos.push("⭐ GRANDE OPORTUNIDADE");
+  } else if (pontos >= 6) {
+    sinal = "ENTRAR";
+    confianca = "alta";
+    sacar = 4.0;
+    motivos.push("⭐ BOA OPORTUNIDADE");
+  } else if (pontos >= 4) {
+    sinal = "ENTRAR";
+    confianca = "média";
+    sacar = 2.0;
+    motivos.push("✓ OPORTUNIDADE");
+  } else if (pontos >= 2) {
+    sinal = "POSSÍVEL";
+    confianca = "baixa";
+    sacar = 2.0;
+  }
+
+  return {
+    apos: ultimaVela,
+    sacar,
+    sinal,
+    confianca,
+    motivo: motivos.join(" | "),
+    pontos,
+    velas_analisadas: multiplicadores.length,
+    media10: Math.round(media10 * 100) / 100,
+  };
+}
+
 function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
   if (velas.length < 5) {
     return {
@@ -525,6 +637,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         velas: [],
         total: 0,
         error: "Erro ao buscar histórico",
+      });
+    }
+  });
+
+  // GET /api/analisar-velas-cyber - Analisa as últimas 10 velas e retorna sinais automáticos
+  app.get("/api/analisar-velas-cyber", async (req, res) => {
+    try {
+      const historico = await storage.getHistorico(10);
+      
+      if (historico.length === 0) {
+        return res.json({
+          apos: null,
+          sacar: null,
+          sinal: "AGUARDAR",
+          confianca: "baixa",
+          motivo: "Nenhuma vela recebida ainda",
+          pontos: 0,
+          velas_analisadas: 0,
+        });
+      }
+
+      const analise = analisarUltimas10Velas(historico);
+      
+      console.log('[ANALISADOR] Análise de 10 velas:', {
+        apos: analise.apos,
+        sacar: analise.sacar,
+        sinal: analise.sinal,
+        pontos: analise.pontos,
+        velas: analise.velas_analisadas,
+      });
+
+      res.json(analise);
+    } catch (error) {
+      console.error('[ANALISADOR] Erro ao analisar velas:', error);
+      res.status(500).json({
+        apos: null,
+        sacar: null,
+        sinal: "AGUARDAR",
+        confianca: "baixa",
+        motivo: "Erro ao analisar velas",
+        pontos: 0,
+        error: "Erro na análise",
       });
     }
   });

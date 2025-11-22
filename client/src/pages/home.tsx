@@ -74,6 +74,29 @@ export default function Home() {
     staleTime: 0,
   });
 
+  // Buscar análise automática de velas (últimas 10)
+  interface AnalisadorResponse {
+    apos: number | null;
+    sacar: number | null;
+    sinal: string;
+    confianca: string;
+    motivo: string;
+    pontos: number;
+    velas_analisadas: number;
+    media10?: number;
+  }
+
+  const { data: analisadorData } = useQuery<AnalisadorResponse>({
+    queryKey: ['/api/analisar-velas-cyber'],
+    queryFn: async () => {
+      const res = await fetch('/api/analisar-velas-cyber');
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    },
+    refetchInterval: 1000,
+    staleTime: 0,
+  });
+
   // Função para retornar cor baseada no multiplicador (cores da foto)
   const getMultiplicadorColor = (valor: number): string => {
     if (valor >= 10.0) return '#ff1493'; // Rosa vibrante (10.00x+) - como na foto
@@ -81,8 +104,8 @@ export default function Home() {
     return '#00bfff';                     // Azul cyan (1.00x - 1.99x)
   };
 
-  // Verificar se é hora de entrar
-  const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR';
+  // Verificar se é hora de entrar (do sistema antigo OU novo analisador)
+  const isHoraDeEntrar = sacarData?.sinal === 'ENTRAR' || analisadorData?.sinal === 'ENTRAR';
 
   // Usar sinais manuais se estiverem ativos, senão usar automáticos
   const usarSinaisManual = sinaisManualData?.ativo === true;
@@ -91,6 +114,7 @@ export default function Home() {
   let valorAposExibir = null;
   let valorSacarExibir = null;
   let deveMostrarValores = false;
+  let infoAnalise = '';
 
   if (usarSinaisManual) {
     // Prioridade 1: Sinais manuais - SEMPRE exibir quando ativo (independente do script)
@@ -98,9 +122,15 @@ export default function Home() {
     valorSacarExibir = sinaisManualData?.sacar ?? null;
     deveMostrarValores = valorAposExibir !== null && valorSacarExibir !== null;
   } else {
-    // Prioridade 2: Sistema automático (requer script rodando)
-    // Mostrar valores SÓ quando: é hora de entrar + está mostrando entrada + tem dados válidos
-    if (isHoraDeEntrar && mostrandoEntrada && aposData?.multiplicador && aposData.multiplicador !== -1 && sacarData?.multiplicador) {
+    // Prioridade 2: Sistema automático com NOVO ANALISADOR (últimas 10 velas)
+    if (analisadorData?.sinal === 'ENTRAR' && analisadorData?.apos && analisadorData?.sacar) {
+      valorAposExibir = analisadorData.apos;
+      valorSacarExibir = analisadorData.sacar;
+      deveMostrarValores = true;
+      infoAnalise = `${analisadorData.pontos}pts | ${analisadorData.confianca}`;
+    }
+    // Fallback: Sistema antigo se novo analisador não tiver oportunidade
+    else if (isHoraDeEntrar && mostrandoEntrada && aposData?.multiplicador && aposData.multiplicador !== -1 && sacarData?.multiplicador) {
       valorAposExibir = aposData.multiplicador;
       valorSacarExibir = sacarData.multiplicador;
       deveMostrarValores = true;
