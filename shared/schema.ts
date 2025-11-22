@@ -180,7 +180,14 @@ export const insertResultadoClienteSchema = createInsertSchema(resultadosCliente
     },
     { message: "Apos deve ter no mínimo 9 dígitos" }
   ),
-  sacar: z.string().min(1),
+  sacar: z.string().min(1).refine(
+    (val) => {
+      // Validar que tem pelo menos 4 dígitos (removendo caracteres não-numéricos)
+      const digits = val.replace(/\D/g, '');
+      return digits.length >= 4;
+    },
+    { message: "Sacar deve ter no mínimo 4 dígitos" }
+  ),
 });
 
 export type InsertResultadoCliente = z.infer<typeof insertResultadoClienteSchema>;

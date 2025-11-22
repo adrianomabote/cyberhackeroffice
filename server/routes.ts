@@ -1267,15 +1267,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!validacao.success) {
         return res.status(400).json({
           success: false,
-          error: "Valores inválidos. Apos e Sacar devem ser números maiores que 0",
+          error: validacao.error.errors[0]?.message || "Valores inválidos. Apos deve ter no mínimo 9 dígitos e Sacar no mínimo 4 dígitos",
         });
       }
 
       // Obter ID do usuário logado (se houver)
       const usuarioId = req.session?.user?.id || null;
 
+      // Usar dados validados do schema
+      const dadosValidados = validacao.data;
+
       // Salvar resultado
-      const resultado = await storage.adicionarResultadoCliente(usuarioId, apos, sacar);
+      const resultado = await storage.adicionarResultadoCliente(usuarioId, dadosValidados.apos, dadosValidados.sacar);
 
       res.json({
         success: true,

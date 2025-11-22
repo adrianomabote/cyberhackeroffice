@@ -92,8 +92,9 @@ export function ResultadosClienteDialog() {
       novoErros.apos = true;
     }
     
-    // Validar Sacar: não vazio
-    if (!valorSacar.trim()) {
+    // Validar Sacar: não vazio E mínimo 4 dígitos
+    const sacarDigits = valorSacar.replace(/\D/g, ''); // Remove tudo que não é dígito
+    if (!valorSacar.trim() || sacarDigits.length < 4) {
       novoErros.sacar = true;
     }
     
@@ -200,7 +201,7 @@ export function ResultadosClienteDialog() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <label className="text-sm font-medium text-gray-300">Apos:</label>
               <Input
                 type="number"
@@ -220,6 +221,9 @@ export function ResultadosClienteDialog() {
                   errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-700'
                 }`}
               />
+              {errosValidacao.apos && (
+                <p className="text-xs text-red-600">Mínimo deve ser 9 dígitos</p>
+              )}
             </div>
 
             <div className="space-y-1">
@@ -229,20 +233,21 @@ export function ResultadosClienteDialog() {
                 placeholder="Ex: 3.20 ou 3.20L"
                 value={valorSacar}
                 onChange={(e) => {
-                  setValorSacar(e.target.value.slice(0, 4));
+                  setValorSacar(e.target.value);
                   // Limpar erro individual ao digitar
                   if (errosValidacao.sacar) {
                     setErrosValidacao(prev => ({ ...prev, sacar: false }));
                   }
                 }}
-                maxLength={4}
                 data-testid="input-sacar-resultado"
                 disabled={enviarMutation.isPending}
                 className={`resultado-input bg-gray-800 text-white ${
                   errosValidacao.sacar ? 'border-red-600 border-2' : 'border-gray-700'
                 }`}
               />
-              <p className="text-xs text-red-600">Máximo 4 dígitos</p>
+              {errosValidacao.sacar && (
+                <p className="text-xs text-red-600">Mínimo deve ser 4 dígitos</p>
+              )}
             </div>
 
             <Button
