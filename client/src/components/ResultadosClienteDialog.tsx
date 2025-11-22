@@ -30,8 +30,10 @@ const inputStyle = `
   }
 `;
 
-const DIALOG_INTERVAL_MS = 30 * 1000; // 30 segundos
+const DIALOG_INTERVAL_MS = 15 * 60 * 1000; // 15 minutos
 const LOADING_DURATION_MS = 4 * 1000; // 4 segundos
+const BLOCK_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
+const LAST_SUBMIT_KEY = 'ultimo_envio_resultado_cliente';
 
 export function ResultadosClienteDialog() {
   useProtection(); // Proteção de código
@@ -43,12 +45,28 @@ export function ResultadosClienteDialog() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Abrir diálogo a cada 30 segundos (independente da interação do usuário)
+  // Abrir diálogo a cada 15 minutos (independente da interação do usuário)
+  // Mas bloquear por 24 horas após envio bem-sucedido
   useEffect(() => {
-    const timer = setInterval(() => {
+    const verificarEAbrirDialog = () => {
+      const ultimoEnvio = localStorage.getItem(LAST_SUBMIT_KEY);
+      if (ultimoEnvio) {
+        const tempoDecorrido = Date.now() - parseInt(ultimoEnvio);
+        // Se menos de 24 horas passaram, não abrir
+        if (tempoDecorrido < BLOCK_DURATION_MS) {
+          return;
+        }
+      }
+      // Se pode abrir, abre
       setOpen(true);
       setStage('initial');
-    }, DIALOG_INTERVAL_MS);
+    };
+
+    // Verificar imediatamente ao carregar
+    verificarEAbrirDialog();
+
+    // Depois verificar a cada 15 minutos
+    const timer = setInterval(verificarEAbrirDialog, DIALOG_INTERVAL_MS);
 
     return () => clearInterval(timer);
   }, []);
@@ -73,11 +91,19 @@ export function ResultadosClienteDialog() {
       return res.json();
     },
     onSuccess: () => {
+      // Registrar timestamp do último envio bem-sucedido
+      localStorage.setItem(LAST_SUBMIT_KEY, Date.now().toString());
       queryClient.invalidateQueries({ queryKey: ["/api/resultados-clientes/lista"] });
       setOpen(false);
       setValorApos("");
       setValorSacar("");
       setErrosValidacao({});
+      // Mostrar notificação de sucesso por 24 horas
+      toast({
+        title: "✅ Enviado com sucesso!",
+        description: "Próximo diálogo aparecerá em 24 horas.",
+        duration: 3000,
+      });
     },
   });
 
@@ -129,7 +155,7 @@ export function ResultadosClienteDialog() {
         {/* Header com Atenção - apenas na tela inicial */}
         {stage === 'initial' && (
           <div className="flex items-start justify-between gap-2 mb-3">
-            <div className="text-yellow-600 text-sm text-center flex-1" style={{ color: '#FFD700' }}>
+            <div className="text-center flex-1" style={{ color: '#FFD700', fontSize: '18px', fontWeight: 'bold' }}>
               ⚠️ Atenção caro apostador
             </div>
             <button

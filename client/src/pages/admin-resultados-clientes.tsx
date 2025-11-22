@@ -62,15 +62,27 @@ export default function AdminResultadosClientes() {
     });
   };
 
+  // Detectar duplicatas e contar
+  const detectarDuplicatas = (resultados: ResultadoCliente[]) => {
+    const contadores: Record<string, number> = {};
+    resultados.forEach((resultado) => {
+      const chave = `${resultado.apos}|${resultado.sacar}`;
+      contadores[chave] = (contadores[chave] || 0) + 1;
+    });
+    return contadores;
+  };
+
+  const duplicatas = detectarDuplicatas(resultados);
+
   // Agrupar por usuário
-  const resultadosPorUsuario = resultados.reduce((acc, resultado) => {
+  const resultadosPorUsuario = resultados.reduce((acc: Record<string, ResultadoCliente[]>, resultado: ResultadoCliente) => {
     const usuarioId = resultado.usuario_id || 'Anônimo';
     if (!acc[usuarioId]) {
       acc[usuarioId] = [];
     }
     acc[usuarioId].push(resultado);
     return acc;
-  }, {} as Record<string, ResultadoCliente[]>);
+  }, {});
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
@@ -134,7 +146,7 @@ export default function AdminResultadosClientes() {
 
         {!isLoading && Object.keys(resultadosPorUsuario).length > 0 && (
           <div className="space-y-6">
-            {Object.entries(resultadosPorUsuario).map(([usuarioId, resultadosUsuario]) => (
+            {Object.entries(resultadosPorUsuario).map(([usuarioId, resultadosUsuario]: [string, ResultadoCliente[]]) => (
               <div
                 key={usuarioId}
                 className="rounded-xl border p-6"
@@ -156,13 +168,18 @@ export default function AdminResultadosClientes() {
 
                 {/* Lista de resultados */}
                 <div className="space-y-3">
-                  {resultadosUsuario.map((resultado) => (
+                  {resultadosUsuario.map((resultado) => {
+                    const chave = `${resultado.apos}|${resultado.sacar}`;
+                    const quantidadeDuplicada = duplicatas[chave];
+                    const isDuplicado = quantidadeDuplicada > 1;
+
+                    return (
                     <div
                       key={resultado.id}
                       className="flex items-center justify-between p-3 rounded-lg"
                       style={{
-                        backgroundColor: 'rgba(157, 78, 221, 0.1)',
-                        borderLeft: '3px solid #9d4edd',
+                        backgroundColor: isDuplicado ? 'rgba(255, 69, 0, 0.15)' : 'rgba(157, 78, 221, 0.1)',
+                        borderLeft: `3px solid ${isDuplicado ? '#ff4500' : '#9d4edd'}`,
                       }}
                       data-testid={`resultado-${resultado.id}`}
                     >
@@ -180,6 +197,11 @@ export default function AdminResultadosClientes() {
                           >
                             <Copy className="w-3 h-3" style={{ color: '#888888' }} />
                           </button>
+                          {isDuplicado && (
+                            <span className="text-xs px-2 py-0.5 rounded" style={{ backgroundColor: '#ff4500', color: '#ffffff' }}>
+                              {quantidadeDuplicada}x duplicado
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm" style={{ color: '#888888' }}>Sacar:</span>
@@ -211,7 +233,8 @@ export default function AdminResultadosClientes() {
                         </button>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
