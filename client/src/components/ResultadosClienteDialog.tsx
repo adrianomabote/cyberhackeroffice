@@ -93,8 +93,8 @@ export function ResultadosClienteDialog() {
       novoErros.apos = true;
     }
     
-    // Validar Sacar: não vazio E tenha pelo menos 1 caractere (máximo 4 é garantido pelo input)
-    if (!valorSacar.trim()) {
+    // Validar Sacar: deve ter exatamente 4 caracteres
+    if (valorSacar.trim().length !== 4) {
       novoErros.sacar = true;
     }
     
@@ -256,7 +256,7 @@ export function ResultadosClienteDialog() {
                 }`}
               />
               {errosValidacao.sacar && (
-                <p className="text-xs text-red-600">Preencha este campo</p>
+                <p className="text-xs text-red-600">Deve ter 4 caracteres</p>
               )}
               {sacarMaximoAtingido && (
                 <p className="text-xs text-red-600">Máximo 4 caracteres</p>

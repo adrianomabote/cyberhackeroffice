@@ -180,7 +180,7 @@ export const insertResultadoClienteSchema = createInsertSchema(resultadosCliente
     },
     { message: "Apos deve ter no mínimo 9 dígitos" }
   ),
-  sacar: z.string().min(1).max(4),
+  sacar: z.string().length(4, { message: "Sacar deve ter exatamente 4 caracteres" }),
 });
 
 export type InsertResultadoCliente = z.infer<typeof insertResultadoClienteSchema>;
