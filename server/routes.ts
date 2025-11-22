@@ -299,96 +299,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada (1 entrada por vela + 2ª tentativa automática)
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
-      // Buscar mais velas para análise mais precisa
+      // Buscar histórico para análise
       const historico = await storage.getHistorico(20);
-      const velaAtual = historico[0];
-      const velaPosterior = historico[1]; // Vela anterior (para verificar se atingiu multiplicador)
-      const analise = analisarOportunidadeEntrada(historico);
-
-      // Verificar se mudou de vela
-      if (velaAtual && velaAtual.id) {
-        const mudouDeVela = entradasConsecutivas.ultimaVelaId !== String(velaAtual.id);
-        
-        if (mudouDeVela) {
-          // Primeira detecção da vela nova
-          console.log(`[ENTRADAS] 🆕 Nova vela detectada (${velaAtual.multiplicador}x). Aguardando confirmação estável...`);
-          entradasConsecutivas.ultimaVelaId = String(velaAtual.id);
-          entradasConsecutivas.contadorVelaNovaDeteccao = 1;
-          entradasConsecutivas.estadoLimpeza = 'AGUARDANDO_NOVA';
-        } else if (entradasConsecutivas.contadorVelaNovaDeteccao === 1) {
-          // Segunda confirmação = CONFIRMAÇÃO que a vela nova REALMENTE chegou e é estável
-          console.log(`[ENTRADAS] ✅ Vela ${String(velaAtual.id)} CONFIRMADA como nova e estável. Processa resultado anterior...`);
-          entradasConsecutivas.contadorVelaNovaDeteccao = 2;
-          entradasConsecutivas.estadoLimpeza = 'VELA_ENTREGUE';
-          
-          // SÓ AGORA (após confirmação dupla) verifica o resultado da vela anterior
-          if (entradasConsecutivas.tentativaNumero === 1 && entradasConsecutivas.multiplicadorRecomendado) {
-            const velaAnteriorAtingiu = velaPosterior ? velaPosterior.multiplicador >= entradasConsecutivas.multiplicadorRecomendado : true;
-            
-            if (!velaAnteriorAtingiu) {
-              console.log(`[ENTRADAS] ❌ Vela anterior NÃO atingiu ${entradasConsecutivas.multiplicadorRecomendado}x. ATIVANDO 2ª TENTATIVA!`);
-              entradasConsecutivas.tentativaNumero = 2; // Ativar 2ª tentativa
-            } else {
-              console.log(`[ENTRADAS] ✓ Vela anterior ATINGIU ${entradasConsecutivas.multiplicadorRecomendado}x. SUCESSO! Limpando.`);
-              entradasConsecutivas.tentativaNumero = 0;
-              entradasConsecutivas.multiplicadorRecomendado = null;
-              entradasConsecutivas.ultimoMultiplicadorEntregue = null; // SÓ LIMPA AQUI
-              entradasConsecutivas.estadoLimpeza = 'AGUARDANDO';
-            }
-          } else {
-            // Resetar se não teve 1ª tentativa ou já completou 2ª
-            console.log(`[ENTRADAS] 🔄 Resetando (tentativa anterior: ${entradasConsecutivas.tentativaNumero}).`);
-            entradasConsecutivas.tentativaNumero = 0;
-            entradasConsecutivas.multiplicadorRecomendado = null;
-            entradasConsecutivas.ultimoMultiplicadorEntregue = null; // SÓ LIMPA AQUI
-            entradasConsecutivas.jaEntregouMultiplicador = false; // Resetar flag
-            entradasConsecutivas.estadoLimpeza = 'AGUARDANDO';
-          }
-        }
+      if (!historico || historico.length === 0) {
+        return res.json({ multiplicador: null, sinal: "AGUARDAR", confianca: "baixa", motivo: "Sem dados" });
       }
 
-      // Determinar resposta baseado no estado
+      const velaAtual = historico[0]; // Mais recente
+      const velaIdAtual = String(velaAtual.id);
+      const analise = analisarOportunidadeEntrada(historico);
+
+      // ============ ETAPA 1: Detectar mudança de vela ============
+      const mudouDeVela = entradasConsecutivas.ultimaVelaId !== null && entradasConsecutivas.ultimaVelaId !== velaIdAtual;
+
+      if (mudouDeVela) {
+        console.log(`[ENTRADAS] 🆕 Nova vela detectada (${velaIdAtual})`);
+        
+        // Processar resultado da vela ANTERIOR se havia entrada ativa
+        const tentativaAnterior = entradasConsecutivas.tentativaNumero;
+        const multiplicadorEsperado = entradasConsecutivas.multiplicadorRecomendado;
+        
+        // Buscar vela anterior do histórico PELA ID que estava gravada
+        const velaAnterior = historico.find(v => String(v.id) === entradasConsecutivas.ultimaVelaId);
+        
+        if (tentativaAnterior === 1 && multiplicadorEsperado && velaAnterior) {
+          // Verificar se a entrada da 1ª tentativa atingiu o objetivo
+          const atingiu = velaAnterior.multiplicador >= multiplicadorEsperado;
+          console.log(`[ENTRADAS] ${atingiu ? '✓' : '❌'} Vela anterior (${velaAnterior.multiplicador}x) ${atingiu ? 'atingiu' : 'não atingiu'} ${multiplicadorEsperado}x`);
+          
+          if (atingiu) {
+            // SUCESSO - limpar tudo
+            entradasConsecutivas.tentativaNumero = 0;
+            entradasConsecutivas.multiplicadorRecomendado = null;
+            entradasConsecutivas.ultimoMultiplicadorEntregue = null;
+            entradasConsecutivas.jaEntregouMultiplicador = false;
+          } else {
+            // FALHOU - ativar 2ª tentativa com 2.00x
+            console.log(`[ENTRADAS] 🔄 Ativando 2ª tentativa com 2.00x`);
+            entradasConsecutivas.tentativaNumero = 2;
+            entradasConsecutivas.multiplicadorRecomendado = 2.0;
+            entradasConsecutivas.ultimoMultiplicadorEntregue = 2.0;
+            entradasConsecutivas.jaEntregouMultiplicador = false; // Permitir enviar de novo
+          }
+        } else if (tentativaAnterior === 2 && velaAnterior) {
+          // Fim da 2ª tentativa - sempre limpar após processar
+          const atingiu = velaAnterior.multiplicador >= 2.0;
+          console.log(`[ENTRADAS] 🔄 2ª tentativa finalizada. Vela ${atingiu ? 'atingiu' : 'não atingiu'} 2.00x. Limpando.`);
+          entradasConsecutivas.tentativaNumero = 0;
+          entradasConsecutivas.multiplicadorRecomendado = null;
+          entradasConsecutivas.ultimoMultiplicadorEntregue = null;
+          entradasConsecutivas.jaEntregouMultiplicador = false;
+        }
+        
+        // Atualizar para nova vela
+        entradasConsecutivas.ultimaVelaId = velaIdAtual;
+        entradasConsecutivas.jaEntregouMultiplicador = false; // Resetar flag para nova vela
+      } else if (entradasConsecutivas.ultimaVelaId === null) {
+        // Primeira vela do sistema
+        entradasConsecutivas.ultimaVelaId = velaIdAtual;
+      }
+
+      // ============ ETAPA 2: Determinar resposta ============
       let podeEntrar = false;
       let multiplicadorFinal = null;
       let confiancaFinal = analise.confianca;
       let motivoFinal = analise.motivo;
 
-      // REGRA: Se há entrada em processamento (tentativaNumero > 0), SEMPRE manter o multiplicador
       if (entradasConsecutivas.tentativaNumero > 0) {
-        console.log(`[ENTRADAS] ⏳ Entrada em processamento (tentativa ${entradasConsecutivas.tentativaNumero}). Mantendo: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x`);
+        // Há entrada ativa - SEMPRE retornar o multiplicador (mesmo se já enviou)
         podeEntrar = true;
         multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-        confiancaFinal = "processando";
-        motivoFinal = `Tentativa ${entradasConsecutivas.tentativaNumero} - Aguardando confirmação de nova vela`;
+        confiancaFinal = "alta";
+        motivoFinal = `Tentativa ${entradasConsecutivas.tentativaNumero} - Aguardando nova vela`;
+        
+        if (!entradasConsecutivas.jaEntregouMultiplicador) {
+          // Primeira vez retornando nesta vela - marcar como enviado
+          console.log(`[ENTRADAS] ✅ ENVIANDO tentativa ${entradasConsecutivas.tentativaNumero}: ${multiplicadorFinal}x`);
+          entradasConsecutivas.jaEntregouMultiplicador = true;
+        } else {
+          // Já enviou, mas continua retornando o multiplicador (para persistir na UI)
+          console.log(`[ENTRADAS] 🔁 MANTENDO tentativa ${entradasConsecutivas.tentativaNumero}: ${multiplicadorFinal}x`);
+        }
       } else if (analise.sinal === "ENTRAR" && entradasConsecutivas.tentativaNumero === 0) {
-        // NOVA ENTRADA: seguir análise normal
-        console.log(`[ENTRADAS] ➡️ INICIAR 1ª ENTRADA com ${analise.multiplicador}x.`);
+        // Nova entrada recomendada pela análise
+        console.log(`[ENTRADAS] ➡️ Iniciando 1ª entrada com ${analise.multiplicador}x`);
         podeEntrar = true;
         multiplicadorFinal = analise.multiplicador;
-        entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // GUARDAR para manter enquanto processa
-        entradasConsecutivas.tentativaNumero = 1; // Marcar que já tem entrada processando
-        entradasConsecutivas.jaEntregouMultiplicador = true; // Marcar como entregue
+        entradasConsecutivas.tentativaNumero = 1;
         entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
+        entradasConsecutivas.ultimoMultiplicadorEntregue = analise.multiplicador;
+        entradasConsecutivas.jaEntregouMultiplicador = true;
+        confiancaFinal = "alta";
+        motivoFinal = "1ª entrada";
       }
-      // Se tentativaNumero === 0 e análise !== "ENTRAR" => podeEntrar fica false, multiplicador null
 
       // Retornar resposta
-      if (podeEntrar) {
-        res.json({
-          multiplicador: multiplicadorFinal,
-          sinal: "ENTRAR",
-          confianca: confiancaFinal,
-          motivo: motivoFinal,
-        });
-      } else {
-        res.json({
-          multiplicador: null,
-          sinal: analise.sinal,
-          confianca: analise.confianca,
-          motivo: analise.motivo,
-        });
-      }
+      res.json({
+        multiplicador: podeEntrar ? multiplicadorFinal : null,
+        sinal: podeEntrar ? "ENTRAR" : analise.sinal,
+        confianca: podeEntrar ? confiancaFinal : analise.confianca,
+        motivo: podeEntrar ? motivoFinal : analise.motivo,
+      });
     } catch (error) {
+      console.error(`[ENTRADAS] Erro:`, error);
       res.status(500).json({
         multiplicador: null,
         sinal: "AGUARDAR",
