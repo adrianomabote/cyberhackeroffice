@@ -110,9 +110,10 @@ export function ResultadosClienteDialog() {
   const enviarResultado = () => {
     const novoErros: { apos?: boolean; sacar?: boolean } = {};
     
-    // Validar Apos: deve ser um número válido
+    // Validar Apos: deve ter mínimo 9 dígitos
     const aposNum = parseFloat(valorApos);
-    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0) {
+    const aposDigitos = valorApos.trim().replace(/[^0-9]/g, '').length; // Conta apenas dígitos
+    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0 || aposDigitos < 9) {
       novoErros.apos = true;
     }
     
