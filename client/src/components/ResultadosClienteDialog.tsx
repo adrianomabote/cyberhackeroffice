@@ -201,7 +201,7 @@ export function ResultadosClienteDialog() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <label className="text-sm font-medium text-gray-300">Sacar:</label>
               <Input
                 type="text"
@@ -213,6 +213,7 @@ export function ResultadosClienteDialog() {
                 disabled={enviarMutation.isPending}
                 className="resultado-input bg-gray-800 border-gray-700 text-white"
               />
+              <p className="text-xs text-gray-500">Máximo 4 dígitos</p>
             </div>
 
             <Button
