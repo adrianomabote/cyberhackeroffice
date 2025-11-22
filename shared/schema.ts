@@ -164,7 +164,7 @@ export const resultadosClientes = pgTable("resultados_clientes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   usuario_id: varchar("usuario_id").references(() => usuarios.id),
   apos: real("apos").notNull(),
-  sacar: real("sacar").notNull(),
+  sacar: varchar("sacar").notNull(),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
 
@@ -173,7 +173,7 @@ export const insertResultadoClienteSchema = createInsertSchema(resultadosCliente
   sacar: true,
 }).extend({
   apos: z.number().min(0.01),
-  sacar: z.number().min(0.01),
+  sacar: z.string().min(1),
 });
 
 export type InsertResultadoCliente = z.infer<typeof insertResultadoClienteSchema>;

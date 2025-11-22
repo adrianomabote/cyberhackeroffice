@@ -196,13 +196,11 @@ class DbStorage {
   }
 
   // Métodos para resultados dos clientes
-  async adicionarResultadoCliente(usuarioId: string | null, apos: number, sacar: number): Promise<ResultadoCliente> {
+  async adicionarResultadoCliente(usuarioId: string | null, apos: number, sacar: string): Promise<ResultadoCliente> {
     try {
-      const [resultado] = await db.insert(resultadosClientes).values({
-        usuario_id: usuarioId,
-        apos,
-        sacar,
-      }).returning();
+      const values: any = { apos, sacar };
+      if (usuarioId) values.usuario_id = usuarioId;
+      const [resultado] = await db.insert(resultadosClientes).values(values).returning();
 
       console.log('[STORAGE] Resultado do cliente registrado:', {
         id: resultado.id,

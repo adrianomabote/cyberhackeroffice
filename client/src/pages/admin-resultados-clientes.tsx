@@ -133,13 +133,13 @@ export default function AdminResultadosClientes() {
                         <div>
                           <span className="text-sm" style={{ color: '#888888' }}>Apos:</span>
                           <span className="ml-2 font-bold" style={{ color: '#00ff00' }}>
-                            {resultado.apos}X
+                            {resultado.apos}
                           </span>
                         </div>
                         <div>
                           <span className="text-sm" style={{ color: '#888888' }}>Sacar:</span>
                           <span className="ml-2 font-bold" style={{ color: '#00d9ff' }}>
-                            {resultado.sacar}X
+                            {resultado.sacar}
                           </span>
                         </div>
                       </div>

@@ -31,7 +31,7 @@ export function ResultadosClienteDialog() {
   }, []);
 
   const enviarMutation = useMutation({
-    mutationFn: async (data: { apos: number; sacar: number }) => {
+    mutationFn: async (data: { apos: number; sacar: string }) => {
       const res = await apiRequest("POST", "/api/resultados-clientes", data);
       return res.json();
     },
@@ -58,7 +58,6 @@ export function ResultadosClienteDialog() {
   const enviarResultado = () => {
     // Validar campos
     const apos = parseFloat(valorApos);
-    const sacar = parseFloat(valorSacar);
 
     if (isNaN(apos) || apos <= 0) {
       toast({
@@ -69,21 +68,21 @@ export function ResultadosClienteDialog() {
       return;
     }
 
-    if (isNaN(sacar) || sacar <= 0) {
+    if (!valorSacar.trim()) {
       toast({
-        title: "⚠️ Valor inválido",
-        description: "Digite um valor válido para SACAR",
+        title: "⚠️ Campo vazio",
+        description: "Digite um valor para SACAR",
         variant: "destructive",
       });
       return;
     }
 
-    enviarMutation.mutate({ apos, sacar });
+    enviarMutation.mutate({ apos, sacar: valorSacar });
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md mx-4 bg-black border" style={{ borderColor: '#333333', borderWidth: '1px' }}>
+      <DialogContent className="sm:max-w-md mx-4 bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px' }}>
         <DialogHeader>
           <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
           <DialogDescription className="sr-only">
@@ -102,21 +101,20 @@ export function ResultadosClienteDialog() {
               onChange={(e) => setValorApos(e.target.value)}
               data-testid="input-apos-resultado"
               disabled={enviarMutation.isPending}
-              className="bg-gray-800 border-gray-700 text-white"
+              className="bg-gray-800 border-gray-700 text-white focus:ring-0 focus:border-gray-700"
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">Sacar:</label>
             <Input
-              type="number"
-              step="0.01"
-              placeholder="Ex: 3.20"
+              type="text"
+              placeholder="Ex: 3.20 ou 3.20L"
               value={valorSacar}
               onChange={(e) => setValorSacar(e.target.value)}
               data-testid="input-sacar-resultado"
               disabled={enviarMutation.isPending}
-              className="bg-gray-800 border-gray-700 text-white"
+              className="bg-gray-800 border-gray-700 text-white focus:ring-0 focus:border-gray-700"
             />
           </div>
 
