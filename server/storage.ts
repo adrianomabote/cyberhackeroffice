@@ -29,6 +29,10 @@ class DbStorage {
   private cachedAnalysisTimestamp: number = 0;
   private cachedVela: Vela | null = null;
 
+  // Rastreamento de sinais "ENTRAR" para não enviar seguidos
+  private lastEntraSignalTime: number | null = null;
+  private lastEntraSignalData: { apos: number; sacar: number } | null = null;
+
   async addVela(data: InsertVela) {
     if (data.multiplicador !== -1 && data.multiplicador === this.lastMultiplicador) {
       console.log('[STORAGE] Ignorando multiplicador duplicado:', data.multiplicador);
@@ -146,6 +150,45 @@ class DbStorage {
     this.cachedAnalysisTimestamp = 0;
     this.cachedVela = null;
     console.log('[STORAGE] Cache limpo');
+  }
+
+  // Rastreamento de sinais ENTRAR - não enviar seguidos
+  registerEntraSignal(apos: number, sacar: number): void {
+    this.lastEntraSignalTime = Date.now();
+    this.lastEntraSignalData = { apos, sacar };
+    console.log('[SINAL] 📍 Sinal ENTRAR registrado:', {
+      apos,
+      sacar,
+      timestamp: new Date(this.lastEntraSignalTime).toISOString()
+    });
+  }
+
+  canSendEntraSignal(): boolean {
+    // Se nunca enviou sinal ENTRAR, pode enviar
+    if (this.lastEntraSignalTime === null) {
+      return true;
+    }
+
+    // Não enviar segundo sinal ENTRAR seguido
+    const tempoDesdeUltimo = Date.now() - this.lastEntraSignalTime;
+    const pode = tempoDesdeUltimo > 5000; // Esperar ao menos 5 segundos (tempo mínimo de uma vela)
+
+    if (!pode) {
+      console.log('[SINAL] ❌ Bloqueado: Não pode enviar ENTRAR seguido. Aguardando resultado anterior...', {
+        tempoDesdeUltimo: tempoDesdeUltimo + 'ms',
+        ultimoSinal: this.lastEntraSignalData
+      });
+    }
+
+    return pode;
+  }
+
+  resetEntraSignal(): void {
+    console.log('[SINAL] ✅ Rastreamento de ENTRAR resetado - pronto para novo sinal', {
+      ultimoSinal: this.lastEntraSignalData
+    });
+    this.lastEntraSignalTime = null;
+    this.lastEntraSignalData = null;
   }
 
   // Feedback de experiência do usuário

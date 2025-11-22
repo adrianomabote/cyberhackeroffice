@@ -51,6 +51,15 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Schema Validation**: Zod schemas for all data inputs and outputs, defining models like Vela, HistoricoResponse, EstatisticasResponse, and PadroesResponse.
 - **Client Results Collection**: Every 2 minutes, dialog asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality (with duplicate detection and visual badges).
 
+### Signal Protection System (NEW)
+- **No Consecutive Entries**: Sistema rastreia e bloqueia envio de dois sinais "ENTRAR" seguidos
+  - Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()`
+  - Próximos sinais "ENTRAR" dentro de 5 segundos são bloqueados e convertidos em "POSSÍVEL"
+  - Quando usuário registra resultado via POST `/api/resultados-clientes`, rastreamento é resetado com `resetEntraSignal()`
+  - Permite novo sinal "ENTRAR" apenas após resultado anterior ser registrado
+- **Proteção automática**: Implementada via métodos `canSendEntraSignal()` e `resetEntraSignal()` na DbStorage
+- **Logs detalhados**: Sistema registra bloqueios com motivo "Aguardando resultado da entrada anterior..."
+
 ## External Dependencies
 - **PostgreSQL**: Relational database for data persistence.
 - **Drizzle ORM**: Object-Relational Mapper for interacting with PostgreSQL.

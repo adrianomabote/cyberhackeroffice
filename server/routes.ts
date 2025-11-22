@@ -668,7 +668,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         velas: analise.velas_analisadas,
       });
 
-      res.json(analise);
+      // PROTEÇÃO: NÃO ENVIAR ENTRADAS SEGUIDAS
+      // Se o analisador quer enviar "ENTRAR", verificar se pode
+      let sinaisFinal = analise.sinal;
+      let motivoFinal = analise.motivo;
+
+      if (analise.sinal === "ENTRAR") {
+        const podeEnviar = storage.canSendEntraSignal();
+        
+        if (podeEnviar) {
+          // Registrar que um sinal ENTRAR foi enviado
+          storage.registerEntraSignal(analise.apos, analise.sacar);
+          console.log('[PROTEÇÃO] ✅ Sinal ENTRAR permitido - registro realizado');
+        } else {
+          // Bloquear e retornar "POSSÍVEL" em vez de "ENTRAR"
+          sinaisFinal = "POSSÍVEL";
+          motivoFinal = "Aguardando resultado da entrada anterior...";
+          console.log('[PROTEÇÃO] ❌ BLOQUEADO - Não enviar ENTRAR seguido. Retornando POSSÍVEL');
+        }
+      }
+
+      res.json({
+        ...analise,
+        sinal: sinaisFinal,
+        motivo: motivoFinal
+      });
     } catch (error) {
       console.error('[ANALISADOR] Erro ao analisar velas:', error);
       res.status(500).json({
@@ -1433,6 +1457,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Salvar resultado
       const resultado = await storage.adicionarResultadoCliente(usuarioId, dadosValidados.apos, dadosValidados.sacar);
+
+      // PROTEÇÃO: Resetar rastreamento de sinal ENTRAR quando resultado é registrado
+      // Isso permite que o analisador envie um novo sinal ENTRAR da próxima vez
+      storage.resetEntraSignal();
+      console.log('[PROTEÇÃO] 🔄 Sinal ENTRAR anterior finalizado - pronto para novo sinal');
 
       res.json({
         success: true,
