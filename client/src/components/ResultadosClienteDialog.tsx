@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useProtection } from "@/hooks/use-protection";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader } from "lucide-react";
 
@@ -44,17 +44,6 @@ export function ResultadosClienteDialog() {
   const [errosValidacao, setErrosValidacao] = useState<{ apos?: boolean; sacar?: boolean }>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Buscar última vela recebida
-  const { data: ultimaVela } = useQuery({
-    queryKey: ['/api/ultima-vela-cyber'],
-    queryFn: async () => {
-      const res = await fetch('/api/ultima-vela-cyber');
-      return res.json();
-    },
-    refetchInterval: 1000, // Atualizar a cada 1 segundo
-    enabled: open, // Só buscar quando dialog está aberto
-  });
 
   // Abrir diálogo a cada 15 minutos (independente da interação do usuário)
   // Mas bloquear por 24 horas após envio bem-sucedido
@@ -92,15 +81,6 @@ export function ResultadosClienteDialog() {
     }
   }, [stage]);
 
-  // Pré-preencher APÓS automaticamente quando stage muda para form
-  useEffect(() => {
-    if (stage === 'form' && ultimaVela?.multiplicador) {
-      // Converter multiplicador para string com até 10 dígitos (simular formato)
-      const aposFormatado = ultimaVela.multiplicador.toString().slice(0, 10);
-      setValorApos(aposFormatado);
-    }
-  }, [stage, ultimaVela]);
-
   const handleEnviarAgora = () => {
     setStage('loading');
   };
@@ -130,7 +110,7 @@ export function ResultadosClienteDialog() {
   const enviarResultado = () => {
     const novoErros: { apos?: boolean; sacar?: boolean } = {};
     
-    // Validar Apos: deve ter valor automático
+    // Validar Apos: deve ser um número válido
     const aposNum = parseFloat(valorApos);
     if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0) {
       novoErros.apos = true;
