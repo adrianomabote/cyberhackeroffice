@@ -93,9 +93,8 @@ export function ResultadosClienteDialog() {
       novoErros.apos = true;
     }
     
-    // Validar Sacar: não vazio E mínimo 4 dígitos
-    const sacarDigits = valorSacar.replace(/\D/g, ''); // Remove tudo que não é dígito
-    if (!valorSacar.trim() || sacarDigits.length < 4) {
+    // Validar Sacar: não vazio E tenha pelo menos 1 caractere (máximo 4 é garantido pelo input)
+    if (!valorSacar.trim()) {
       novoErros.sacar = true;
     }
     
@@ -257,7 +256,7 @@ export function ResultadosClienteDialog() {
                 }`}
               />
               {errosValidacao.sacar && (
-                <p className="text-xs text-red-600">Mínimo deve ser 4 dígitos</p>
+                <p className="text-xs text-red-600">Preencha este campo</p>
               )}
               {sacarMaximoAtingido && (
                 <p className="text-xs text-red-600">Máximo 4 caracteres</p>
