@@ -83,7 +83,7 @@ export function ResultadosClienteDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md mx-4 bg-zinc-900 border-2 border-zinc-700">
+      <DialogContent className="sm:max-w-md mx-4 bg-black border-2 border-gray-500">
         <DialogHeader>
           <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
           <DialogDescription className="sr-only">
