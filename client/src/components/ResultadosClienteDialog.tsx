@@ -207,7 +207,8 @@ export function ResultadosClienteDialog() {
                 type="text"
                 placeholder="Ex: 3.20 ou 3.20L"
                 value={valorSacar}
-                onChange={(e) => setValorSacar(e.target.value)}
+                onChange={(e) => setValorSacar(e.target.value.slice(0, 4))}
+                maxLength={4}
                 data-testid="input-sacar-resultado"
                 disabled={enviarMutation.isPending}
                 className="resultado-input bg-gray-800 border-gray-700 text-white"
