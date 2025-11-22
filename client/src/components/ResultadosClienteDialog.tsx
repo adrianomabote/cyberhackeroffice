@@ -94,7 +94,15 @@ export function ResultadosClienteDialog() {
       <style>{inputStyle}</style>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-        <DialogHeader>
+        <DialogHeader className="relative pb-4">
+          <button
+            onClick={() => setOpen(false)}
+            className="absolute right-0 top-0 text-gray-400 hover:text-white transition-colors"
+            data-testid="button-close-resultado"
+            title="Fechar"
+          >
+            <span className="text-xl font-bold">✕</span>
+          </button>
           <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
           <DialogDescription className="sr-only">
             Informe a última entrada vencedora
@@ -102,6 +110,10 @@ export function ResultadosClienteDialog() {
         </DialogHeader>
         
         <div className="space-y-4">
+          <div className="text-yellow-600 text-sm text-center py-2" style={{ color: '#FFD700' }}>
+            ⚠️ Atenção caro apostador
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-300">Apos:</label>
             <Input
@@ -136,6 +148,15 @@ export function ResultadosClienteDialog() {
             data-testid="button-enviar-resultado"
           >
             {enviarMutation.isPending ? "Enviando..." : "Enviar para o Suporte"}
+          </Button>
+
+          <Button
+            onClick={() => setOpen(false)}
+            variant="ghost"
+            className="w-full text-gray-400 hover:text-white"
+            data-testid="button-enviar-depois"
+          >
+            Enviar depois
           </Button>
         </div>
       </DialogContent>
