@@ -29,11 +29,17 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Code Protection**: 12 layers of security including disabling right-click, text selection, DevTools keys, view source, save/print, copy/cut, anti-selection CSS, and meta tags (`noindex`, `no-cache`). Production builds are minified and obfuscated.
 - **Error Handling**: Guards against crashes using optional chaining and handling empty arrays.
 - **Client Results System**: 
-  - Dialog appears every 2 minutes via `setInterval` (independent of user interaction)
-  - Accepts numeric Apos and text Sacar (with letters allowed for marks like "L", "P", etc)
+  - **Dialog Timing Logic** (UPDATED Nov 2025):
+    - **First appearance**: 15 minutes after page load
+    - **If user clicks "Depois" (dismiss)**: Re-appears every 10 minutes
+    - **If user submits result**: Re-appears after 7 hours
+    - **After reload**: Calculates remaining time based on localStorage timestamps
+    - Implementation uses `useRef` for stable timer management with explicit cleanup
+  - Accepts numeric Apos (min 9 digits) and text Sacar (exactly 4 characters, letters allowed)
   - Stores data in `resultados_clientes` table with user_id (nullable for anonymous users)
-  - Admin panel at `/admin/resultados-clientes` shows results grouped by user
+  - Admin panel at `/admin/resultados-clientes` shows results grouped by user with copy/delete functionality
   - API endpoints: POST/GET/DELETE at `/api/resultados-clientes` and `/api/resultados-clientes/lista`
+  - Duplicate detection system shows visual badges for repeated entries
 
 ### Feature Specifications
 - **Real-time Signals Dashboard**: Displays predicted "APÓS" and "SACAR" values based on an advanced pattern detection system.
@@ -66,7 +72,7 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Manual Maintenance System**: Admin panel (`/admin/cyber`) to activate/deactivate maintenance mode with custom messages and enable/disable manual signal inputs.
 - **Automatic Capture Script**: `aviator-script.js` captures multipliers every second and sends them to the backend, with protection against consecutive duplicates.
 - **Schema Validation**: Zod schemas for all data inputs and outputs, defining models like Vela, HistoricoResponse, EstatisticasResponse, and PadroesResponse.
-- **Client Results Collection**: Every 2 minutes, dialog asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality (with duplicate detection and visual badges).
+- **Client Results Collection**: Dialog timing: 15min (first), 10min (dismissed), 7hr (after submit). Asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality (with duplicate detection and visual badges).
 
 ### Signal Protection System (NEW)
 - **No Consecutive Entries**: Sistema rastreia e bloqueia envio de dois sinais "ENTRAR" seguidos
