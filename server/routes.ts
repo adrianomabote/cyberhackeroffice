@@ -359,47 +359,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (tentativaAnterior === 1 && multiplicadorEsperado && velaAnterior) {
-          // Verificar se a entrada da 1ª tentativa atingiu o objetivo
+          // Verificar se a entrada atingiu o objetivo
           const atingiu = velaAnterior.multiplicador >= multiplicadorEsperado;
           console.log(`[ENTRADAS] ${atingiu ? '✓' : '❌'} Vela anterior (${velaAnterior.multiplicador}x) ${atingiu ? 'atingiu' : 'não atingiu'} ${multiplicadorEsperado}x`);
           
-          if (atingiu) {
-            // SUCESSO - limpar tudo COM PROTEÇÃO
-            console.log(`[PROTEÇÃO] ✅ Limpeza autorizada: Meta atingida em tentativa ${tentativaAnterior}`);
-            entradasConsecutivas.tentativaNumero = 0;
-            entradasConsecutivas.multiplicadorRecomendado = null;
-            entradasConsecutivas.ultimoMultiplicadorEntregue = null;
-            entradasConsecutivas.jaEntregouMultiplicador = false;
-            entradasConsecutivas.contadorEntradasTotais = 0; // RESETAR contador
-            entradasConsecutivas.bloqueioLimpeza = false; // Desbloquear limpeza APÓS processar
-            entradasConsecutivas.velaIdUltimaLimpeza = entradasConsecutivas.ultimaVelaId; // Vela que acabou de processar
-          } else {
-            // FALHOU - ativar 2ª tentativa com 2.00x COM PROTEÇÃO
-            if (entradasConsecutivas.contadorEntradasTotais >= 2) {
-              console.error(`[PROTEÇÃO] ⛔ BLOQUEIO: Não pode ativar 3ª tentativa! Limpando.`);
-              entradasConsecutivas.tentativaNumero = 0;
-              entradasConsecutivas.multiplicadorRecomendado = null;
-              entradasConsecutivas.ultimoMultiplicadorEntregue = null;
-              entradasConsecutivas.jaEntregouMultiplicador = false;
-              entradasConsecutivas.contadorEntradasTotais = 0;
-              entradasConsecutivas.bloqueioLimpeza = false;
-              entradasConsecutivas.velaIdUltimaLimpeza = entradasConsecutivas.ultimaVelaId; // Vela que acabou de processar
-            } else {
-              console.log(`[ENTRADAS] 🔄 Ativando 2ª tentativa com 2.00x`);
-              console.log(`[PROTEÇÃO] 📊 Contador de entradas: ${entradasConsecutivas.contadorEntradasTotais} → ${entradasConsecutivas.contadorEntradasTotais + 1}`);
-              entradasConsecutivas.tentativaNumero = 2;
-              entradasConsecutivas.multiplicadorRecomendado = 2.0;
-              entradasConsecutivas.ultimoMultiplicadorEntregue = 2.0;
-              entradasConsecutivas.jaEntregouMultiplicador = false; // Permitir enviar de novo
-              entradasConsecutivas.contadorEntradasTotais++; // INCREMENTAR contador (2ª entrada)
-              entradasConsecutivas.bloqueioLimpeza = true; // BLOQUEAR limpeza até nova vela
-            }
-          }
-        } else if (tentativaAnterior === 2 && velaAnterior) {
-          // Fim da 2ª tentativa - sempre limpar após processar COM PROTEÇÃO
-          const atingiu = velaAnterior.multiplicador >= 2.0;
-          console.log(`[ENTRADAS] 🔄 2ª tentativa finalizada. Vela ${atingiu ? 'atingiu' : 'não atingiu'} 2.00x. Limpando.`);
-          console.log(`[PROTEÇÃO] ✅ Limpeza autorizada: Fim de ciclo completo (2 tentativas)`);
+          // SEMPRE limpar após processar (sucesso ou falha) - SEM 2ª tentativa
+          console.log(`[PROTEÇÃO] ✅ Limpeza autorizada: Fim do ciclo (${atingiu ? 'sucesso' : 'falha'})`);
           entradasConsecutivas.tentativaNumero = 0;
           entradasConsecutivas.multiplicadorRecomendado = null;
           entradasConsecutivas.ultimoMultiplicadorEntregue = null;
