@@ -108,7 +108,7 @@ export function ResultadosClienteDialog() {
     setErrosValidacao({});
     toast({
       title: "Conexão em andamento...",
-      duration: 60000,
+      duration: 3000,
     });
     enviarMutation.mutate({ apos: aposNum, sacar: valorSacar });
   };
