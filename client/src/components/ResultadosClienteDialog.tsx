@@ -94,7 +94,10 @@ export function ResultadosClienteDialog() {
       <style>{inputStyle}</style>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-sm mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-        <div className="flex items-start gap-2 mb-2">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="text-yellow-600 text-sm text-center flex-1" style={{ color: '#FFD700' }}>
+            ⚠️ Atenção caro apostador
+          </div>
           <button
             onClick={() => setOpen(false)}
             className="text-gray-300 hover:text-white hover:bg-gray-800 rounded p-1 transition-colors flex-shrink-0"
@@ -103,9 +106,6 @@ export function ResultadosClienteDialog() {
           >
             <span className="text-xl font-bold">✕</span>
           </button>
-          <div className="text-yellow-600 text-sm text-center flex-1" style={{ color: '#FFD700' }}>
-            ⚠️ Atenção caro apostador
-          </div>
         </div>
 
         <DialogHeader className="pb-2">
