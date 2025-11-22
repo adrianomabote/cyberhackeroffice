@@ -10,10 +10,10 @@ const PADROES = [
   { nome: "Alternância Leve", sequencia: [1.5, 2.1, 1.6, 2.5], cashout: 2.00, tolerancia: 0.4 },
   { nome: "Subida Lenta", sequencia: [1.1, 1.3, 1.6, 2.0], cashout: 2.00, tolerancia: 0.3 },
   
-  // 🟣 Padrões de 4x (médios altos)
-  { nome: "Pré-Pico Médio", sequencia: [1.3, 1.4, 1.6, 3.2], cashout: 4.00, tolerancia: 0.4 },
-  { nome: "Ciclo Médio", sequencia: [2.0, 1.8, 2.5, 1.4], cashout: 4.00, tolerancia: 0.4 },
-  { nome: "Repetição Média", sequencia: [2.2, 1.5, 2.0, 1.4], cashout: 4.00, tolerancia: 0.4 },
+  // 🟣 Padrões de 3x (médios altos)
+  { nome: "Pré-Pico Médio", sequencia: [1.3, 1.4, 1.6, 3.2], cashout: 3.00, tolerancia: 0.4 },
+  { nome: "Ciclo Médio", sequencia: [2.0, 1.8, 2.5, 1.4], cashout: 3.00, tolerancia: 0.4 },
+  { nome: "Repetição Média", sequencia: [2.2, 1.5, 2.0, 1.4], cashout: 3.00, tolerancia: 0.4 },
   
   // 💗 Padrões de 10x (altos)
   { nome: "Sequência Fria Longa", sequencia: [1.2, 1.4, 1.05, 1.7, 1.3], cashout: 10.00, tolerancia: 0.3 },
@@ -23,13 +23,15 @@ const PADROES = [
 
 /**
  * 🔍 VERIFICA SE VELAS CORRESPONDEM A UM PADRÃO PRÉ-DEFINIDO
+ * ATENÇÃO: storage.getHistorico retorna em ordem DECRESCENTE (mais recente primeiro)
+ * então slice(0, tamanho) pega as PRIMEIRAS N (mais recentes) e reverse() inverte para ordem cronológica
  */
 function verificarPadrao(velas: number[], padrao: typeof PADROES[0]): boolean {
   const tamanho = padrao.sequencia.length;
   if (velas.length < tamanho) return false;
   
-  // Pegar as últimas N velas (ordem: mais recente primeiro)
-  const velasRecentes = velas.slice(-tamanho);
+  // Pegar as primeiras N velas e reverter (ordem: mais antiga → mais recente)
+  const velasRecentes = velas.slice(0, tamanho).reverse();
   
   // Verificar se cada vela está dentro da tolerância do padrão
   for (let i = 0; i < tamanho; i++) {
@@ -83,7 +85,7 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
       return { 
         multiplicador: padrao.cashout,
         sinal: "ENTRAR",
-        confianca: padrao.cashout === 10.00 ? "alta" : padrao.cashout === 4.00 ? "média" : "média",
+        confianca: padrao.cashout === 10.00 ? "alta" : padrao.cashout === 3.00 ? "média" : "média",
         motivo: `Padrão "${padrao.nome}" detectado`,
       };
     }
@@ -120,12 +122,12 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
     };
   }
 
-  // 🔵 PADRÃO 2: PREVISÃO DE 4.00x - Alta volatilidade com velas médias
+  // 🔵 PADRÃO 2: PREVISÃO DE 3.00x - Alta volatilidade com velas médias
   const velasMedioAltas = multiplicadores.slice(-4).filter(v => v >= 2.5 && v < 6.0).length;
   if ((maxima - minima) > 3.0 && velasMedioAltas >= 2 && media >= 2.5 && media < 5.0) {
-    console.log("🎯 PADRÃO 2: Volatilidade favorável - Sinal 4.00x");
+    console.log("🎯 PADRÃO 2: Volatilidade favorável - Sinal 3.00x");
     return { 
-      multiplicador: 4.00,
+      multiplicador: 3.00,
       sinal: "ENTRAR",
       confianca: "média",
       motivo: `Volatilidade ${(maxima - minima).toFixed(2)} + média ${media.toFixed(2)}x`,
@@ -154,12 +156,12 @@ function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
     };
   }
 
-  // 🟢 PADRÃO 5: PREVISÃO DE 4.00x - Sequência crescente média/alta
+  // 🟢 PADRÃO 5: PREVISÃO DE 3.00x - Sequência crescente média/alta
   const crescente = v1 < v2 && v2 < v3 && v3 < v4;
   if (crescente && media >= 2.5 && media < 5.0 && baixas === 0) {
-    console.log("🎯 PADRÃO 5: Sequência crescente - Sinal 4.00x");
+    console.log("🎯 PADRÃO 5: Sequência crescente - Sinal 3.00x");
     return { 
-      multiplicador: 4.00,
+      multiplicador: 3.00,
       sinal: "ENTRAR",
       confianca: "média",
       motivo: `Crescente + média ${media.toFixed(2)}x + sem baixas`,

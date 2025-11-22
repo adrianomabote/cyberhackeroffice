@@ -36,14 +36,31 @@ Not specified in the original document. The AI should infer these preferences ba
   - API endpoints: POST/GET/DELETE at `/api/resultados-clientes` and `/api/resultados-clientes/lista`
 
 ### Feature Specifications
-- **Real-time Signals Dashboard**: Displays predicted "APÓS" and "SACAR" values based on an advanced ML algorithm.
-- **Opportunity Detection Algorithm**: Analyzes the last 50 candles for 10 favorable patterns, scoring them to recommend entry multipliers (2.00x, 3.00x, 4.00x, 6.00x, 10.00x).
-- **Advanced Vela Analyzer** (NEW): Endpoint `/api/analisar-velas-cyber` analyzes the latest 10 velas automatically:
-  - Detects 5 pattern types: Sequência de baixos, Última vela baixa, Tendência de recuperação, Sem altos extremos, Volatilidade controlada
-  - Scores patterns with point-based system (0-9 points)
-  - Returns entry opportunities with APENAS 2.00x, 4.00x, or 10.00x multipliers
-  - Continuous polling at 1 second intervals from frontend
-  - Returns: apos (last vela), sacar (recommended multiplier), sinal (ENTRAR/POSSÍVEL/AGUARDAR), confianca (alta/média/baixa), pontos, motivo
+- **Real-time Signals Dashboard**: Displays predicted "APÓS" and "SACAR" values based on an advanced pattern detection system.
+- **Advanced Pattern Detection System** (UPDATED): Sistema de análise em duas camadas:
+  
+  **Camada 1 - Padrões Pré-Definidos (9 padrões com tolerância)**:
+  - **Padrões 2x** (2 padrões): "Alternância Leve" [1.5, 2.1, 1.6, 2.5], "Subida Lenta" [1.1, 1.3, 1.6, 2.0]
+  - **Padrões 3x** (3 padrões): "Pré-Pico Médio" [1.3, 1.4, 1.6, 3.2], "Ciclo Médio" [2.0, 1.8, 2.5, 1.4], "Repetição Média" [2.2, 1.5, 2.0, 1.4]
+  - **Padrões 10x** (4 padrões): "Sequência Fria Longa" [1.2, 1.4, 1.05, 1.7, 1.3], "Frio Longo" [1.1, 1.3, 1.2, 1.4, 1.5], "Aquecimento Alto" [1.5, 2.0, 2.8, 1.9]
+  - Cada padrão tem tolerância configurável (0.3-0.5) para flexibilidade na detecção
+  - Sistema compara últimas N velas com sequências pré-definidas usando matching com tolerância
+  
+  **Camada 2 - Análise Estatística Fallback (6 padrões)**:
+  Quando nenhum padrão pré-definido é detectado, usa análise estatística:
+  - **Padrão 1**: 10.00x - 4 velas altas (≥4.0x) + crescente forte + média ≥5.0x + sem baixas
+  - **Padrão 2**: 3.00x - Alta volatilidade (>3.0) + velas médio-altas + média 2.5-5.0x
+  - **Padrão 3**: 2.00x - 3+ velas baixas + média <2.0x (recuperação esperada)
+  - **Padrão 4**: 2.00x - Média baixa <2.0x + 2+ velas baixas
+  - **Padrão 5**: 3.00x - Sequência crescente + média 2.5-5.0x + sem baixas
+  - **Padrão 6**: 2.00x - Recuperação após período baixo
+  
+  **Proteções**:
+  - Bloqueio automático quando 5+ velas baixas consecutivas (aguarda recuperação)
+  - Logs detalhados de cada padrão detectado no console do servidor
+  - Retorna apenas 2.00x, 3.00x ou 10.00x (sem valores intermediários)
+  - Endpoint: `/api/sacar/cyber` analisa últimas 20 velas
+  - Returns: multiplicador, sinal (ENTRAR/POSSÍVEL/AGUARDAR), confianca (alta/média/baixa), motivo
 - **Statistics System**: Provides moving averages (MA5, MA10, MA20), trend analysis, volatility assessment, and extreme values.
 - **Notification System**: Detects 4 types of patterns (Low Sequence, High Volatility, Strong Trend, Opportunity) and provides toast notifications with deduplication.
 - **Manual Maintenance System**: Admin panel (`/admin/cyber`) to activate/deactivate maintenance mode with custom messages and enable/disable manual signal inputs.
