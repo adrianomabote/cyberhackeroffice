@@ -40,7 +40,6 @@ export function ResultadosClienteDialog() {
   const [valorApos, setValorApos] = useState("");
   const [valorSacar, setValorSacar] = useState("");
   const [errosValidacao, setErrosValidacao] = useState<{ apos?: boolean; sacar?: boolean }>({});
-  const [sacarMaximoAtingido, setSacarMaximoAtingido] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -119,7 +118,6 @@ export function ResultadosClienteDialog() {
     setValorApos("");
     setValorSacar("");
     setErrosValidacao({});
-    setSacarMaximoAtingido(false);
   };
 
   return (
@@ -241,7 +239,6 @@ export function ResultadosClienteDialog() {
                 onChange={(e) => {
                   const novoValor = e.target.value.slice(0, 4);
                   
-                  setSacarMaximoAtingido(novoValor.length === 4);
                   setValorSacar(novoValor);
                   
                   // Limpar erro individual ao digitar
@@ -257,9 +254,6 @@ export function ResultadosClienteDialog() {
               />
               {errosValidacao.sacar && (
                 <p className="text-xs text-red-600">Deve ter 4 caracteres</p>
-              )}
-              {sacarMaximoAtingido && (
-                <p className="text-xs text-red-600">Máximo 4 caracteres</p>
               )}
             </div>
 
