@@ -353,53 +353,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let confiancaFinal = analise.confianca;
       let motivoFinal = analise.motivo;
 
-      if (entradasConsecutivas.tentativaNumero === 1) {
-        // 1ª ENTRADA em PROCESSAMENTO: Enviar UMA VEZ, depois aguardar
-        if (entradasConsecutivas.ultimoMultiplicadorEntregue && !entradasConsecutivas.jaEntregouMultiplicador) {
-          // PRIMEIRA VEZ: enviar multiplicador
-          console.log(`[ENTRADAS] ✅ ENTREGANDO 1ª ENTRADA: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x (aguardando nova vela)`);
-          podeEntrar = true;
-          multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-          entradasConsecutivas.jaEntregouMultiplicador = true; // Marcar que já entregou
-          confiancaFinal = "entrando";
-          motivoFinal = "1ª entrada";
-        } else if (entradasConsecutivas.jaEntregouMultiplicador) {
-          // JÁ ENTREGOU: MANTER RETORNANDO o multiplicador até confirmação de nova vela
-          console.log(`[ENTRADAS] 🔁 Aguardando confirmação de nova vela... Multiplicador: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x`);
-          podeEntrar = true;
-          multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-          confiancaFinal = "processando";
-          motivoFinal = "Aguardando confirmação de nova vela";
-        }
-      } else if (entradasConsecutivas.tentativaNumero === 2) {
-        // 2ª TENTATIVA: enviar com 2.00x (mais conservador)
-        if (analise.sinal === "ENTRAR" || analise.sinal === "POSSÍVEL") {
-          console.log(`[ENTRADAS] 🔄 Enviando 2ª TENTATIVA com 2.00x.`);
-          podeEntrar = true;
-          multiplicadorFinal = 2.0;
-          confiancaFinal = "média";
-          motivoFinal = "2ª TENTATIVA - Entrada anterior não atingiu multiplicador";
-          entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // MANTER para 2ª tentativa
-          // NÃO reseta aqui - deixa para quando nova vela chegar
-        } else {
-          console.log(`[ENTRADAS] ⏳ 2ª tentativa em espera (análise: AGUARDAR).`);
-          // MANTER 2ª tentativa enquanto aguarda análise positiva
-          if (entradasConsecutivas.ultimoMultiplicadorEntregue) {
-            multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-            podeEntrar = true;
-          }
-        }
+      // REGRA: Se há entrada em processamento (tentativaNumero > 0), SEMPRE manter o multiplicador
+      if (entradasConsecutivas.tentativaNumero > 0) {
+        console.log(`[ENTRADAS] ⏳ Entrada em processamento (tentativa ${entradasConsecutivas.tentativaNumero}). Mantendo: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x`);
+        podeEntrar = true;
+        multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
+        confiancaFinal = "processando";
+        motivoFinal = `Tentativa ${entradasConsecutivas.tentativaNumero} - Aguardando confirmação de nova vela`;
       } else if (analise.sinal === "ENTRAR" && entradasConsecutivas.tentativaNumero === 0) {
-        // 1ª ENTRADA: seguir análise normal
+        // NOVA ENTRADA: seguir análise normal
         console.log(`[ENTRADAS] ➡️ INICIAR 1ª ENTRADA com ${analise.multiplicador}x.`);
         podeEntrar = true;
         multiplicadorFinal = analise.multiplicador;
         entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // GUARDAR para manter enquanto processa
-        entradasConsecutivas.tentativaNumero = 1; // Marcar que já mandou 1ª entrada
-        entradasConsecutivas.jaEntregouMultiplicador = true; // Marcar como entregue UMA VEZ
+        entradasConsecutivas.tentativaNumero = 1; // Marcar que já tem entrada processando
+        entradasConsecutivas.jaEntregouMultiplicador = true; // Marcar como entregue
         entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
       }
-      // Se tentativaNumero === 0 e análise !== "ENTRAR" => podeEntrar fica false, multiplica null
+      // Se tentativaNumero === 0 e análise !== "ENTRAR" => podeEntrar fica false, multiplicador null
 
       // Retornar resposta
       if (podeEntrar) {
