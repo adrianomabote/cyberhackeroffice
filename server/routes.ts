@@ -414,7 +414,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Atualizar para nova vela SOMENTE SE processou resultado com sucesso
         entradasConsecutivas.ultimaVelaId = velaIdAtual;
-        entradasConsecutivas.jaEntregouMultiplicador = false; // Resetar flag para nova vela
+        
+        // PROTEÇÃO CRÍTICA: Só resetar jaEntregou se NÃO há entrada ativa
+        // Se tem entrada ativa (tentativa > 0), não resetar aqui pois será enviada logo abaixo!
+        if (entradasConsecutivas.tentativaNumero === 0) {
+          entradasConsecutivas.jaEntregouMultiplicador = false; // Resetar flag para nova vela
+        }
       } else if (entradasConsecutivas.ultimaVelaId === null) {
         // Primeira vela do sistema
         entradasConsecutivas.ultimaVelaId = velaIdAtual;
