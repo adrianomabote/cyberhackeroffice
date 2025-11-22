@@ -14,6 +14,12 @@ const entradasConsecutivas = {
   ultimoMultiplicadorEntregue: null as number | null, // Manter último multiplicador até nova vela
   estadoLimpeza: 'AGUARDANDO' as 'AGUARDANDO' | 'VELA_ENTREGUE' | 'AGUARDANDO_NOVA', // Controlar quando limpar
   jaEntregouMultiplicador: false, // Flag para enviar multiplicador UMA VEZ só
+  
+  // ===== PROTEÇÕES ANTI-ERRO =====
+  contadorEntradasTotais: 0, // PROTEÇÃO: Conta total de entradas (máximo 2)
+  timestampUltimaEntrada: null as Date | null, // PROTEÇÃO: Timestamp da última entrada
+  velaIdUltimaLimpeza: null as string | null, // PROTEÇÃO: ID da última vela onde limpou estado
+  bloqueioLimpeza: false, // PROTEÇÃO: Bloqueia limpeza prematura até nova vela confirmar
 };
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -309,6 +315,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const velaIdAtual = String(velaAtual.id);
       const analise = analisarOportunidadeEntrada(historico);
 
+      // Log de segurança: Estado atual do sistema
+      console.log(`[PROTEÇÃO] 📋 Estado: tentativa=${entradasConsecutivas.tentativaNumero}, contador=${entradasConsecutivas.contadorEntradasTotais}, bloqueio=${entradasConsecutivas.bloqueioLimpeza}`);
+
+      // ============ PROTEÇÃO ANTI-ERRO: Verificar anomalias ============
+      if (entradasConsecutivas.contadorEntradasTotais > 2) {
+        console.error(`[PROTEÇÃO] ⛔ BLOQUEIO: Contador de entradas excedeu máximo (${entradasConsecutivas.contadorEntradasTotais}). Resetando sistema!`);
+        // RESETAR TUDO por segurança
+        entradasConsecutivas.tentativaNumero = 0;
+        entradasConsecutivas.multiplicadorRecomendado = null;
+        entradasConsecutivas.ultimoMultiplicadorEntregue = null;
+        entradasConsecutivas.jaEntregouMultiplicador = false;
+        entradasConsecutivas.contadorEntradasTotais = 0;
+        entradasConsecutivas.bloqueioLimpeza = false;
+        return res.json({ multiplicador: null, sinal: "AGUARDAR", confianca: "baixa", motivo: "Sistema resetado por segurança" });
+      }
+
       // ============ ETAPA 1: Detectar mudança de vela ============
       const mudouDeVela = entradasConsecutivas.ultimaVelaId !== null && entradasConsecutivas.ultimaVelaId !== velaIdAtual;
 
@@ -322,41 +344,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Buscar vela anterior do histórico PELA ID que estava gravada
         const velaAnterior = historico.find(v => String(v.id) === entradasConsecutivas.ultimaVelaId);
         
+        // PROTEÇÃO CRÍTICA: Só processar se encontrou vela anterior (evita race condition)
+        if (!velaAnterior && tentativaAnterior > 0) {
+          console.error(`[PROTEÇÃO] ⚠️ RACE CONDITION: Nova vela detectada mas vela anterior não encontrada no histórico!`);
+          console.error(`[PROTEÇÃO] - Mantendo estado ativo até vela anterior ser confirmada.`);
+          console.error(`[PROTEÇÃO] - Vela anterior ID: ${entradasConsecutivas.ultimaVelaId}`);
+          // NÃO atualizar ultimaVelaId - aguardar próxima chamada
+          return res.json({
+            multiplicador: entradasConsecutivas.ultimoMultiplicadorEntregue,
+            sinal: "ENTRAR",
+            confianca: "alta",
+            motivo: "Aguardando confirmação de resultado",
+          });
+        }
+        
         if (tentativaAnterior === 1 && multiplicadorEsperado && velaAnterior) {
           // Verificar se a entrada da 1ª tentativa atingiu o objetivo
           const atingiu = velaAnterior.multiplicador >= multiplicadorEsperado;
           console.log(`[ENTRADAS] ${atingiu ? '✓' : '❌'} Vela anterior (${velaAnterior.multiplicador}x) ${atingiu ? 'atingiu' : 'não atingiu'} ${multiplicadorEsperado}x`);
           
           if (atingiu) {
-            // SUCESSO - limpar tudo
+            // SUCESSO - limpar tudo COM PROTEÇÃO
+            console.log(`[PROTEÇÃO] ✅ Limpeza autorizada: Meta atingida em tentativa ${tentativaAnterior}`);
             entradasConsecutivas.tentativaNumero = 0;
             entradasConsecutivas.multiplicadorRecomendado = null;
             entradasConsecutivas.ultimoMultiplicadorEntregue = null;
             entradasConsecutivas.jaEntregouMultiplicador = false;
+            entradasConsecutivas.contadorEntradasTotais = 0; // RESETAR contador
+            entradasConsecutivas.bloqueioLimpeza = false; // Desbloquear limpeza APÓS processar
+            entradasConsecutivas.velaIdUltimaLimpeza = entradasConsecutivas.ultimaVelaId; // Vela que acabou de processar
           } else {
-            // FALHOU - ativar 2ª tentativa com 2.00x
-            console.log(`[ENTRADAS] 🔄 Ativando 2ª tentativa com 2.00x`);
-            entradasConsecutivas.tentativaNumero = 2;
-            entradasConsecutivas.multiplicadorRecomendado = 2.0;
-            entradasConsecutivas.ultimoMultiplicadorEntregue = 2.0;
-            entradasConsecutivas.jaEntregouMultiplicador = false; // Permitir enviar de novo
+            // FALHOU - ativar 2ª tentativa com 2.00x COM PROTEÇÃO
+            if (entradasConsecutivas.contadorEntradasTotais >= 2) {
+              console.error(`[PROTEÇÃO] ⛔ BLOQUEIO: Não pode ativar 3ª tentativa! Limpando.`);
+              entradasConsecutivas.tentativaNumero = 0;
+              entradasConsecutivas.multiplicadorRecomendado = null;
+              entradasConsecutivas.ultimoMultiplicadorEntregue = null;
+              entradasConsecutivas.jaEntregouMultiplicador = false;
+              entradasConsecutivas.contadorEntradasTotais = 0;
+              entradasConsecutivas.bloqueioLimpeza = false;
+              entradasConsecutivas.velaIdUltimaLimpeza = entradasConsecutivas.ultimaVelaId; // Vela que acabou de processar
+            } else {
+              console.log(`[ENTRADAS] 🔄 Ativando 2ª tentativa com 2.00x`);
+              console.log(`[PROTEÇÃO] 📊 Contador de entradas: ${entradasConsecutivas.contadorEntradasTotais} → ${entradasConsecutivas.contadorEntradasTotais + 1}`);
+              entradasConsecutivas.tentativaNumero = 2;
+              entradasConsecutivas.multiplicadorRecomendado = 2.0;
+              entradasConsecutivas.ultimoMultiplicadorEntregue = 2.0;
+              entradasConsecutivas.jaEntregouMultiplicador = false; // Permitir enviar de novo
+              entradasConsecutivas.contadorEntradasTotais++; // INCREMENTAR contador (2ª entrada)
+              entradasConsecutivas.bloqueioLimpeza = true; // BLOQUEAR limpeza até nova vela
+            }
           }
         } else if (tentativaAnterior === 2 && velaAnterior) {
-          // Fim da 2ª tentativa - sempre limpar após processar
+          // Fim da 2ª tentativa - sempre limpar após processar COM PROTEÇÃO
           const atingiu = velaAnterior.multiplicador >= 2.0;
           console.log(`[ENTRADAS] 🔄 2ª tentativa finalizada. Vela ${atingiu ? 'atingiu' : 'não atingiu'} 2.00x. Limpando.`);
+          console.log(`[PROTEÇÃO] ✅ Limpeza autorizada: Fim de ciclo completo (2 tentativas)`);
           entradasConsecutivas.tentativaNumero = 0;
           entradasConsecutivas.multiplicadorRecomendado = null;
           entradasConsecutivas.ultimoMultiplicadorEntregue = null;
           entradasConsecutivas.jaEntregouMultiplicador = false;
+          entradasConsecutivas.contadorEntradasTotais = 0; // RESETAR contador
+          entradasConsecutivas.bloqueioLimpeza = false; // Desbloquear limpeza APÓS processar
+          entradasConsecutivas.velaIdUltimaLimpeza = entradasConsecutivas.ultimaVelaId; // Vela que acabou de processar
+        } else if (tentativaAnterior === 0) {
+          // Não havia entrada ativa - só desbloquear limpeza
+          entradasConsecutivas.bloqueioLimpeza = false;
         }
         
-        // Atualizar para nova vela
+        // Atualizar para nova vela SOMENTE SE processou resultado com sucesso
         entradasConsecutivas.ultimaVelaId = velaIdAtual;
         entradasConsecutivas.jaEntregouMultiplicador = false; // Resetar flag para nova vela
       } else if (entradasConsecutivas.ultimaVelaId === null) {
         // Primeira vela do sistema
         entradasConsecutivas.ultimaVelaId = velaIdAtual;
+        entradasConsecutivas.bloqueioLimpeza = false;
       }
 
       // ============ ETAPA 2: Determinar resposta ============
@@ -367,30 +429,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (entradasConsecutivas.tentativaNumero > 0) {
         // Há entrada ativa - SEMPRE retornar o multiplicador (mesmo se já enviou)
-        podeEntrar = true;
-        multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-        confiancaFinal = "alta";
-        motivoFinal = `Tentativa ${entradasConsecutivas.tentativaNumero} - Aguardando nova vela`;
         
-        if (!entradasConsecutivas.jaEntregouMultiplicador) {
-          // Primeira vez retornando nesta vela - marcar como enviado
-          console.log(`[ENTRADAS] ✅ ENVIANDO tentativa ${entradasConsecutivas.tentativaNumero}: ${multiplicadorFinal}x`);
-          entradasConsecutivas.jaEntregouMultiplicador = true;
+        // PROTEÇÃO: Verificar se mesma vela (anti enviar múltiplas vezes)
+        if (entradasConsecutivas.ultimaVelaId === velaIdAtual) {
+          podeEntrar = true;
+          multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
+          confiancaFinal = "alta";
+          motivoFinal = `Tentativa ${entradasConsecutivas.tentativaNumero} - Aguardando nova vela`;
+          
+          if (!entradasConsecutivas.jaEntregouMultiplicador) {
+            // Primeira vez retornando nesta vela - marcar como enviado
+            console.log(`[ENTRADAS] ✅ ENVIANDO tentativa ${entradasConsecutivas.tentativaNumero}: ${multiplicadorFinal}x`);
+            console.log(`[PROTEÇÃO] 📝 Timestamp da entrada: ${new Date().toISOString()}`);
+            entradasConsecutivas.jaEntregouMultiplicador = true;
+            entradasConsecutivas.timestampUltimaEntrada = new Date();
+          } else {
+            // Já enviou, mas continua retornando o multiplicador (para persistir na UI)
+            console.log(`[ENTRADAS] 🔁 MANTENDO tentativa ${entradasConsecutivas.tentativaNumero}: ${multiplicadorFinal}x`);
+          }
         } else {
-          // Já enviou, mas continua retornando o multiplicador (para persistir na UI)
-          console.log(`[ENTRADAS] 🔁 MANTENDO tentativa ${entradasConsecutivas.tentativaNumero}: ${multiplicadorFinal}x`);
+          // PROTEÇÃO: Vela mudou mas estado ainda ativo (anomalia)
+          console.warn(`[PROTEÇÃO] ⚠️ ANOMALIA DETECTADA: Estado ativo mas vela diferente. Corrigindo...`);
+          console.warn(`[PROTEÇÃO] - Última vela registrada: ${entradasConsecutivas.ultimaVelaId}`);
+          console.warn(`[PROTEÇÃO] - Vela atual: ${velaIdAtual}`);
+          console.warn(`[PROTEÇÃO] - Tentativa ativa: ${entradasConsecutivas.tentativaNumero}`);
+          // Processar como se fosse mudança de vela
+          entradasConsecutivas.ultimaVelaId = velaIdAtual;
         }
       } else if (analise.sinal === "ENTRAR" && entradasConsecutivas.tentativaNumero === 0) {
         // Nova entrada recomendada pela análise
-        console.log(`[ENTRADAS] ➡️ Iniciando 1ª entrada com ${analise.multiplicador}x`);
-        podeEntrar = true;
-        multiplicadorFinal = analise.multiplicador;
-        entradasConsecutivas.tentativaNumero = 1;
-        entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
-        entradasConsecutivas.ultimoMultiplicadorEntregue = analise.multiplicador;
-        entradasConsecutivas.jaEntregouMultiplicador = true;
-        confiancaFinal = "alta";
-        motivoFinal = "1ª entrada";
+        
+        // PROTEÇÃO CRÍTICA: Não permitir nova entrada se já tem contador > 0 (ciclo ainda não terminou)
+        if (entradasConsecutivas.contadorEntradasTotais > 0) {
+          console.error(`[PROTEÇÃO] ⛔ BLOQUEIO CRÍTICO: Contador > 0 mas tentativa=0 (estado inconsistente)!`);
+          console.error(`[PROTEÇÃO] - Contador: ${entradasConsecutivas.contadorEntradasTotais}`);
+          console.error(`[PROTEÇÃO] - Vela atual: ${velaIdAtual}`);
+          console.error(`[PROTEÇÃO] - Última limpeza: ${entradasConsecutivas.velaIdUltimaLimpeza}`);
+          console.error(`[PROTEÇÃO] - Aguardando limpeza completa antes de nova entrada.`);
+          podeEntrar = false;
+        }
+        // PROTEÇÃO: Verificar se já limpou nesta vela (anti enviar logo após limpar)
+        else if (entradasConsecutivas.velaIdUltimaLimpeza === velaIdAtual) {
+          console.warn(`[PROTEÇÃO] ⚠️ BLOQUEIO: Não pode enviar nova entrada na mesma vela que acabou de limpar!`);
+          console.warn(`[PROTEÇÃO] - Aguardando próxima vela para nova entrada.`);
+          podeEntrar = false;
+        }
+        // PROTEÇÃO: Verificar se limpeza ainda está bloqueada
+        else if (entradasConsecutivas.bloqueioLimpeza) {
+          console.error(`[PROTEÇÃO] ⛔ BLOQUEIO: Limpeza ainda bloqueada! Não pode enviar nova entrada.`);
+          console.error(`[PROTEÇÃO] - Aguardando nova vela para processar resultado anterior.`);
+          podeEntrar = false;
+        }
+        // Tudo ok - pode enviar nova entrada
+        else {
+          console.log(`[ENTRADAS] ➡️ Iniciando 1ª entrada com ${analise.multiplicador}x`);
+          console.log(`[PROTEÇÃO] 📊 Contador de entradas: ${entradasConsecutivas.contadorEntradasTotais} → ${entradasConsecutivas.contadorEntradasTotais + 1}`);
+          podeEntrar = true;
+          multiplicadorFinal = analise.multiplicador;
+          entradasConsecutivas.tentativaNumero = 1;
+          entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
+          entradasConsecutivas.ultimoMultiplicadorEntregue = analise.multiplicador;
+          entradasConsecutivas.jaEntregouMultiplicador = true;
+          entradasConsecutivas.contadorEntradasTotais++; // INCREMENTAR contador
+          entradasConsecutivas.timestampUltimaEntrada = new Date();
+          entradasConsecutivas.bloqueioLimpeza = true; // BLOQUEAR limpeza até nova vela
+          confiancaFinal = "alta";
+          motivoFinal = "1ª entrada";
+        }
       }
 
       // Retornar resposta
