@@ -180,11 +180,10 @@ export function ResultadosClienteDialog() {
       setValorSacar("");
       setErrosValidacao({});
       
-      // Mostrar notificação de sucesso
+      // Mostrar notificação de conexão
       toast({
-        title: "✅ Enviado com sucesso!",
-        description: "Próximo diálogo aparecerá em 7 horas.",
-        duration: 3000,
+        description: "Conexão em andamento...",
+        duration: 2000,
       });
       
       // Reagendar para 7 horas
