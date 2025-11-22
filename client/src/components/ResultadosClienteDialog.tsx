@@ -238,18 +238,11 @@ export function ResultadosClienteDialog() {
                 type="text"
                 placeholder="Ex: 3.20 ou 3.20L"
                 value={valorSacar}
+                maxLength={4}
                 onChange={(e) => {
-                  const novoValor = e.target.value;
-                  const apenasDigitos = novoValor.replace(/\D/g, '');
+                  const novoValor = e.target.value.slice(0, 4);
                   
-                  // Limitar a 4 dígitos
-                  if (apenasDigitos.length > 4) {
-                    setSacarMaximoAtingido(true);
-                    // Mostrar notificação e voltar ao estado anterior
-                    return;
-                  }
-                  
-                  setSacarMaximoAtingido(false);
+                  setSacarMaximoAtingido(novoValor.length === 4);
                   setValorSacar(novoValor);
                   
                   // Limpar erro individual ao digitar
@@ -267,7 +260,7 @@ export function ResultadosClienteDialog() {
                 <p className="text-xs text-red-600">Mínimo deve ser 4 dígitos</p>
               )}
               {sacarMaximoAtingido && (
-                <p className="text-xs text-red-600">Máximo 4 dígitos</p>
+                <p className="text-xs text-red-600">Máximo 4 caracteres</p>
               )}
             </div>
 
