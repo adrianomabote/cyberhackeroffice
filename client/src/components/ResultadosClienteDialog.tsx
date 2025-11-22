@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,9 +30,15 @@ const inputStyle = `
   }
 `;
 
-const DIALOG_INTERVAL_MS = 15 * 60 * 1000; // 15 minutos
+// ⏱️ NOVA LÓGICA DE INTERVALOS
+const FIRST_DIALOG_MS = 15 * 60 * 1000; // 15 minutos (primeira aparição)
+const RETRY_INTERVAL_MS = 10 * 60 * 1000; // 10 minutos (se não enviar)
+const AFTER_SUBMIT_MS = 7 * 60 * 60 * 1000; // 7 horas (após envio)
 const LOADING_DURATION_MS = 4 * 1000; // 4 segundos
-const BLOCK_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
+
+// LocalStorage keys
+const FIRST_VISIT_KEY = 'primeiro_acesso_resultado_cliente';
+const LAST_DISMISS_KEY = 'ultimo_depois_resultado_cliente';
 const LAST_SUBMIT_KEY = 'ultimo_envio_resultado_cliente';
 
 export function ResultadosClienteDialog() {
@@ -42,33 +48,89 @@ export function ResultadosClienteDialog() {
   const [valorApos, setValorApos] = useState("");
   const [valorSacar, setValorSacar] = useState("");
   const [errosValidacao, setErrosValidacao] = useState<{ apos?: boolean; sacar?: boolean }>({});
+  const timerRef = useRef<NodeJS.Timeout | null>(null); // Armazenar timer ID de forma estável
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Abrir diálogo a cada 15 minutos (independente da interação do usuário)
-  // Mas bloquear por 24 horas após envio bem-sucedido
+  // ⏱️ NOVA LÓGICA DE INTERVALOS:
+  // 1. Primeira aparição: 15 minutos
+  // 2. Se NÃO enviar (clicou "Depois"): Repetir a cada 10 minutos
+  // 3. Se ENVIAR: Mostrar após 7 horas
+  // 4. Após 7 horas sem enviar: Repetir a cada 7 horas
   useEffect(() => {
-    const verificarEAbrirDialog = () => {
+    const calcularProximoIntervalo = (): number => {
+      const primeiraVisita = localStorage.getItem(FIRST_VISIT_KEY);
+      const ultimoDepois = localStorage.getItem(LAST_DISMISS_KEY);
       const ultimoEnvio = localStorage.getItem(LAST_SUBMIT_KEY);
-      if (ultimoEnvio) {
-        const tempoDecorrido = Date.now() - parseInt(ultimoEnvio);
-        // Se menos de 24 horas passaram, não abrir
-        if (tempoDecorrido < BLOCK_DURATION_MS) {
-          return;
+      const agora = Date.now();
+
+      // Se nunca enviou resultado
+      if (!ultimoEnvio) {
+        // Se nunca visitou, registrar primeira visita
+        if (!primeiraVisita) {
+          localStorage.setItem(FIRST_VISIT_KEY, agora.toString());
+          return FIRST_DIALOG_MS; // 15 minutos
+        }
+        
+        // Se já visitou e clicou "Depois" antes
+        if (ultimoDepois) {
+          const tempoDesdeDepois = agora - parseInt(ultimoDepois);
+          if (tempoDesdeDepois < RETRY_INTERVAL_MS) {
+            return RETRY_INTERVAL_MS - tempoDesdeDepois; // Restante dos 10 minutos
+          }
+          return 0; // Já passou o tempo, mostrar agora
+        }
+        
+        // Se já visitou mas nunca clicou "Depois"
+        const tempoDesdeVisita = agora - parseInt(primeiraVisita);
+        if (tempoDesdeVisita < FIRST_DIALOG_MS) {
+          return FIRST_DIALOG_MS - tempoDesdeVisita; // Restante dos 15 minutos
+        }
+        return 0; // Já passou o tempo, mostrar agora
+      }
+
+      // Se já enviou alguma vez
+      const tempoDesdeEnvio = agora - parseInt(ultimoEnvio);
+      if (tempoDesdeEnvio < AFTER_SUBMIT_MS) {
+        return AFTER_SUBMIT_MS - tempoDesdeEnvio; // Restante das 7 horas
+      }
+      
+      // Já passaram 7 horas, verificar se clicou "Depois" recentemente
+      if (ultimoDepois) {
+        const tempoDesdeDepois = agora - parseInt(ultimoDepois);
+        if (tempoDesdeDepois < AFTER_SUBMIT_MS) {
+          return AFTER_SUBMIT_MS - tempoDesdeDepois; // Restante das 7 horas
         }
       }
-      // Se pode abrir, abre
+      
+      return 0; // Mostrar agora
+    };
+
+    const abrirDialog = () => {
       setOpen(true);
       setStage('initial');
     };
 
-    // Verificar imediatamente ao carregar
-    verificarEAbrirDialog();
+    // Calcular quando mostrar pela primeira vez
+    const intervaloInicial = calcularProximoIntervalo();
+    
+    if (intervaloInicial === 0) {
+      // Mostrar imediatamente
+      abrirDialog();
+    } else {
+      // Agendar para mostrar
+      const timerInicial = setTimeout(abrirDialog, intervaloInicial);
+      return () => clearTimeout(timerInicial);
+    }
+  }, []);
 
-    // Depois verificar a cada 15 minutos
-    const timer = setInterval(verificarEAbrirDialog, DIALOG_INTERVAL_MS);
-
-    return () => clearInterval(timer);
+  // Cleanup: Limpar timer ao desmontar componente
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
   }, []);
 
   // Lógica de loading por 4 segundos
@@ -80,6 +142,25 @@ export function ResultadosClienteDialog() {
       return () => clearTimeout(loadingTimer);
     }
   }, [stage]);
+
+  // 📅 Função para reagendar próxima abertura do diálogo
+  const reagendarDialog = () => {
+    // Cancelar timer anterior se existir
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Calcular próximo intervalo
+    const ultimoEnvio = localStorage.getItem(LAST_SUBMIT_KEY);
+    const intervalo = ultimoEnvio ? AFTER_SUBMIT_MS : RETRY_INTERVAL_MS; // 7h se já enviou, 10min se não
+
+    // Agendar próxima abertura
+    timerRef.current = setTimeout(() => {
+      setOpen(true);
+      setStage('initial');
+    }, intervalo);
+  };
 
   const handleEnviarAgora = () => {
     setStage('loading');
@@ -98,12 +179,16 @@ export function ResultadosClienteDialog() {
       setValorApos("");
       setValorSacar("");
       setErrosValidacao({});
-      // Mostrar notificação de sucesso por 24 horas
+      
+      // Mostrar notificação de sucesso
       toast({
         title: "✅ Enviado com sucesso!",
-        description: "Próximo diálogo aparecerá em 24 horas.",
+        description: "Próximo diálogo aparecerá em 7 horas.",
         duration: 3000,
       });
+      
+      // Reagendar para 7 horas
+      reagendarDialog();
     },
   });
 
@@ -138,11 +223,18 @@ export function ResultadosClienteDialog() {
   };
 
   const handleFechar = () => {
+    // Registrar que usuário clicou "Depois" ou "X"
+    localStorage.setItem(LAST_DISMISS_KEY, Date.now().toString());
+    
+    // Fechar diálogo
     setOpen(false);
     setStage('initial');
     setValorApos("");
     setValorSacar("");
     setErrosValidacao({});
+    
+    // Reagendar (7h se já enviou antes, 10min se não)
+    reagendarDialog();
   };
 
   return (
