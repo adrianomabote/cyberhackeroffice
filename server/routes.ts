@@ -1256,6 +1256,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // POST /api/resultados-clientes - Registrar resultado do cliente (última entrada que pegou)
+  app.post("/api/resultados-clientes", async (req, res) => {
+    try {
+      const { apos, sacar } = req.body;
+      const { insertResultadoClienteSchema } = await import("../shared/schema");
+      
+      // Validar entrada
+      const validacao = insertResultadoClienteSchema.safeParse({ apos, sacar });
+      if (!validacao.success) {
+        return res.status(400).json({
+          success: false,
+          error: "Valores inválidos. Apos e Sacar devem ser números maiores que 0",
+        });
+      }
+
+      // Obter ID do usuário logado (se houver)
+      const usuarioId = req.session?.user?.id || null;
+
+      // Salvar resultado
+      const resultado = await storage.adicionarResultadoCliente(usuarioId, apos, sacar);
+
+      res.json({
+        success: true,
+        message: "Resultado registrado com sucesso!",
+        data: resultado,
+      });
+    } catch (error) {
+      console.error('[RESULTADOS] Erro ao registrar:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao registrar resultado",
+      });
+    }
+  });
+
+  // GET /api/resultados-clientes/lista - Listar todos os resultados (apenas admin)
+  app.get("/api/resultados-clientes/lista", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+      const resultados = await storage.listarResultadosClientes(limit);
+
+      res.json({
+        success: true,
+        data: resultados,
+        total: resultados.length,
+      });
+    } catch (error) {
+      console.error('[RESULTADOS] Erro ao listar:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao listar resultados",
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

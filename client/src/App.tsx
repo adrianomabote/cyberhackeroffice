@@ -15,6 +15,7 @@ import BotGratuito from "@/pages/bot-gratuito";
 import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import AdminUsuarios from "@/pages/admin-usuarios";
+import AdminResultadosClientes from "@/pages/admin-resultados-clientes";
 import Welcome from "@/pages/welcome";
 import NotFound from "@/pages/not-found";
 
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/usuarios" component={AdminUsuarios} />
+      <Route path="/admin/resultados-clientes" component={AdminResultadosClientes} />
 
             {/* 404 */}
       <Route>

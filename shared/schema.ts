@@ -158,3 +158,23 @@ export const insertFeedbackSchema = createInsertSchema(feedbacks).pick({
 
 export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
 export type Feedback = typeof feedbacks.$inferSelect;
+
+// Resultados enviados pelos clientes
+export const resultadosClientes = pgTable("resultados_clientes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuario_id: varchar("usuario_id").references(() => usuarios.id),
+  apos: real("apos").notNull(),
+  sacar: real("sacar").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const insertResultadoClienteSchema = createInsertSchema(resultadosClientes).pick({
+  apos: true,
+  sacar: true,
+}).extend({
+  apos: z.number().min(0.01),
+  sacar: z.number().min(0.01),
+});
+
+export type InsertResultadoCliente = z.infer<typeof insertResultadoClienteSchema>;
+export type ResultadoCliente = typeof resultadosClientes.$inferSelect;

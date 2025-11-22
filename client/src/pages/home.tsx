@@ -5,6 +5,7 @@ import { useProtection } from "@/hooks/use-protection";
 import { useAuth, logout } from "@/hooks/use-auth";
 import { LogOut } from "lucide-react";
 import type { UltimaVelaResponse, PrevisaoResponse, ManutencaoStatus, SinaisManual } from "@shared/schema";
+import { ResultadosClienteDialog } from "@/components/ResultadosClienteDialog";
 
 export default function Home() {
   useProtection(); // Proteção de código
@@ -390,6 +391,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Diálogo de Resultados dos Clientes */}
+      <ResultadosClienteDialog />
     </div>
   );
 }

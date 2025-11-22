@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
 import { eq, desc, sql, and, lt } from "drizzle-orm";
-import { velas, usuarios, feedbacks, type InsertVela, type Vela, type InsertFeedback, type Feedback } from "../shared/schema";
+import { velas, usuarios, feedbacks, resultadosClientes, type InsertVela, type Vela, type InsertFeedback, type Feedback, type InsertResultadoCliente, type ResultadoCliente } from "../shared/schema";
 import type { ManutencaoStatus, SinaisManual, PrevisaoResponse, UltimaVelaResponse } from "../shared/schema";
 import bcrypt from "bcryptjs";
 
@@ -193,6 +193,40 @@ class DbStorage {
       resposta: r.resposta,
       total: Number(r.total),
     }));
+  }
+
+  // Métodos para resultados dos clientes
+  async adicionarResultadoCliente(usuarioId: string | null, apos: number, sacar: number): Promise<ResultadoCliente> {
+    try {
+      const [resultado] = await db.insert(resultadosClientes).values({
+        usuario_id: usuarioId,
+        apos,
+        sacar,
+      }).returning();
+
+      console.log('[STORAGE] Resultado do cliente registrado:', {
+        id: resultado.id,
+        usuario_id: resultado.usuario_id,
+        apos: resultado.apos,
+        sacar: resultado.sacar,
+        timestamp: resultado.timestamp,
+      });
+
+      return resultado;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao registrar resultado do cliente:', error);
+      throw error;
+    }
+  }
+
+  async listarResultadosClientes(limit: number = 100): Promise<ResultadoCliente[]> {
+    const resultados = await db
+      .select()
+      .from(resultadosClientes)
+      .orderBy(desc(resultadosClientes.timestamp))
+      .limit(limit);
+
+    return resultados;
   }
 }
 

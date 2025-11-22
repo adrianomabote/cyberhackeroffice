@@ -227,7 +227,7 @@ export default function Admin() {
         </div>
 
         {/* Botão Gerenciar Usuários */}
-        <div className="mb-8">
+        <div className="mb-4">
           <button
             onClick={() => setLocation('/admin/usuarios')}
             className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
@@ -237,8 +237,26 @@ export default function Admin() {
               fontSize: '1.25rem',
               border: 'none',
             }}
+            data-testid="button-gerenciar-usuarios"
           >
             👥 GERENCIAR USUÁRIOS
+          </button>
+        </div>
+
+        {/* Botão Ver Resultados dos Clientes */}
+        <div className="mb-8">
+          <button
+            onClick={() => setLocation('/admin/resultados-clientes')}
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+            style={{
+              backgroundColor: '#9d4edd',
+              color: '#ffffff',
+              fontSize: '1.25rem',
+              border: 'none',
+            }}
+            data-testid="button-ver-resultados-clientes"
+          >
+            📊 VER RESULTADOS DOS CLIENTES
           </button>
         </div>
 
