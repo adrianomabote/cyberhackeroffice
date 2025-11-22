@@ -13,6 +13,7 @@ const entradasConsecutivas = {
   contadorVelaNovaDeteccao: 0, // Contador para confirmar que vela nova realmente chegou
   ultimoMultiplicadorEntregue: null as number | null, // Manter último multiplicador até nova vela
   estadoLimpeza: 'AGUARDANDO' as 'AGUARDANDO' | 'VELA_ENTREGUE' | 'AGUARDANDO_NOVA', // Controlar quando limpar
+  jaEntregouMultiplicador: false, // Flag para enviar multiplicador UMA VEZ só
 };
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -340,6 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             entradasConsecutivas.tentativaNumero = 0;
             entradasConsecutivas.multiplicadorRecomendado = null;
             entradasConsecutivas.ultimoMultiplicadorEntregue = null; // SÓ LIMPA AQUI
+            entradasConsecutivas.jaEntregouMultiplicador = false; // Resetar flag
             entradasConsecutivas.estadoLimpeza = 'AGUARDANDO';
           }
         }
@@ -352,13 +354,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let motivoFinal = analise.motivo;
 
       if (entradasConsecutivas.tentativaNumero === 1) {
-        // 1ª ENTRADA em PROCESSAMENTO: MANTER retornando o multiplicador até nova vela
-        if (entradasConsecutivas.ultimoMultiplicadorEntregue) {
-          console.log(`[ENTRADAS] 🔁 1ª ENTRADA ainda processando: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x (aguardando confirmação de nova vela)`);
+        // 1ª ENTRADA em PROCESSAMENTO: Enviar UMA VEZ, depois aguardar
+        if (entradasConsecutivas.ultimoMultiplicadorEntregue && !entradasConsecutivas.jaEntregouMultiplicador) {
+          // PRIMEIRA VEZ: enviar multiplicador
+          console.log(`[ENTRADAS] ✅ ENTREGANDO 1ª ENTRADA: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x (aguardando nova vela)`);
           podeEntrar = true;
           multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-          confiancaFinal = "processando";
-          motivoFinal = "Aguardando confirmação de nova vela";
+          entradasConsecutivas.jaEntregouMultiplicador = true; // Marcar que já entregou
+          confiancaFinal = "entrando";
+          motivoFinal = "1ª entrada";
+        } else if (entradasConsecutivas.jaEntregouMultiplicador) {
+          // JÁ ENTREGOU: aguardar nova vela
+          console.log(`[ENTRADAS] ⏳ 1ª entrada aguardando confirmação de nova vela...`);
+          podeEntrar = false; // Não manda mais nada até nova vela
         }
       } else if (entradasConsecutivas.tentativaNumero === 2) {
         // 2ª TENTATIVA: enviar com 2.00x (mais conservador)
@@ -380,11 +388,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else if (analise.sinal === "ENTRAR" && entradasConsecutivas.tentativaNumero === 0) {
         // 1ª ENTRADA: seguir análise normal
-        console.log(`[ENTRADAS] ➡️ Enviando 1ª ENTRADA com ${analise.multiplicador}x.`);
+        console.log(`[ENTRADAS] ➡️ INICIAR 1ª ENTRADA com ${analise.multiplicador}x.`);
         podeEntrar = true;
         multiplicadorFinal = analise.multiplicador;
         entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // GUARDAR para manter enquanto processa
         entradasConsecutivas.tentativaNumero = 1; // Marcar que já mandou 1ª entrada
+        entradasConsecutivas.jaEntregouMultiplicador = true; // Marcar como entregue UMA VEZ
         entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
       }
       // Se tentativaNumero === 0 e análise !== "ENTRAR" => podeEntrar fica false, multiplica null
