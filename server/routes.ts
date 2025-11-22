@@ -622,6 +622,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GET /api/ultima-vela-cyber - Retorna a última vela recebida
+  app.get("/api/ultima-vela-cyber", async (req, res) => {
+    try {
+      const ultimaVela = await storage.getUltimaVela();
+
+      if (!ultimaVela) {
+        return res.json({
+          multiplicador: null,
+          timestamp: null,
+        });
+      }
+
+      res.json({
+        multiplicador: ultimaVela.multiplicador,
+        timestamp: ultimaVela.timestamp,
+      });
+    } catch (error) {
+      console.error('[ULTIMA VELA] Erro:', error);
+      res.status(500).json({
+        multiplicador: null,
+        timestamp: null,
+        error: "Erro ao buscar última vela",
+      });
+    }
+  });
+
   // GET /api/historico/cyber - Retorna histórico completo de velas
   app.get("/api/historico/cyber", async (req, res) => {
     try {

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useProtection } from "@/hooks/use-protection";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader } from "lucide-react";
 
@@ -44,6 +44,17 @@ export function ResultadosClienteDialog() {
   const [errosValidacao, setErrosValidacao] = useState<{ apos?: boolean; sacar?: boolean }>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Buscar última vela recebida
+  const { data: ultimaVela } = useQuery({
+    queryKey: ['/api/ultima-vela-cyber'],
+    queryFn: async () => {
+      const res = await fetch('/api/ultima-vela-cyber');
+      return res.json();
+    },
+    refetchInterval: 1000, // Atualizar a cada 1 segundo
+    enabled: open, // Só buscar quando dialog está aberto
+  });
 
   // Abrir diálogo a cada 15 minutos (independente da interação do usuário)
   // Mas bloquear por 24 horas após envio bem-sucedido
@@ -81,6 +92,15 @@ export function ResultadosClienteDialog() {
     }
   }, [stage]);
 
+  // Pré-preencher APÓS automaticamente quando stage muda para form
+  useEffect(() => {
+    if (stage === 'form' && ultimaVela?.multiplicador) {
+      // Converter multiplicador para string com até 10 dígitos (simular formato)
+      const aposFormatado = ultimaVela.multiplicador.toString().slice(0, 10);
+      setValorApos(aposFormatado);
+    }
+  }, [stage, ultimaVela]);
+
   const handleEnviarAgora = () => {
     setStage('loading');
   };
@@ -110,11 +130,9 @@ export function ResultadosClienteDialog() {
   const enviarResultado = () => {
     const novoErros: { apos?: boolean; sacar?: boolean } = {};
     
-    // Validar Apos: não vazio, número válido maior que 0, E mínimo 9 dígitos
+    // Validar Apos: deve ter valor automático
     const aposNum = parseFloat(valorApos);
-    const aposDigits = valorApos.replace(/\D/g, ''); // Remove tudo que não é dígito
-    
-    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0 || aposDigits.length < 9) {
+    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0) {
       novoErros.apos = true;
     }
     
@@ -231,27 +249,20 @@ export function ResultadosClienteDialog() {
             </DialogHeader>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-300">Apos:</label>
+              <label className="text-sm font-medium text-gray-300">Apos: (Automático)</label>
               <Input
-                type="number"
-                step="0.01"
-                placeholder="Ex: 2.50"
+                type="text"
+                placeholder="Carregando..."
                 value={valorApos}
-                onChange={(e) => {
-                  setValorApos(e.target.value);
-                  // Limpar erro individual ao digitar
-                  if (errosValidacao.apos) {
-                    setErrosValidacao(prev => ({ ...prev, apos: false }));
-                  }
-                }}
+                readOnly
                 data-testid="input-apos-resultado"
-                disabled={enviarMutation.isPending}
-                className={`resultado-input bg-gray-800 text-white ${
-                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-700'
+                disabled
+                className={`resultado-input bg-gray-700 text-white cursor-not-allowed opacity-75 ${
+                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-600'
                 }`}
               />
               {errosValidacao.apos && (
-                <p className="text-xs text-red-600">Mínimo deve ser 9 dígitos</p>
+                <p className="text-xs text-red-600">Erro ao carregar vela</p>
               )}
             </div>
 
