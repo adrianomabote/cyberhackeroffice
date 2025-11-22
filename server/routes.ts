@@ -4,134 +4,186 @@ import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "../shared/schema";
 import { z } from "zod";
 
-// Função que detecta oportunidades de entrada analisando padrões
+// 📊 PADRÕES PRÉ-DEFINIDOS - Sistema Avançado de Análise
+const PADROES = [
+  // 🔵 Padrões de 2x (baixos e médios)
+  { nome: "Alternância Leve", sequencia: [1.5, 2.1, 1.6, 2.5], cashout: 2.00, tolerancia: 0.4 },
+  { nome: "Subida Lenta", sequencia: [1.1, 1.3, 1.6, 2.0], cashout: 2.00, tolerancia: 0.3 },
+  
+  // 🟣 Padrões de 4x (médios altos)
+  { nome: "Pré-Pico Médio", sequencia: [1.3, 1.4, 1.6, 3.2], cashout: 4.00, tolerancia: 0.4 },
+  { nome: "Ciclo Médio", sequencia: [2.0, 1.8, 2.5, 1.4], cashout: 4.00, tolerancia: 0.4 },
+  { nome: "Repetição Média", sequencia: [2.2, 1.5, 2.0, 1.4], cashout: 4.00, tolerancia: 0.4 },
+  
+  // 💗 Padrões de 10x (altos)
+  { nome: "Sequência Fria Longa", sequencia: [1.2, 1.4, 1.05, 1.7, 1.3], cashout: 10.00, tolerancia: 0.3 },
+  { nome: "Frio Longo", sequencia: [1.1, 1.3, 1.2, 1.4, 1.5], cashout: 10.00, tolerancia: 0.3 },
+  { nome: "Aquecimento Alto", sequencia: [1.5, 2.0, 2.8, 1.9], cashout: 10.00, tolerancia: 0.5 },
+];
+
+/**
+ * 🔍 VERIFICA SE VELAS CORRESPONDEM A UM PADRÃO PRÉ-DEFINIDO
+ */
+function verificarPadrao(velas: number[], padrao: typeof PADROES[0]): boolean {
+  const tamanho = padrao.sequencia.length;
+  if (velas.length < tamanho) return false;
+  
+  // Pegar as últimas N velas (ordem: mais recente primeiro)
+  const velasRecentes = velas.slice(-tamanho);
+  
+  // Verificar se cada vela está dentro da tolerância do padrão
+  for (let i = 0; i < tamanho; i++) {
+    const velaAtual = velasRecentes[i];
+    const velaEsperada = padrao.sequencia[i];
+    const diferenca = Math.abs(velaAtual - velaEsperada);
+    
+    if (diferenca > padrao.tolerancia) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+// ✅ ANÁLISE AUTOMÁTICA DE PADRÕES - MODO ASSERTIVO
 function analisarOportunidadeEntrada(velas: Array<{ multiplicador: number }>) {
-  if (velas.length < 5) {
+  if (velas.length < 4) {
     return {
       multiplicador: null,
       sinal: "AGUARDAR",
       confianca: "baixa",
-      motivo: "Aguardando mais dados",
+      motivo: "Aguardando mais velas (mínimo 4)",
     };
   }
 
-  const ultimas = velas.slice(-20);
-  const multiplicadores = ultimas.map(v => v.multiplicador);
-  const n = multiplicadores.length;
-  const ultimas5 = multiplicadores.slice(-5);
-  const ultimas10 = multiplicadores.slice(-10);
-
-  // Calcular médias
-  const media5 = ultimas5.reduce((a, b) => a + b, 0) / ultimas5.length;
-  const media10 = ultimas10.reduce((a, b) => a + b, 0) / Math.min(ultimas10.length, 10);
-  const mediaGeral = multiplicadores.reduce((a, b) => a + b, 0) / n;
-
-  // Detectar padrões favoráveis
-  let pontos = 0;
-  let motivos: string[] = [];
-
-  // Padrão 1: Sequência de baixos (3+ velas <2x nas últimas 5)
-  const baixosRecentes = ultimas5.filter(m => m < 2).length;
-  if (baixosRecentes >= 3) {
-    pontos += 3;
-    motivos.push(`${baixosRecentes} velas baixas consecutivas`);
+  // Extrair apenas multiplicadores válidos (> 0)
+  const multiplicadores = velas.map(v => v.multiplicador).filter(m => m > 0);
+  
+  if (multiplicadores.length < 4) {
+    return {
+      multiplicador: null,
+      sinal: "AGUARDAR",
+      confianca: "baixa",
+      motivo: "Sem dados válidos suficientes",
+    };
   }
 
-  // Padrão 2: Última vela baixa (<2.5x) após média razoável
-  const ultimaVela = multiplicadores[multiplicadores.length - 1];
-  if (ultimaVela < 2.5 && media10 > 2.5) {
-    pontos += 2;
-    motivos.push("Última vela baixa após média alta");
-  }
+  const [v1, v2, v3, v4] = multiplicadores.slice(-4);
+  const media = (v1 + v2 + v3 + v4) / 4;
+  const maxima = Math.max(...multiplicadores.slice(-10));
+  const minima = Math.min(...multiplicadores.slice(-10));
+  const baixas = multiplicadores.slice(-10).filter(v => v < 2.0).length;
 
-  // Padrão 3: Tendência de recuperação (média das 5 últimas < média geral)
-  if (media5 < mediaGeral * 0.85) {
-    pontos += 2;
-    motivos.push("Tendência de recuperação detectada");
-  }
-
-  // Padrão 4: Não houve alto recente (nenhuma vela >5x nas últimas 3)
-  const ultimas3 = multiplicadores.slice(-3);
-  const altosRecentes = ultimas3.filter(m => m > 5).length;
-  if (altosRecentes === 0) {
-    pontos += 1;
-    motivos.push("Sem altos extremos recentes");
-  }
-
-  // Padrão 5: Volatilidade moderada (não muito caótico)
-  const variancia = multiplicadores.reduce((sum, m) => sum + Math.pow(m - mediaGeral, 2), 0) / n;
-  const desvioPadrao = Math.sqrt(variancia);
-  const cv = desvioPadrao / mediaGeral;
-  if (cv < 0.6) {
-    pontos += 1;
-    motivos.push("Volatilidade controlada");
-  }
-
-  // Calcular previsão usando EMA
-  const alpha = 0.3;
-  let ema = multiplicadores[0];
-  for (let i = 1; i < n; i++) {
-    ema = alpha * multiplicadores[i] + (1 - alpha) * ema;
-  }
-
-  // Ajustar previsão baseado em padrões
-  let previsao = ema;
-  if (baixosRecentes >= 3) previsao *= 1.15;
-  if (media5 < 2.2) previsao *= 1.1;
-
-  previsao = Math.round(Math.max(1.5, Math.min(10, previsao)) * 100) / 100;
-
-  // Determinar sinal baseado nos pontos
-  let sinal = "AGUARDAR";
-  let confianca = "baixa";
-  let multiplicadorSacar = previsao;
-
-  if (pontos >= 6) {
-    sinal = "ENTRAR";
-    confianca = "alta";
-    // Confiança alta: recomendar sacar baseado na média geral - MUITO CONSERVADOR
-    if (mediaGeral < 2.5) {
-      multiplicadorSacar = 2.0; // Após sequência muito baixa, sacar em 2.00x
-    } else if (mediaGeral < 3.5) {
-      multiplicadorSacar = 2.5; // Média normal, sacar em 2.50x
-    } else if (mediaGeral < 5.0) {
-      multiplicadorSacar = 3.0; // Média alta, sacar em 3.00x
-    } else if (mediaGeral < 7.0) {
-      multiplicadorSacar = 4.0; // Média muito alta, sacar em 4.00x
-    } else {
-      // MUITO RARO: só recomendar 10.00x se média geral >= 7.0
-      // e teve pelo menos 2 velas >= 8.0x nas últimas 10
-      const altosExtremos = ultimas10.filter(m => m >= 8.0).length;
-      if (altosExtremos >= 2) {
-        multiplicadorSacar = 10.0; // Apenas em condições extremamente favoráveis
-      } else {
-        multiplicadorSacar = 5.0; // Caso contrário, mais conservador
-      }
+  // 🎯 PRIMEIRO: VERIFICAR PADRÕES PRÉ-DEFINIDOS
+  for (const padrao of PADROES) {
+    if (verificarPadrao(multiplicadores, padrao)) {
+      console.log(`🎯 PADRÃO DETECTADO: "${padrao.nome}" - Sinal ${padrao.cashout}x`);
+      console.log(`   Velas: [${multiplicadores.slice(-padrao.sequencia.length).map(v => v.toFixed(2)).join(', ')}]`);
+      
+      return { 
+        multiplicador: padrao.cashout,
+        sinal: "ENTRAR",
+        confianca: padrao.cashout === 10.00 ? "alta" : padrao.cashout === 4.00 ? "média" : "média",
+        motivo: `Padrão "${padrao.nome}" detectado`,
+      };
     }
-  } else if (pontos >= 4) {
-    sinal = "ENTRAR";
-    confianca = "média";
-    // Confiança média: muito conservador
-    if (mediaGeral < 2.5) {
-      multiplicadorSacar = 2.0;
-    } else {
-      multiplicadorSacar = 2.5; // Mais seguro com confiança média
-    }
-  } else if (pontos >= 2) {
-    sinal = "POSSÍVEL";
-    confianca = "baixa";
-    multiplicadorSacar = 2.0; // Se entrar, sacar rápido
   }
 
-  // Garantir que o multiplicador está arredondado corretamente
-  multiplicadorSacar = Math.round(multiplicadorSacar * 100) / 100;
+  // ⛔ BLOQUEIO: 5+ velas baixas consecutivas (proteção)
+  if (multiplicadores.length >= 5) {
+    const ultimas5 = multiplicadores.slice(-5);
+    const todas5Baixas = ultimas5.every(v => v < 2.0);
+    if (todas5Baixas) {
+      console.log("⛔ BLOQUEADO: 5 velas baixas consecutivas - aguardando recuperação");
+      return {
+        multiplicador: null,
+        sinal: "AGUARDAR",
+        confianca: "baixa",
+        motivo: "5 velas baixas consecutivas - aguardando recuperação",
+      };
+    }
+  }
 
+  // 📊 FALLBACK: Análise estatística se nenhum padrão pré-definido foi detectado
+
+  // 🟣 PADRÃO 1: PREVISÃO RARA DE 10.00x - Condições MUITO RESTRITIVAS
+  const velasAltas = multiplicadores.slice(-4).filter(v => v >= 4.0).length;
+  const crescenteForte = v1 < v2 && v2 < v3 && v3 < v4 && v4 >= 5.0;
+  
+  if (velasAltas === 4 && crescenteForte && media >= 5.0 && baixas === 0) {
+    console.log("🎯 PADRÃO 1 (RARO): Condições EXCEPCIONAIS para 10.00x");
+    return { 
+      multiplicador: 10.00,
+      sinal: "ENTRAR",
+      confianca: "alta",
+      motivo: "4 velas altas + crescente forte + média ≥5.0x",
+    };
+  }
+
+  // 🔵 PADRÃO 2: PREVISÃO DE 4.00x - Alta volatilidade com velas médias
+  const velasMedioAltas = multiplicadores.slice(-4).filter(v => v >= 2.5 && v < 6.0).length;
+  if ((maxima - minima) > 3.0 && velasMedioAltas >= 2 && media >= 2.5 && media < 5.0) {
+    console.log("🎯 PADRÃO 2: Volatilidade favorável - Sinal 4.00x");
+    return { 
+      multiplicador: 4.00,
+      sinal: "ENTRAR",
+      confianca: "média",
+      motivo: `Volatilidade ${(maxima - minima).toFixed(2)} + média ${media.toFixed(2)}x`,
+    };
+  }
+
+  // 🔴 PADRÃO 3: PREVISÃO DE 2.00x - 3+ velas baixas (recuperação esperada)
+  if (baixas >= 3 && media < 2.0) {
+    console.log("🎯 PADRÃO 3: 3+ velas baixas - Sinal 2.00x (recuperação)");
+    return { 
+      multiplicador: 2.00,
+      sinal: "ENTRAR",
+      confianca: "média",
+      motivo: `${baixas} velas baixas + média ${media.toFixed(2)}x`,
+    };
+  }
+
+  // 🟡 PADRÃO 4: PREVISÃO DE 2.00x - Média baixa (padrão comum)
+  if (media < 2.0 && baixas >= 2) {
+    console.log("🎯 PADRÃO 4: Média baixa - Sinal 2.00x");
+    return { 
+      multiplicador: 2.00,
+      sinal: "POSSÍVEL",
+      confianca: "baixa",
+      motivo: `Média ${media.toFixed(2)}x + ${baixas} velas baixas`,
+    };
+  }
+
+  // 🟢 PADRÃO 5: PREVISÃO DE 4.00x - Sequência crescente média/alta
+  const crescente = v1 < v2 && v2 < v3 && v3 < v4;
+  if (crescente && media >= 2.5 && media < 5.0 && baixas === 0) {
+    console.log("🎯 PADRÃO 5: Sequência crescente - Sinal 4.00x");
+    return { 
+      multiplicador: 4.00,
+      sinal: "ENTRAR",
+      confianca: "média",
+      motivo: `Crescente + média ${media.toFixed(2)}x + sem baixas`,
+    };
+  }
+
+  // 🟠 PADRÃO 6: PREVISÃO DE 2.00x - Recuperação após período baixo
+  if (v4 >= 2.0 && v4 < 4.0 && baixas >= 2) {
+    console.log("🎯 PADRÃO 6: Recuperação detectada - Sinal 2.00x");
+    return { 
+      multiplicador: 2.00,
+      sinal: "POSSÍVEL",
+      confianca: "baixa",
+      motivo: `Última ${v4.toFixed(2)}x + ${baixas} baixas anteriores`,
+    };
+  }
+
+  // ⚪ Nenhum padrão favorável detectado
+  console.log("⚪ Nenhum padrão favorável - aguardando oportunidade");
   return {
-    multiplicador: multiplicadorSacar,
-    sinal,
-    confianca,
-    motivo: motivos.length > 0 ? motivos.join(" | ") : "Análise em andamento",
-    pontos, // Para debug
+    multiplicador: null,
+    sinal: "AGUARDAR",
+    confianca: "baixa",
+    motivo: "Nenhum padrão favorável detectado",
   };
 }
 
