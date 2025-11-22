@@ -249,20 +249,27 @@ export function ResultadosClienteDialog() {
             </DialogHeader>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium text-gray-300">Apos: (Automático)</label>
+              <label className="text-sm font-medium text-gray-300">Apos:</label>
               <Input
-                type="text"
-                placeholder="Carregando..."
+                type="number"
+                step="0.01"
+                placeholder="Ex: 2.50"
                 value={valorApos}
-                readOnly
+                onChange={(e) => {
+                  setValorApos(e.target.value);
+                  // Limpar erro individual ao digitar
+                  if (errosValidacao.apos) {
+                    setErrosValidacao(prev => ({ ...prev, apos: false }));
+                  }
+                }}
                 data-testid="input-apos-resultado"
-                disabled
-                className={`resultado-input bg-gray-700 text-white cursor-not-allowed opacity-75 ${
-                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-600'
+                disabled={enviarMutation.isPending}
+                className={`resultado-input bg-gray-800 text-white ${
+                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-700'
                 }`}
               />
               {errosValidacao.apos && (
-                <p className="text-xs text-red-600">Erro ao carregar vela</p>
+                <p className="text-xs text-red-600">Mínimo deve ser 9 dígitos</p>
               )}
             </div>
 
