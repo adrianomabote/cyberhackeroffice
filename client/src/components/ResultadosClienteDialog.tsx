@@ -84,9 +84,11 @@ export function ResultadosClienteDialog() {
   const enviarResultado = () => {
     const novoErros: { apos?: boolean; sacar?: boolean } = {};
     
-    // Validar Apos: não vazio E número válido maior que 0
+    // Validar Apos: não vazio, número válido maior que 0, E mínimo 9 dígitos
     const aposNum = parseFloat(valorApos);
-    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0) {
+    const aposDigits = valorApos.replace(/\D/g, ''); // Remove tudo que não é dígito
+    
+    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0 || aposDigits.length < 9) {
       novoErros.apos = true;
     }
     

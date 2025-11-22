@@ -172,7 +172,14 @@ export const insertResultadoClienteSchema = createInsertSchema(resultadosCliente
   apos: true,
   sacar: true,
 }).extend({
-  apos: z.number().min(0.01),
+  apos: z.number().min(0.01).refine(
+    (val) => {
+      // Validar que tem pelo menos 9 dígitos (removendo caracteres não-numéricos)
+      const digits = String(val).replace(/\D/g, '');
+      return digits.length >= 9;
+    },
+    { message: "Apos deve ter no mínimo 9 dígitos" }
+  ),
   sacar: z.string().min(1),
 });
 
