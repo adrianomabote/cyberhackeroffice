@@ -220,7 +220,7 @@ export function ResultadosClienteDialog() {
 
             <Button
               onClick={enviarResultado}
-              disabled={enviarMutation.isPending || !valorApos || !valorSacar}
+              disabled={enviarMutation.isPending}
               className="w-full"
               data-testid="button-enviar-resultado"
             >

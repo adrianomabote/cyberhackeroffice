@@ -3,8 +3,10 @@ import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Share2, Gift, CheckCircle2 } from 'lucide-react';
+import { useProtection } from '@/hooks/use-protection';
 
 export default function BotGratuito() {
+  useProtection(); // Proteção de código
   const [compartilhamentos, setCompartilhamentos] = useState(0);
   const [progresso, setProgresso] = useState(0);
   const compartilhamentosNecessarios = 15;
