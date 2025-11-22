@@ -74,45 +74,16 @@ export function ResultadosClienteDialog() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/resultados-clientes/lista"] });
-      toast({
-        title: "✅ Enviado com sucesso!",
-        description: "Seu resultado foi registrado e enviado para o suporte.",
-        variant: "default",
-      });
       setOpen(false);
       setValorApos("");
       setValorSacar("");
-    },
-    onError: () => {
-      toast({
-        title: "❌ Erro",
-        description: "Não foi possível enviar o resultado. Tente novamente.",
-        variant: "destructive",
-      });
+      setErrosValidacao({});
     },
   });
 
   const enviarResultado = () => {
-    // Validar campos
+    // Enviar sem validação local - deixar backend validar
     const apos = parseFloat(valorApos);
-    const novoErros: { apos?: boolean; sacar?: boolean } = {};
-
-    if (isNaN(apos) || apos <= 0) {
-      novoErros.apos = true;
-    }
-
-    if (!valorSacar.trim()) {
-      novoErros.sacar = true;
-    }
-
-    // Se houver erros, mostrar visualmente e retornar
-    if (Object.keys(novoErros).length > 0) {
-      setErrosValidacao(novoErros);
-      return;
-    }
-
-    // Limpar erros se tudo OK
-    setErrosValidacao({});
     enviarMutation.mutate({ apos, sacar: valorSacar });
   };
 
@@ -218,9 +189,7 @@ export function ResultadosClienteDialog() {
                 onChange={(e) => setValorApos(e.target.value)}
                 data-testid="input-apos-resultado"
                 disabled={enviarMutation.isPending}
-                className={`resultado-input bg-gray-800 text-white ${
-                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-700'
-                }`}
+                className="resultado-input bg-gray-800 border-gray-700 text-white"
               />
             </div>
 
@@ -234,9 +203,7 @@ export function ResultadosClienteDialog() {
                 maxLength={4}
                 data-testid="input-sacar-resultado"
                 disabled={enviarMutation.isPending}
-                className={`resultado-input bg-gray-800 text-white ${
-                  errosValidacao.sacar ? 'border-red-600 border-2' : 'border-gray-700'
-                }`}
+                className="resultado-input bg-gray-800 border-gray-700 text-white"
               />
               <p className="text-xs text-red-600">Máximo 4 dígitos</p>
             </div>
@@ -247,7 +214,7 @@ export function ResultadosClienteDialog() {
               className="w-full"
               data-testid="button-enviar-resultado"
             >
-              {enviarMutation.isPending ? "Enviando..." : "Enviar para o Suporte"}
+              {enviarMutation.isPending ? "Conexão em andamento..." : "Enviar para o Suporte"}
             </Button>
 
             <Button
