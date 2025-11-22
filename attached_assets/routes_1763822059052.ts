@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "../shared/schema";
+import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "@shared/schema";
 import { z } from "zod";
 
 // Função que detecta oportunidades de entrada analisando padrões
@@ -1005,67 +1005,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         success: false,
         error: "Erro ao ativar usuário",
-      });
-    }
-  });
-
-  // Rotas de resultados de clientes
-  app.post("/api/resultados-clientes", async (req, res) => {
-    try {
-      const { apos, sacar } = req.body;
-      
-      if (!apos || !sacar) {
-        return res.status(400).json({
-          success: false,
-          error: "Apos e Sacar são obrigatórios",
-        });
-      }
-
-      const resultado = await storage.adicionarResultadoCliente(null, apos, sacar);
-
-      res.json({
-        success: true,
-        data: resultado,
-      });
-    } catch (error) {
-      console.error('[RESULTADOS] Erro ao adicionar:', error);
-      res.status(500).json({
-        success: false,
-        error: "Erro ao registrar resultado",
-      });
-    }
-  });
-
-  app.get("/api/resultados-clientes/lista", async (req, res) => {
-    try {
-      const resultados = await storage.listarResultadosClientes();
-      res.json({
-        success: true,
-        data: resultados,
-      });
-    } catch (error) {
-      console.error('[RESULTADOS] Erro ao listar:', error);
-      res.status(500).json({
-        success: false,
-        error: "Erro ao listar resultados",
-      });
-    }
-  });
-
-  app.delete("/api/resultados-clientes/:resultadoId", async (req, res) => {
-    try {
-      const { resultadoId } = req.params;
-      await storage.deletarResultadoCliente(resultadoId);
-
-      res.json({
-        success: true,
-        message: "Resultado deletado com sucesso",
-      });
-    } catch (error) {
-      console.error('[RESULTADOS] Erro ao deletar:', error);
-      res.status(500).json({
-        success: false,
-        error: "Erro ao deletar resultado",
       });
     }
   });
