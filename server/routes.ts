@@ -351,7 +351,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let confiancaFinal = analise.confianca;
       let motivoFinal = analise.motivo;
 
-      if (entradasConsecutivas.tentativaNumero === 2) {
+      if (entradasConsecutivas.tentativaNumero === 1) {
+        // 1ª ENTRADA em PROCESSAMENTO: MANTER retornando o multiplicador até nova vela
+        if (entradasConsecutivas.ultimoMultiplicadorEntregue) {
+          console.log(`[ENTRADAS] 🔁 1ª ENTRADA ainda processando: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x (aguardando confirmação de nova vela)`);
+          podeEntrar = true;
+          multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
+          confiancaFinal = "processando";
+          motivoFinal = "Aguardando confirmação de nova vela";
+        }
+      } else if (entradasConsecutivas.tentativaNumero === 2) {
         // 2ª TENTATIVA: enviar com 2.00x (mais conservador)
         if (analise.sinal === "ENTRAR" || analise.sinal === "POSSÍVEL") {
           console.log(`[ENTRADAS] 🔄 Enviando 2ª TENTATIVA com 2.00x.`);
@@ -359,11 +368,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           multiplicadorFinal = 2.0;
           confiancaFinal = "média";
           motivoFinal = "2ª TENTATIVA - Entrada anterior não atingiu multiplicador";
-          entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // MANTER
+          entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // MANTER para 2ª tentativa
           // NÃO reseta aqui - deixa para quando nova vela chegar
         } else {
           console.log(`[ENTRADAS] ⏳ 2ª tentativa em espera (análise: AGUARDAR).`);
-          // Manter último multiplicador entregue se houver
+          // MANTER 2ª tentativa enquanto aguarda análise positiva
           if (entradasConsecutivas.ultimoMultiplicadorEntregue) {
             multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
             podeEntrar = true;
@@ -374,17 +383,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`[ENTRADAS] ➡️ Enviando 1ª ENTRADA com ${analise.multiplicador}x.`);
         podeEntrar = true;
         multiplicadorFinal = analise.multiplicador;
-        entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // MANTER
+        entradasConsecutivas.ultimoMultiplicadorEntregue = multiplicadorFinal; // GUARDAR para manter enquanto processa
         entradasConsecutivas.tentativaNumero = 1; // Marcar que já mandou 1ª entrada
         entradasConsecutivas.multiplicadorRecomendado = analise.multiplicador;
-      } else if (entradasConsecutivas.ultimoMultiplicadorEntregue) {
-        // MANTER RETORNANDO o último multiplicador até confirmação de nova vela
-        console.log(`[ENTRADAS] 🔁 Retornando último multiplicador: ${entradasConsecutivas.ultimoMultiplicadorEntregue}x (aguardando confirmação de nova vela)`);
-        podeEntrar = true;
-        multiplicadorFinal = entradasConsecutivas.ultimoMultiplicadorEntregue;
-        confiancaFinal = "aguardando";
-        motivoFinal = "Aguardando confirmação de nova vela antes de limpar";
       }
+      // Se tentativaNumero === 0 e análise !== "ENTRAR" => podeEntrar fica false, multiplica null
 
       // Retornar resposta
       if (podeEntrar) {
