@@ -83,7 +83,7 @@ export function ResultadosClienteDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md mx-4 bg-black border-2 border-gray-500">
+      <DialogContent className="sm:max-w-md mx-4 bg-black border" style={{ borderColor: '#333333', borderWidth: '1px' }}>
         <DialogHeader>
           <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
           <DialogDescription className="sr-only">
@@ -93,7 +93,7 @@ export function ResultadosClienteDialog() {
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200">Apos:</label>
+            <label className="text-sm font-medium text-gray-300">Apos:</label>
             <Input
               type="number"
               step="0.01"
@@ -102,11 +102,12 @@ export function ResultadosClienteDialog() {
               onChange={(e) => setValorApos(e.target.value)}
               data-testid="input-apos-resultado"
               disabled={enviarMutation.isPending}
+              className="bg-gray-800 border-gray-700 text-white"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-200">Sacar:</label>
+            <label className="text-sm font-medium text-gray-300">Sacar:</label>
             <Input
               type="number"
               step="0.01"
@@ -115,6 +116,7 @@ export function ResultadosClienteDialog() {
               onChange={(e) => setValorSacar(e.target.value)}
               data-testid="input-sacar-resultado"
               disabled={enviarMutation.isPending}
+              className="bg-gray-800 border-gray-700 text-white"
             />
           </div>
 
