@@ -39,6 +39,7 @@ export function ResultadosClienteDialog() {
   const [stage, setStage] = useState<'initial' | 'loading' | 'form'>('initial'); // initial, loading, form
   const [valorApos, setValorApos] = useState("");
   const [valorSacar, setValorSacar] = useState("");
+  const [errosValidacao, setErrosValidacao] = useState<{ apos?: boolean; sacar?: boolean }>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -94,25 +95,24 @@ export function ResultadosClienteDialog() {
   const enviarResultado = () => {
     // Validar campos
     const apos = parseFloat(valorApos);
+    const novoErros: { apos?: boolean; sacar?: boolean } = {};
 
     if (isNaN(apos) || apos <= 0) {
-      toast({
-        title: "⚠️ Valor inválido",
-        description: "Digite um valor válido para APOS",
-        variant: "destructive",
-      });
-      return;
+      novoErros.apos = true;
     }
 
     if (!valorSacar.trim()) {
-      toast({
-        title: "⚠️ Campo vazio",
-        description: "Digite um valor para SACAR",
-        variant: "destructive",
-      });
+      novoErros.sacar = true;
+    }
+
+    // Se houver erros, mostrar visualmente e retornar
+    if (Object.keys(novoErros).length > 0) {
+      setErrosValidacao(novoErros);
       return;
     }
 
+    // Limpar erros se tudo OK
+    setErrosValidacao({});
     enviarMutation.mutate({ apos, sacar: valorSacar });
   };
 
@@ -121,6 +121,7 @@ export function ResultadosClienteDialog() {
     setStage('initial');
     setValorApos("");
     setValorSacar("");
+    setErrosValidacao({});
   };
 
   return (
@@ -128,19 +129,37 @@ export function ResultadosClienteDialog() {
       <style>{inputStyle}</style>
       <Dialog open={open} onOpenChange={handleFechar}>
         <DialogContent className="sm:max-w-sm mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <div className="text-yellow-600 text-sm text-center flex-1" style={{ color: '#FFD700' }}>
-            ⚠️ Atenção caro apostador
+        
+        {/* Header com Atenção - apenas na tela inicial */}
+        {stage === 'initial' && (
+          <div className="flex items-start justify-between gap-2 mb-3">
+            <div className="text-yellow-600 text-sm text-center flex-1" style={{ color: '#FFD700' }}>
+              ⚠️ Atenção caro apostador
+            </div>
+            <button
+              onClick={handleFechar}
+              className="text-gray-300 hover:text-white hover:bg-gray-800 rounded p-1 transition-colors flex-shrink-0"
+              data-testid="button-close-resultado"
+              title="Fechar"
+            >
+              <span className="text-xl font-bold">✕</span>
+            </button>
           </div>
-          <button
-            onClick={handleFechar}
-            className="text-gray-300 hover:text-white hover:bg-gray-800 rounded p-1 transition-colors flex-shrink-0"
-            data-testid="button-close-resultado"
-            title="Fechar"
-          >
-            <span className="text-xl font-bold">✕</span>
-          </button>
-        </div>
+        )}
+
+        {/* Botão X - nos estágios loading e form */}
+        {(stage === 'loading' || stage === 'form') && (
+          <div className="flex justify-end mb-3">
+            <button
+              onClick={handleFechar}
+              className="text-gray-300 hover:text-white hover:bg-gray-800 rounded p-1 transition-colors"
+              data-testid="button-close-resultado"
+              title="Fechar"
+            >
+              <span className="text-xl font-bold">✕</span>
+            </button>
+          </div>
+        )}
 
         {/* Tela Inicial com 2 botões */}
         {stage === 'initial' && (
@@ -199,7 +218,9 @@ export function ResultadosClienteDialog() {
                 onChange={(e) => setValorApos(e.target.value)}
                 data-testid="input-apos-resultado"
                 disabled={enviarMutation.isPending}
-                className="resultado-input bg-gray-800 border-gray-700 text-white"
+                className={`resultado-input bg-gray-800 text-white ${
+                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-700'
+                }`}
               />
             </div>
 
@@ -213,7 +234,9 @@ export function ResultadosClienteDialog() {
                 maxLength={4}
                 data-testid="input-sacar-resultado"
                 disabled={enviarMutation.isPending}
-                className="resultado-input bg-gray-800 border-gray-700 text-white"
+                className={`resultado-input bg-gray-800 text-white ${
+                  errosValidacao.sacar ? 'border-red-600 border-2' : 'border-gray-700'
+                }`}
               />
               <p className="text-xs text-red-600">Máximo 4 dígitos</p>
             </div>
