@@ -82,13 +82,28 @@ export function ResultadosClienteDialog() {
   });
 
   const enviarResultado = () => {
-    // Não enviar se campos estiverem vazios
-    if (!valorApos.trim() || !valorSacar.trim()) {
+    const novoErros: { apos?: boolean; sacar?: boolean } = {};
+    
+    // Validar Apos: não vazio E número válido maior que 0
+    const aposNum = parseFloat(valorApos);
+    if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0) {
+      novoErros.apos = true;
+    }
+    
+    // Validar Sacar: não vazio
+    if (!valorSacar.trim()) {
+      novoErros.sacar = true;
+    }
+    
+    // Se houver erros, mostrar bordas vermelhas e não enviar
+    if (Object.keys(novoErros).length > 0) {
+      setErrosValidacao(novoErros);
       return;
     }
     
-    const apos = parseFloat(valorApos);
-    enviarMutation.mutate({ apos, sacar: valorSacar });
+    // Limpar erros e enviar
+    setErrosValidacao({});
+    enviarMutation.mutate({ apos: aposNum, sacar: valorSacar });
   };
 
   const handleFechar = () => {
@@ -190,10 +205,18 @@ export function ResultadosClienteDialog() {
                 step="0.01"
                 placeholder="Ex: 2.50"
                 value={valorApos}
-                onChange={(e) => setValorApos(e.target.value)}
+                onChange={(e) => {
+                  setValorApos(e.target.value);
+                  // Limpar erro individual ao digitar
+                  if (errosValidacao.apos) {
+                    setErrosValidacao(prev => ({ ...prev, apos: false }));
+                  }
+                }}
                 data-testid="input-apos-resultado"
                 disabled={enviarMutation.isPending}
-                className="resultado-input bg-gray-800 border-gray-700 text-white"
+                className={`resultado-input bg-gray-800 text-white ${
+                  errosValidacao.apos ? 'border-red-600 border-2' : 'border-gray-700'
+                }`}
               />
             </div>
 
@@ -203,11 +226,19 @@ export function ResultadosClienteDialog() {
                 type="text"
                 placeholder="Ex: 3.20 ou 3.20L"
                 value={valorSacar}
-                onChange={(e) => setValorSacar(e.target.value.slice(0, 4))}
+                onChange={(e) => {
+                  setValorSacar(e.target.value.slice(0, 4));
+                  // Limpar erro individual ao digitar
+                  if (errosValidacao.sacar) {
+                    setErrosValidacao(prev => ({ ...prev, sacar: false }));
+                  }
+                }}
                 maxLength={4}
                 data-testid="input-sacar-resultado"
                 disabled={enviarMutation.isPending}
-                className="resultado-input bg-gray-800 border-gray-700 text-white"
+                className={`resultado-input bg-gray-800 text-white ${
+                  errosValidacao.sacar ? 'border-red-600 border-2' : 'border-gray-700'
+                }`}
               />
               <p className="text-xs text-red-600">Máximo 4 dígitos</p>
             </div>
