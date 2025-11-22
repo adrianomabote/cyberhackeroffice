@@ -93,20 +93,22 @@ export function ResultadosClienteDialog() {
     <>
       <style>{inputStyle}</style>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-        <div className="text-yellow-600 text-sm text-center py-2 mb-4" style={{ color: '#FFD700' }}>
-          ⚠️ Atenção caro apostador
-        </div>
-
-        <DialogHeader className="relative pb-4">
+        <DialogContent className="sm:max-w-sm mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+        <div className="flex items-start gap-2 mb-2">
           <button
             onClick={() => setOpen(false)}
-            className="absolute right-0 top-0 text-gray-400 hover:text-white transition-colors"
+            className="text-gray-300 hover:text-white hover:bg-gray-800 rounded p-1 transition-colors flex-shrink-0"
             data-testid="button-close-resultado"
             title="Fechar"
           >
             <span className="text-xl font-bold">✕</span>
           </button>
+          <div className="text-yellow-600 text-sm text-center flex-1" style={{ color: '#FFD700' }}>
+            ⚠️ Atenção caro apostador
+          </div>
+        </div>
+
+        <DialogHeader className="pb-2">
           <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
           <DialogDescription className="sr-only">
             Informe a última entrada vencedora
@@ -153,7 +155,8 @@ export function ResultadosClienteDialog() {
 
           <Button
             onClick={() => setOpen(false)}
-            className="w-full bg-gray-700 hover:bg-gray-600 text-white"
+            variant="ghost"
+            className="w-full text-gray-400 hover:text-white"
             data-testid="button-enviar-depois"
           >
             Enviar depois
