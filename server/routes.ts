@@ -1311,6 +1311,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // DELETE /api/resultados-clientes/:id - Deletar um resultado
+  app.delete("/api/resultados-clientes/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        return res.status(400).json({
+          success: false,
+          error: "ID do resultado é obrigatório",
+        });
+      }
+
+      await storage.deletarResultadoCliente(id);
+
+      res.json({
+        success: true,
+        message: "Resultado deletado com sucesso!",
+      });
+    } catch (error) {
+      console.error('[RESULTADOS] Erro ao deletar:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao deletar resultado",
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

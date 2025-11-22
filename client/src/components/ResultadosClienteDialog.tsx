@@ -12,6 +12,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
+// Estilo para remover o focus ring
+const inputStyle = `
+  .resultado-input:focus {
+    outline: none !important;
+    ring: 0 !important;
+    box-shadow: none !important;
+  }
+`;
+
 const DIALOG_INTERVAL_MS = 2 * 60 * 1000; // 2 minutos
 
 export function ResultadosClienteDialog() {
@@ -81,8 +90,10 @@ export function ResultadosClienteDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md mx-4 bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px' }}>
+    <>
+      <style>{inputStyle}</style>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
         <DialogHeader>
           <DialogTitle className="text-base text-white">Nos diz: qual é a última entrada que pegou?</DialogTitle>
           <DialogDescription className="sr-only">
@@ -101,7 +112,7 @@ export function ResultadosClienteDialog() {
               onChange={(e) => setValorApos(e.target.value)}
               data-testid="input-apos-resultado"
               disabled={enviarMutation.isPending}
-              className="bg-gray-800 border-gray-700 text-white focus:ring-0 focus:border-gray-700"
+              className="resultado-input bg-gray-800 border-gray-700 text-white"
             />
           </div>
 
@@ -114,7 +125,7 @@ export function ResultadosClienteDialog() {
               onChange={(e) => setValorSacar(e.target.value)}
               data-testid="input-sacar-resultado"
               disabled={enviarMutation.isPending}
-              className="bg-gray-800 border-gray-700 text-white focus:ring-0 focus:border-gray-700"
+              className="resultado-input bg-gray-800 border-gray-700 text-white"
             />
           </div>
 
@@ -129,5 +140,6 @@ export function ResultadosClienteDialog() {
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

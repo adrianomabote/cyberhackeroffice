@@ -1,13 +1,17 @@
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useProtection } from "@/hooks/use-protection";
-import { ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Copy, Trash2 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 import type { ResultadoCliente } from "@shared/schema";
 
 export default function AdminResultadosClientes() {
   useProtection();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Verificar autenticação
   useEffect(() => {
@@ -24,6 +28,39 @@ export default function AdminResultadosClientes() {
   });
 
   const resultados = resultadosData?.data || [];
+
+  // Mutation para deletar resultado
+  const deletarMutation = useMutation({
+    mutationFn: async (resultadoId: string) => {
+      const res = await apiRequest("DELETE", `/api/resultados-clientes/${resultadoId}`, null);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/resultados-clientes/lista'] });
+      toast({
+        title: "✅ Resultado removido",
+        description: "O resultado foi deletado com sucesso.",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "❌ Erro",
+        description: "Não foi possível deletar o resultado.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Copiar para clipboard
+  const copiarParaClipboard = (valor: string | number, tipo: string) => {
+    navigator.clipboard.writeText(String(valor));
+    toast({
+      title: `✅ ${tipo} copiado!`,
+      description: `Valor: ${valor}`,
+      variant: "default",
+    });
+  };
 
   // Agrupar por usuário
   const resultadosPorUsuario = resultados.reduce((acc, resultado) => {
@@ -130,23 +167,48 @@ export default function AdminResultadosClientes() {
                       data-testid={`resultado-${resultado.id}`}
                     >
                       <div className="flex flex-col gap-2">
-                        <div>
+                        <div className="flex items-center gap-2">
                           <span className="text-sm" style={{ color: '#888888' }}>Apos:</span>
-                          <span className="ml-2 font-bold" style={{ color: '#00ff00' }}>
+                          <span className="font-bold" style={{ color: '#ffffff' }}>
                             {resultado.apos}
                           </span>
+                          <button
+                            onClick={() => copiarParaClipboard(resultado.apos, 'Apos')}
+                            className="p-1 hover:bg-gray-700 rounded transition-colors"
+                            data-testid={`button-copy-apos-${resultado.id}`}
+                            title="Copiar Apos"
+                          >
+                            <Copy className="w-3 h-3" style={{ color: '#888888' }} />
+                          </button>
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2">
                           <span className="text-sm" style={{ color: '#888888' }}>Sacar:</span>
-                          <span className="ml-2 font-bold" style={{ color: '#00d9ff' }}>
+                          <span className="font-bold" style={{ color: '#ff0000' }}>
                             {resultado.sacar}
                           </span>
+                          <button
+                            onClick={() => copiarParaClipboard(resultado.sacar, 'Sacar')}
+                            className="p-1 hover:bg-gray-700 rounded transition-colors"
+                            data-testid={`button-copy-sacar-${resultado.id}`}
+                            title="Copiar Sacar"
+                          >
+                            <Copy className="w-3 h-3" style={{ color: '#888888' }} />
+                          </button>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex flex-col items-end gap-2">
                         <p className="text-xs" style={{ color: '#666666' }}>
                           {new Date(resultado.timestamp).toLocaleString('pt-BR')}
                         </p>
+                        <button
+                          onClick={() => deletarMutation.mutate(resultado.id)}
+                          disabled={deletarMutation.isPending}
+                          className="p-1 hover:bg-red-900 rounded transition-colors"
+                          data-testid={`button-delete-${resultado.id}`}
+                          title="Deletar resultado"
+                        >
+                          <Trash2 className="w-4 h-4" style={{ color: '#ff0000' }} />
+                        </button>
                       </div>
                     </div>
                   ))}

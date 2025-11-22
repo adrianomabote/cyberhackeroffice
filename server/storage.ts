@@ -226,6 +226,19 @@ class DbStorage {
 
     return resultados;
   }
+
+  async deletarResultadoCliente(resultadoId: string): Promise<void> {
+    try {
+      await db
+        .delete(resultadosClientes)
+        .where(eq(resultadosClientes.id, resultadoId));
+
+      console.log('[STORAGE] Resultado deletado:', resultadoId);
+    } catch (error) {
+      console.error('[STORAGE] Erro ao deletar resultado:', error);
+      throw error;
+    }
+  }
 }
 
 // Storage de usuários com sistema de expiração

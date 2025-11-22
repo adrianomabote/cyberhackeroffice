@@ -17,15 +17,23 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Maintenance Screen**: Cyberpunk design matching the app, displaying a custom message and fixed reason during maintenance.
 - **Asset Management**: Optimized video delivery from the `public` folder to reduce bundle size.
 - **Design System**: Distinct color palettes for the dashboard (cyber hacker colors) and landing/auth pages (professional dark red without glow).
+- **Client Results Dialog**: Appears every 2 minutes asking "Nos diz: qual é a última entrada que pegou?" with Apos/Sacar input fields. Preto com borda cinza 1px, arredondado, sem highlighting roxo ao focar, centralizado no meio da tela.
+- **Admin Results Panel**: Shows Apos (branco), Sacar (vermelho), botões para copiar cada valor, botão de deletar resultado, data/hora do registro.
 
 ### Technical Implementations
 - **Frontend**: React, TypeScript, Tailwind CSS, TanStack Query, Recharts for graphs, Shadcn UI for components (Toast, Cards).
 - **Backend**: Express.js, Node.js, running on port 5000.
-- **Database**: PostgreSQL with Drizzle ORM for data persistence (table 'velas').
+- **Database**: PostgreSQL with Drizzle ORM for data persistence (tables: 'velas', 'resultados_clientes').
 - **Real-time Updates**: Active polling every 1 second for `/api/apos/cyber` and `/api/sacar/cyber`.
 - **Authentication**: Session-based authentication protecting routes like `/app` and `/welcome`, with `isAuthenticated()`, `getUser()`, and `logout()` utilities.
 - **Code Protection**: 12 layers of security including disabling right-click, text selection, DevTools keys, view source, save/print, copy/cut, anti-selection CSS, and meta tags (`noindex`, `no-cache`). Production builds are minified and obfuscated.
 - **Error Handling**: Guards against crashes using optional chaining and handling empty arrays.
+- **Client Results System**: 
+  - Dialog appears every 2 minutes via `setInterval` (independent of user interaction)
+  - Accepts numeric Apos and text Sacar (with letters allowed for marks like "L", "P", etc)
+  - Stores data in `resultados_clientes` table with user_id (nullable for anonymous users)
+  - Admin panel at `/admin/resultados-clientes` shows results grouped by user
+  - API endpoints: POST/GET/DELETE at `/api/resultados-clientes` and `/api/resultados-clientes/lista`
 
 ### Feature Specifications
 - **Real-time Signals Dashboard**: Displays predicted "APÓS" and "SACAR" values based on an advanced ML algorithm.
@@ -35,9 +43,11 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Manual Maintenance System**: Admin panel (`/admin/cyber`) to activate/deactivate maintenance mode with custom messages and enable/disable manual signal inputs.
 - **Automatic Capture Script**: `aviator-script.js` captures multipliers every second and sends them to the backend, with protection against consecutive duplicates.
 - **Schema Validation**: Zod schemas for all data inputs and outputs, defining models like Vela, HistoricoResponse, EstatisticasResponse, and PadroesResponse.
+- **Client Results Collection**: Every 2 minutes, dialog asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality.
 
 ## External Dependencies
 - **PostgreSQL**: Relational database for data persistence.
 - **Drizzle ORM**: Object-Relational Mapper for interacting with PostgreSQL.
 - **Recharts**: JavaScript charting library for displaying graphs in the frontend.
 - **Shadcn UI**: UI component library (e.g., Toast, Cards).
+- **Lucide React**: Icon library for UI elements (Copy, Trash2, etc).
