@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { useProtection } from "@/hooks/use-protection";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader } from "lucide-react";
@@ -33,6 +34,7 @@ const DIALOG_INTERVAL_MS = 30 * 1000; // 30 segundos
 const LOADING_DURATION_MS = 4 * 1000; // 4 segundos
 
 export function ResultadosClienteDialog() {
+  useProtection(); // Proteção de código
   const [open, setOpen] = useState(false);
   const [stage, setStage] = useState<'initial' | 'loading' | 'form'>('initial'); // initial, loading, form
   const [valorApos, setValorApos] = useState("");
@@ -213,7 +215,7 @@ export function ResultadosClienteDialog() {
                 disabled={enviarMutation.isPending}
                 className="resultado-input bg-gray-800 border-gray-700 text-white"
               />
-              <p className="text-xs text-gray-500">Máximo 4 dígitos</p>
+              <p className="text-xs text-red-600">Máximo 4 dígitos</p>
             </div>
 
             <Button
