@@ -338,38 +338,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/apos/cyber - Retorna última vela registrada OU sinal manual APOS OU sinal ENTRAR ativo
+  // GET /api/apos/cyber - Retorna última vela registrada
   app.get("/api/apos/cyber", async (req, res) => {
     try {
-      // 🎯 PRIORIDADE 1: Verificar sinal ENTRAR ativo (persiste até nova vela)
-      const sinalEntraAtivo = await storage.getSinalEntraAtivo();
-      if (sinalEntraAtivo) {
-        console.log('[APOS] Retornando sinal ENTRAR ativo (APOS):', sinalEntraAtivo.apos);
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        res.json({
-          multiplicador: sinalEntraAtivo.apos,
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      // 🎯 PRIORIDADE 2: Verificar sinais manuais (APOS)
-      const sinaisManual = await storage.getSinaisManual();
-      if (sinaisManual.ativo && sinaisManual.apos !== null) {
-        console.log('[APOS] Retornando sinal manual (APOS):', sinaisManual.apos);
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-        res.json({
-          multiplicador: sinaisManual.apos,
-          timestamp: new Date().toISOString(),
-        });
-        return;
-      }
-
-      // 🤖 PRIORIDADE 3: Última vela do banco
+      // 📊 SEMPRE retornar última vela do banco (sem interferência de sinais)
       const ultimaVela = await storage.getUltimaVela();
 
       const response: UltimaVelaResponse = {
