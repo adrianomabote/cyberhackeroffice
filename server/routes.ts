@@ -291,6 +291,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/velas/cyber - Recebe multiplicadores do Aviator
   app.post("/api/velas/cyber", async (req, res) => {
     try {
+      // 🧹 LIMPAR sinal ENTRAR anterior (nova vela chegou)
+      await storage.limparSinalEntraAtivo();
+
       // Permitir -1 como sinal especial para três pontinhos
       const multiplicador = req.body.multiplicador;
 
@@ -335,10 +338,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/apos/cyber - Retorna última vela registrada OU sinal manual APOS
+  // GET /api/apos/cyber - Retorna última vela registrada OU sinal manual APOS OU sinal ENTRAR ativo
   app.get("/api/apos/cyber", async (req, res) => {
     try {
-      // 🎯 PRIORIDADE 1: Verificar sinais manuais (APOS)
+      // 🎯 PRIORIDADE 1: Verificar sinal ENTRAR ativo (persiste até nova vela)
+      const sinalEntraAtivo = await storage.getSinalEntraAtivo();
+      if (sinalEntraAtivo) {
+        console.log('[APOS] Retornando sinal ENTRAR ativo (APOS):', sinalEntraAtivo.apos);
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.json({
+          multiplicador: sinalEntraAtivo.apos,
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      // 🎯 PRIORIDADE 2: Verificar sinais manuais (APOS)
       const sinaisManual = await storage.getSinaisManual();
       if (sinaisManual.ativo && sinaisManual.apos !== null) {
         console.log('[APOS] Retornando sinal manual (APOS):', sinaisManual.apos);
@@ -352,7 +369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
 
-      // 🤖 PRIORIDADE 2: Última vela do banco
+      // 🤖 PRIORIDADE 3: Última vela do banco
       const ultimaVela = await storage.getUltimaVela();
 
       const response: UltimaVelaResponse = {
@@ -385,7 +402,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
-      // 🎯 PRIORIDADE 1: Verificar sinais manuais
+      // 🎯 PRIORIDADE 1: Verificar sinal ENTRAR ativo (persiste até nova vela)
+      const sinalEntraAtivo = await storage.getSinalEntraAtivo();
+      if (sinalEntraAtivo) {
+        console.log('[SACAR] Retornando sinal ENTRAR ativo (SACAR):', sinalEntraAtivo.sacar);
+        res.json({
+          multiplicador: sinalEntraAtivo.sacar,
+          sinal: "ENTRAR",
+          confianca: "alta",
+          motivo: "Sinal ativo (aguardando confirmação)",
+        });
+        return;
+      }
+
+      // 🎯 PRIORIDADE 2: Verificar sinais manuais
       const sinaisManual = await storage.getSinaisManual();
       if (sinaisManual.ativo && sinaisManual.apos !== null && sinaisManual.sacar !== null) {
         console.log('[SACAR] Retornando sinais manuais:', {
@@ -401,7 +431,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return;
       }
 
-      // 🤖 PRIORIDADE 2: Análise automática
+      // 🤖 PRIORIDADE 3: Análise automática
       const historico = await storage.getHistorico(20);
       const analise = analisarOportunidadeEntrada(historico);
 
@@ -425,6 +455,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         console.log('[PROTEÇÃO] ✅ Sinal ENTRAR permitido e registrado atomicamente');
+        
+        // ✅ GUARDAR sinal ENTRAR para persistir na tela até nova vela
+        await storage.setSinalEntraAtivo(analise.multiplicador || 0, analise.multiplicador || 0);
       }
 
       res.json({

@@ -33,6 +33,23 @@ class DbStorage {
   private lastEntraSignalTime: number | null = null;
   private lastEntraSignalData: { apos: number; sacar: number } | null = null;
 
+  // Sinal ENTRAR ativo (persiste até nova vela)
+  private sinaiEntraAtivo: { apos: number; sacar: number } | null = null;
+
+  async getSinalEntraAtivo() {
+    return this.sinaiEntraAtivo;
+  }
+
+  async setSinalEntraAtivo(apos: number, sacar: number) {
+    this.sinaiEntraAtivo = { apos, sacar };
+    console.log('[STORAGE] Sinal ENTRAR guardado:', this.sinaiEntraAtivo);
+  }
+
+  async limparSinalEntraAtivo() {
+    console.log('[STORAGE] Sinal ENTRAR limpo (nova vela chegou)');
+    this.sinaiEntraAtivo = null;
+  }
+
   async addVela(data: InsertVela) {
     if (data.multiplicador !== -1 && data.multiplicador === this.lastMultiplicador) {
       console.log('[STORAGE] Ignorando multiplicador duplicado:', data.multiplicador);
