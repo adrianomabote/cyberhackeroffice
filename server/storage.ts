@@ -3,7 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
 import { eq, desc, sql, and, lt } from "drizzle-orm";
-import { velas, usuarios, feedbacks, resultadosClientes, type InsertVela, type Vela, type InsertFeedback, type Feedback, type InsertResultadoCliente, type ResultadoCliente } from "../shared/schema";
+import { velas, usuarios, feedbacks, resultadosClientes, sinaisProtecao, type InsertVela, type Vela, type InsertFeedback, type Feedback, type InsertResultadoCliente, type ResultadoCliente } from "../shared/schema";
 import type { ManutencaoStatus, SinaisManual, PrevisaoResponse, UltimaVelaResponse } from "../shared/schema";
 import bcrypt from "bcryptjs";
 
@@ -29,10 +29,9 @@ class DbStorage {
   private cachedAnalysisTimestamp: number = 0;
   private cachedVela: Vela | null = null;
 
-  // Rastreamento de sinais "ENTRAR" para não enviar seguidos
+  // Rastreamento de sinais "ENTRAR" - APENAS PARA LOGS (estado real está no banco)
   private lastEntraSignalTime: number | null = null;
   private lastEntraSignalData: { apos: number; sacar: number } | null = null;
-  private lastEntraSignalVelaTimestamp: Date | null = null; // Timestamp da vela quando enviou ENTRAR
 
   async addVela(data: InsertVela) {
     if (data.multiplicador !== -1 && data.multiplicador === this.lastMultiplicador) {
@@ -153,65 +152,88 @@ class DbStorage {
     console.log('[STORAGE] Cache limpo');
   }
 
-  // Rastreamento de sinais ENTRAR - não enviar seguidos
+  // Rastreamento de sinais ENTRAR - persistente no banco
   async registerEntraSignal(apos: number, sacar: number): Promise<void> {
     const ultimaVela = await this.getUltimaVela();
     
+    // 🔒 VALIDAÇÃO CRÍTICA: Não permitir registrar se não houver velas
+    if (!ultimaVela || !ultimaVela.timestamp) {
+      console.error('[SINAL] ❌ ERRO CRÍTICO: Tentativa de registrar sinal sem vela válida!');
+      throw new Error('Não é possível registrar sinal ENTRAR sem vela válida no banco');
+    }
+    
+    // Salvar no banco de forma persistente (UPSERT - sempre 1 registro)
+    await db.insert(sinaisProtecao)
+      .values({
+        id: 'ultima_entrada',
+        vela_timestamp: ultimaVela.timestamp,
+      })
+      .onConflictDoUpdate({
+        target: sinaisProtecao.id,
+        set: {
+          vela_timestamp: ultimaVela.timestamp,
+          registrado_em: sql`NOW()`,
+        },
+      });
+    
+    // Atualizar cache local apenas para logs
     this.lastEntraSignalTime = Date.now();
     this.lastEntraSignalData = { apos, sacar };
-    this.lastEntraSignalVelaTimestamp = ultimaVela?.timestamp || null;
     
-    console.log('[SINAL] 📍 Sinal ENTRAR registrado:', {
+    console.log('[SINAL] 📍 Sinal ENTRAR registrado NO BANCO:', {
       apos,
       sacar,
-      velaTimestamp: this.lastEntraSignalVelaTimestamp,
-      timestamp: new Date(this.lastEntraSignalTime).toISOString()
+      velaId: ultimaVela.id,
+      velaTimestamp: ultimaVela.timestamp,
+      timestamp: new Date().toISOString()
     });
   }
 
   async canSendEntraSignal(): Promise<boolean> {
-    // Se nunca enviou sinal ENTRAR, pode enviar
-    if (this.lastEntraSignalTime === null || this.lastEntraSignalVelaTimestamp === null) {
-      return true;
-    }
-
-    // 🔒 PROTEÇÃO SÉRIA: Contar TODAS as velas após o timestamp do último ENTRAR
-    // Query direta no banco sem limitar quantidade
-    const result = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(velas)
-      .where(sql`${velas.timestamp} > ${this.lastEntraSignalVelaTimestamp}`);
-    
-    const velasNovas = Number(result[0]?.count || 0);
     const MINIMO_VELAS = 2; // Precisa passar pelo menos 2 velas
-    
-    if (velasNovas < MINIMO_VELAS) {
-      console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {
+
+    // 🔒 TRANSAÇÃO COM LOCK para prevenir race conditions
+    return await db.transaction(async (tx) => {
+      // Buscar último registro de proteção COM LOCK (FOR UPDATE)
+      const [protecao] = await tx
+        .select()
+        .from(sinaisProtecao)
+        .where(eq(sinaisProtecao.id, 'ultima_entrada'))
+        .for('update'); // Lock da linha - previne race conditions
+
+      // Se nunca enviou sinal ENTRAR, pode enviar
+      if (!protecao) {
+        console.log('[SINAL] ✅ Primeira entrada - nenhum registro de proteção encontrado');
+        return true;
+      }
+
+      // Contar quantas velas passaram desde o último sinal
+      const result = await tx
+        .select({ count: sql<number>`count(*)` })
+        .from(velas)
+        .where(sql`${velas.timestamp} > ${protecao.vela_timestamp}`);
+
+      const velasNovas = Number(result[0]?.count || 0);
+
+      if (velasNovas < MINIMO_VELAS) {
+        console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {
+          velasNovas,
+          minimoNecessario: MINIMO_VELAS,
+          timestampUltimoSinal: protecao.vela_timestamp,
+          registradoEm: protecao.registrado_em,
+          ultimoSinal: this.lastEntraSignalData,
+          motivo: `Aguardando ${MINIMO_VELAS - velasNovas} velas para permitir nova entrada`
+        });
+        return false;
+      }
+
+      console.log('[SINAL] ✅ Proteção liberada - velas suficientes passaram', {
         velasNovas,
         minimoNecessario: MINIMO_VELAS,
-        timestampUltimoSinal: this.lastEntraSignalVelaTimestamp,
-        ultimoSinal: this.lastEntraSignalData,
-        motivo: `Aguardando ${MINIMO_VELAS - velasNovas} velas para permitir nova entrada`
+        timestampUltimoSinal: protecao.vela_timestamp
       });
-      return false;
-    }
-
-    console.log('[SINAL] ✅ Proteção liberada - velas suficientes passaram', {
-      velasNovas,
-      minimoNecessario: MINIMO_VELAS
+      return true;
     });
-    return true;
-  }
-
-  // 🔒 MÉTODO PRIVADO - NÃO EXPORTAR
-  // Este método não deve ser usado por nada - proteção é automática baseada em velas
-  private resetEntraSignal(): void {
-    console.log('[SINAL] ✅ Rastreamento de ENTRAR resetado - pronto para novo sinal', {
-      ultimoSinal: this.lastEntraSignalData
-    });
-    this.lastEntraSignalTime = null;
-    this.lastEntraSignalData = null;
-    this.lastEntraSignalVelaTimestamp = null;
   }
 
   // Feedback de experiência do usuário

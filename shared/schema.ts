@@ -185,3 +185,12 @@ export const insertResultadoClienteSchema = createInsertSchema(resultadosCliente
 
 export type InsertResultadoCliente = z.infer<typeof insertResultadoClienteSchema>;
 export type ResultadoCliente = typeof resultadosClientes.$inferSelect;
+
+// Proteção contra entradas consecutivas - persistente no banco
+export const sinaisProtecao = pgTable("sinais_protecao", {
+  id: varchar("id").primaryKey().default('ultima_entrada'), // Singleton: sempre 1 registro
+  vela_timestamp: timestamp("vela_timestamp").notNull(), // Timestamp da vela quando último ENTRAR foi enviado
+  registrado_em: timestamp("registrado_em").notNull().defaultNow(), // Quando foi registrado
+});
+
+export type SinalProtecao = typeof sinaisProtecao.$inferSelect;
