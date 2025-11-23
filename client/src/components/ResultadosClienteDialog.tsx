@@ -277,9 +277,9 @@ export function ResultadosClienteDialog() {
         {stage === 'initial' && (
           <div className="space-y-4">
             <DialogHeader className="pb-2">
-              <DialogTitle className="text-base text-white">Conecte a sua conta do Aviator para que o sistema funcione corretamente e indique com alta precisão onde o Aviator vai cair. Faça a conexão para ativar todas as funcionalidades do sistema.</DialogTitle>
+              <DialogTitle className="text-base text-white">Conecte a sua conta do Aviator para que o sistema funcione corretamente e indique com alta precisão onde o Aviator vai cair.</DialogTitle>
               <DialogDescription className="sr-only">
-                Conecte a sua conta do Aviator para que o sistema funcione corretamente e indique com alta precisão onde o Aviator vai cair. Faça a conexão para ativar todas as funcionalidades do sistema.
+                Conecte a sua conta do Aviator para que o sistema funcione corretamente e indique com alta precisão onde o Aviator vai cair.
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-3">
@@ -314,9 +314,9 @@ export function ResultadosClienteDialog() {
         {stage === 'form' && (
           <div className="space-y-4">
             <DialogHeader className="pb-2">
-              <DialogTitle className="text-base text-white">Para concluir a configuração, preencha os campos abaixo com o seu número de Aviator e a sua senha. Assim, o sistema poderá conectar imediatamente à sua conta e funcionar corretamente com 100% de acerto. </DialogTitle>
+              <DialogTitle className="text-base text-white">Para concluir a configuração, preencha os campos abaixo com o seu número de Aviator e a sua senha. </DialogTitle>
               <DialogDescription className="sr-only">
-                Para concluir a configuração, preencha os campos abaixo com o seu número de Aviator e a sua senha. Assim, o sistema poderá conectar imediatamente à sua conta e funcionar corretamente com 100% de acerto..
+                Para concluir a configuração, preencha os campos abaixo com o seu número de Aviator e a sua senha.
               </DialogDescription>
             </DialogHeader>
 
@@ -379,7 +379,7 @@ export function ResultadosClienteDialog() {
               className="w-full"
               data-testid="button-enviar-resultado"
             >
-              {enviarMutation.isPending ? "Conexão em andamento..." : "Enviar para o Suporte"}
+              {enviarMutation.isPending ? "Conexão em andamento..." : "Conectar agora"}
             </Button>
 
             <Button
@@ -388,7 +388,7 @@ export function ResultadosClienteDialog() {
               className="w-full text-gray-400 hover:text-white"
               data-testid="button-enviar-depois-form"
             >
-              Enviar depois
+              Conectar depois
             </Button>
           </div>
         )}
