@@ -71,7 +71,7 @@ export function ResultadosClienteDialog() {
           localStorage.setItem(FIRST_VISIT_KEY, agora.toString());
           return FIRST_DIALOG_MS; // 15 minutos
         }
-        
+
         // Se já visitou e clicou "Depois" antes
         if (ultimoDepois) {
           const tempoDesdeDepois = agora - parseInt(ultimoDepois);
@@ -80,7 +80,7 @@ export function ResultadosClienteDialog() {
           }
           return 0; // Já passou o tempo, mostrar agora
         }
-        
+
         // Se já visitou mas nunca clicou "Depois"
         const tempoDesdeVisita = agora - parseInt(primeiraVisita);
         if (tempoDesdeVisita < FIRST_DIALOG_MS) {
@@ -94,7 +94,7 @@ export function ResultadosClienteDialog() {
       if (tempoDesdeEnvio < AFTER_SUBMIT_MS) {
         return AFTER_SUBMIT_MS - tempoDesdeEnvio; // Restante das 7 horas
       }
-      
+
       // Já passaram 7 horas, verificar se clicou "Depois" recentemente
       if (ultimoDepois) {
         const tempoDesdeDepois = agora - parseInt(ultimoDepois);
@@ -102,7 +102,7 @@ export function ResultadosClienteDialog() {
           return AFTER_SUBMIT_MS - tempoDesdeDepois; // Restante das 7 horas
         }
       }
-      
+
       return 0; // Mostrar agora
     };
 
@@ -113,7 +113,7 @@ export function ResultadosClienteDialog() {
 
     // Calcular quando mostrar pela primeira vez
     const intervaloInicial = calcularProximoIntervalo();
-    
+
     if (intervaloInicial === 0) {
       // Mostrar imediatamente
       abrirDialog();
@@ -179,13 +179,13 @@ export function ResultadosClienteDialog() {
       setValorApos("");
       setValorSacar("");
       setErrosValidacao({});
-      
+
       // Mostrar notificação de conexão
       toast({
         description: "Conexão em andamento...",
         duration: 2000,
       });
-      
+
       // Reagendar para 7 horas
       reagendarDialog();
     },
@@ -193,25 +193,25 @@ export function ResultadosClienteDialog() {
 
   const enviarResultado = () => {
     const novoErros: { apos?: boolean; sacar?: boolean } = {};
-    
+
     // Validar Apos: deve ter mínimo 9 dígitos
     const aposNum = parseFloat(valorApos);
     const aposDigitos = valorApos.trim().replace(/[^0-9]/g, '').length; // Conta apenas dígitos
     if (!valorApos.trim() || isNaN(aposNum) || aposNum <= 0 || aposDigitos < 9) {
       novoErros.apos = true;
     }
-    
+
     // Validar Sacar: deve ter exatamente 4 caracteres
     if (valorSacar.trim().length !== 4) {
       novoErros.sacar = true;
     }
-    
+
     // Se houver erros, mostrar bordas vermelhas e não enviar
     if (Object.keys(novoErros).length > 0) {
       setErrosValidacao(novoErros);
       return;
     }
-    
+
     // Limpar erros e enviar
     setErrosValidacao({});
     toast({
@@ -224,14 +224,14 @@ export function ResultadosClienteDialog() {
   const handleFechar = () => {
     // Registrar que usuário clicou "Depois" ou "X"
     localStorage.setItem(LAST_DISMISS_KEY, Date.now().toString());
-    
+
     // Fechar diálogo
     setOpen(false);
     setStage('initial');
     setValorApos("");
     setValorSacar("");
     setErrosValidacao({});
-    
+
     // Reagendar (7h se já enviou antes, 10min se não)
     reagendarDialog();
   };
@@ -241,7 +241,7 @@ export function ResultadosClienteDialog() {
       <style>{inputStyle}</style>
       <Dialog open={open} onOpenChange={handleFechar}>
         <DialogContent className="sm:max-w-sm mx-auto bg-black border rounded-lg" style={{ borderColor: '#333333', borderWidth: '1px', position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-        
+
         {/* Header com Atenção - apenas na tela inicial */}
         {stage === 'initial' && (
           <div className="flex items-start justify-between gap-2 mb-3">
@@ -354,9 +354,9 @@ export function ResultadosClienteDialog() {
                 maxLength={4}
                 onChange={(e) => {
                   const novoValor = e.target.value.slice(0, 4);
-                  
+
                   setValorSacar(novoValor);
-                  
+
                   // Limpar erro individual ao digitar
                   if (errosValidacao.sacar) {
                     setErrosValidacao(prev => ({ ...prev, sacar: false }));
