@@ -183,7 +183,7 @@ class DbStorage {
       .where(sql`${velas.timestamp} > ${this.lastEntraSignalVelaTimestamp}`);
     
     const velasNovas = Number(result[0]?.count || 0);
-    const MINIMO_VELAS = 7; // Precisa passar pelo menos 7 velas (5 + 2 extras)
+    const MINIMO_VELAS = 2; // Precisa passar pelo menos 2 velas
     
     if (velasNovas < MINIMO_VELAS) {
       console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {

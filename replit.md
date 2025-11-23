@@ -77,11 +77,11 @@ Not specified in the original document. The AI should infer these preferences ba
 ### Signal Protection System (UPDATED Nov 2025 - PROTEÇÃO SÉRIA)
 - **🔒 PROTEÇÃO ABSOLUTA contra Entradas Consecutivas**: Sistema NUNCA permite dois sinais "ENTRAR" seguidos
   - **Bloqueio baseado em velas**: Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()` com timestamp da vela atual
-  - **Mínimo de 7 velas**: Sistema só permite novo "ENTRAR" após pelo menos 7 velas novas serem registradas (5 + 2 extras)
+  - **Mínimo de 2 velas**: Sistema só permite novo "ENTRAR" após pelo menos 2 velas novas serem registradas
   - **Conversão automática**: Sinais "ENTRAR" bloqueados são convertidos para "AGUARDAR" com motivo explicativo
   - **Independente do diálogo**: Proteção funciona de forma automática, SEM dependência do diálogo de resultados
 - **Implementação em 2 camadas**:
-  1. `canSendEntraSignal()` em DbStorage - verifica quantas velas passaram desde último sinal, mínimo 7 velas (async)
+  1. `canSendEntraSignal()` em DbStorage - verifica quantas velas passaram desde último sinal, mínimo 2 velas (async)
   2. GET `/api/sacar/cyber` - verifica antes de retornar "ENTRAR", bloqueia e converte se necessário
 - **Logs detalhados**: Todos os bloqueios, registros e liberações são logados no console do servidor com contagem de velas
 
