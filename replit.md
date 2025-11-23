@@ -74,15 +74,23 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Schema Validation**: Zod schemas for all data inputs and outputs, defining models like Vela, HistoricoResponse, EstatisticasResponse, and PadroesResponse.
 - **Client Results Collection**: Dialog timing: 15min (first), 10min (dismissed), 7hr (after submit). Asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality (with duplicate detection and visual badges).
 
-### Signal Protection System (UPDATED Nov 2025 - PROTEÇÃO SÉRIA)
+### Signal Protection System (UPDATED Nov 2025 - PROTEÇÃO CRÍTICA REFORÇADA)
 - **🔒 PROTEÇÃO ABSOLUTA contra Entradas Consecutivas**: Sistema NUNCA permite dois sinais "ENTRAR" seguidos
-  - **Bloqueio baseado em velas**: Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()` com timestamp da vela atual
+  - **Persistência em banco de dados**: Estado salvo na tabela `sinais_protecao` (sobrevive restarts do servidor)
+  - **Transações com lock**: Usa `FOR UPDATE` lock para prevenir race conditions em requisições simultâneas
+  - **Validação de vela**: Rejeita registro se não houver vela válida (previne proteção desabilitada por null)
   - **Mínimo de 2 velas**: Sistema só permite novo "ENTRAR" após pelo menos 2 velas novas serem registradas
   - **Conversão automática**: Sinais "ENTRAR" bloqueados são convertidos para "AGUARDAR" com motivo explicativo
   - **Independente do diálogo**: Proteção funciona de forma automática, SEM dependência do diálogo de resultados
-- **Implementação em 2 camadas**:
-  1. `canSendEntraSignal()` em DbStorage - verifica quantas velas passaram desde último sinal, mínimo 2 velas (async)
-  2. GET `/api/sacar/cyber` - verifica antes de retornar "ENTRAR", bloqueia e converte se necessário
+- **Implementação robusta em 3 camadas**:
+  1. Tabela `sinais_protecao` - armazena timestamp da vela do último ENTRAR (singleton: 1 registro com id='ultima_entrada')
+  2. `registerEntraSignal()` - valida vela existe, faz UPSERT no banco com timestamp
+  3. `canSendEntraSignal()` - transação com lock, conta velas novas, mínimo 2 velas
+  4. GET `/api/sacar/cyber` - verifica antes de retornar "ENTRAR", bloqueia e converte se necessário
+- **Proteção contra falhas críticas**:
+  - ✅ Servidor restart não perde estado (salvo no banco)
+  - ✅ Race conditions bloqueadas (transação + row lock)
+  - ✅ Null timestamp não desabilita proteção (validação obrigatória)
 - **Logs detalhados**: Todos os bloqueios, registros e liberações são logados no console do servidor com contagem de velas
 
 ## External Dependencies
