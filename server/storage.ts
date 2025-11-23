@@ -32,6 +32,7 @@ class DbStorage {
   // Rastreamento de sinais "ENTRAR" para não enviar seguidos
   private lastEntraSignalTime: number | null = null;
   private lastEntraSignalData: { apos: number; sacar: number } | null = null;
+  private lastEntraSignalVelaTimestamp: Date | null = null; // Timestamp da vela quando enviou ENTRAR
 
   async addVela(data: InsertVela) {
     if (data.multiplicador !== -1 && data.multiplicador === this.lastMultiplicador) {
@@ -153,41 +154,64 @@ class DbStorage {
   }
 
   // Rastreamento de sinais ENTRAR - não enviar seguidos
-  registerEntraSignal(apos: number, sacar: number): void {
+  async registerEntraSignal(apos: number, sacar: number): Promise<void> {
+    const ultimaVela = await this.getUltimaVela();
+    
     this.lastEntraSignalTime = Date.now();
     this.lastEntraSignalData = { apos, sacar };
+    this.lastEntraSignalVelaTimestamp = ultimaVela?.timestamp || null;
+    
     console.log('[SINAL] 📍 Sinal ENTRAR registrado:', {
       apos,
       sacar,
+      velaTimestamp: this.lastEntraSignalVelaTimestamp,
       timestamp: new Date(this.lastEntraSignalTime).toISOString()
     });
   }
 
-  canSendEntraSignal(): boolean {
+  async canSendEntraSignal(): Promise<boolean> {
     // Se nunca enviou sinal ENTRAR, pode enviar
-    if (this.lastEntraSignalTime === null) {
+    if (this.lastEntraSignalTime === null || this.lastEntraSignalVelaTimestamp === null) {
       return true;
     }
 
-    // 🔒 PROTEÇÃO SÉRIA: Não enviar segundo sinal ENTRAR seguido
-    // Só permite novo ENTRAR após registrar resultado anterior via resetEntraSignal()
-    const tempoDesdeUltimo = Date.now() - this.lastEntraSignalTime;
+    // 🔒 PROTEÇÃO SÉRIA: Contar TODAS as velas após o timestamp do último ENTRAR
+    // Query direta no banco sem limitar quantidade
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(velas)
+      .where(sql`${velas.timestamp} > ${this.lastEntraSignalVelaTimestamp}`);
     
-    console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {
-      tempoDesdeUltimo: Math.floor(tempoDesdeUltimo / 1000) + 's',
-      ultimoSinal: this.lastEntraSignalData,
-      motivo: 'Aguardando resultado da entrada anterior para permitir nova entrada'
-    });
+    const velasNovas = Number(result[0]?.count || 0);
+    const MINIMO_VELAS = 5; // Precisa passar pelo menos 5 velas
+    
+    if (velasNovas < MINIMO_VELAS) {
+      console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {
+        velasNovas,
+        minimoNecessario: MINIMO_VELAS,
+        timestampUltimoSinal: this.lastEntraSignalVelaTimestamp,
+        ultimoSinal: this.lastEntraSignalData,
+        motivo: `Aguardando ${MINIMO_VELAS - velasNovas} velas para permitir nova entrada`
+      });
+      return false;
+    }
 
-    return false; // SEMPRE bloquear até resetar
+    console.log('[SINAL] ✅ Proteção liberada - velas suficientes passaram', {
+      velasNovas,
+      minimoNecessario: MINIMO_VELAS
+    });
+    return true;
   }
 
-  resetEntraSignal(): void {
+  // 🔒 MÉTODO PRIVADO - NÃO EXPORTAR
+  // Este método não deve ser usado por nada - proteção é automática baseada em velas
+  private resetEntraSignal(): void {
     console.log('[SINAL] ✅ Rastreamento de ENTRAR resetado - pronto para novo sinal', {
       ultimoSinal: this.lastEntraSignalData
     });
     this.lastEntraSignalTime = null;
     this.lastEntraSignalData = null;
+    this.lastEntraSignalVelaTimestamp = null;
   }
 
   // Feedback de experiência do usuário

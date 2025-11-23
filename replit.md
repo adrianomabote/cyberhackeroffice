@@ -76,15 +76,14 @@ Not specified in the original document. The AI should infer these preferences ba
 
 ### Signal Protection System (UPDATED Nov 2025 - PROTEÇÃO SÉRIA)
 - **🔒 PROTEÇÃO ABSOLUTA contra Entradas Consecutivas**: Sistema NUNCA permite dois sinais "ENTRAR" seguidos
-  - **Bloqueio permanente**: Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()` e o sistema BLOQUEIA todas as tentativas seguintes
-  - **Sem timeout**: Não há limite de tempo - a proteção é PERMANENTE até registrar resultado
+  - **Bloqueio baseado em velas**: Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()` com timestamp da vela atual
+  - **Mínimo de 5 velas**: Sistema só permite novo "ENTRAR" após pelo menos 5 velas novas serem registradas
   - **Conversão automática**: Sinais "ENTRAR" bloqueados são convertidos para "AGUARDAR" com motivo explicativo
-  - **Reset manual obrigatório**: Só permite novo "ENTRAR" após usuário registrar resultado via POST `/api/resultados-clientes`, que chama `resetEntraSignal()`
-- **Implementação em 3 camadas**:
-  1. `canSendEntraSignal()` em DbStorage - verifica se pode enviar (retorna false se pendente)
+  - **Independente do diálogo**: Proteção funciona de forma automática, SEM dependência do diálogo de resultados
+- **Implementação em 2 camadas**:
+  1. `canSendEntraSignal()` em DbStorage - verifica quantas velas passaram desde último sinal (async)
   2. GET `/api/sacar/cyber` - verifica antes de retornar "ENTRAR", bloqueia e converte se necessário
-  3. POST `/api/resultados-clientes` - reseta proteção após registrar resultado
-- **Logs detalhados**: Todos os bloqueios, registros e resets são logados no console do servidor
+- **Logs detalhados**: Todos os bloqueios, registros e liberações são logados no console do servidor com contagem de velas
 
 ## External Dependencies
 - **PostgreSQL**: Relational database for data persistence.
