@@ -85,9 +85,11 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Implementação atômica em 1 transação**:
   1. Tabela `sinais_protecao` - armazena timestamp da vela do último ENTRAR (singleton: 1 registro com id='ultima_entrada')
   2. `tryRegisterEntraSignal()` - ÚNICO método que faz TUDO atomicamente:
+     - INSERT ON CONFLICT DO NOTHING com timestamp epoch=0 (marcador primeira vez)
      - Lock da linha (FOR UPDATE)
      - Valida vela existe
-     - Conta velas novas (mínimo 2)
+     - Se timestamp === epoch=0 → primeira vez, UPDATE e retorna {permitido: true}
+     - Se timestamp !== epoch=0 → conta velas novas (mínimo 2)
      - Se permitido → ATUALIZA timestamp E retorna {permitido: true}
      - Se bloqueado → retorna {permitido: false, motivo}
   3. GET `/api/sacar/cyber` - chama tryRegisterEntraSignal(), converte ENTRAR→AGUARDAR se bloqueado
