@@ -74,14 +74,17 @@ Not specified in the original document. The AI should infer these preferences ba
 - **Schema Validation**: Zod schemas for all data inputs and outputs, defining models like Vela, HistoricoResponse, EstatisticasResponse, and PadroesResponse.
 - **Client Results Collection**: Dialog timing: 15min (first), 10min (dismissed), 7hr (after submit). Asks for last winning trade (Apos + Sacar values). Data stored and displayable in admin panel with copy/delete functionality (with duplicate detection and visual badges).
 
-### Signal Protection System (NEW)
-- **No Consecutive Entries**: Sistema rastreia e bloqueia envio de dois sinais "ENTRAR" seguidos
-  - Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()`
-  - Próximos sinais "ENTRAR" dentro de 5 segundos são bloqueados e convertidos em "POSSÍVEL"
-  - Quando usuário registra resultado via POST `/api/resultados-clientes`, rastreamento é resetado com `resetEntraSignal()`
-  - Permite novo sinal "ENTRAR" apenas após resultado anterior ser registrado
-- **Proteção automática**: Implementada via métodos `canSendEntraSignal()` e `resetEntraSignal()` na DbStorage
-- **Logs detalhados**: Sistema registra bloqueios com motivo "Aguardando resultado da entrada anterior..."
+### Signal Protection System (UPDATED Nov 2025 - PROTEÇÃO SÉRIA)
+- **🔒 PROTEÇÃO ABSOLUTA contra Entradas Consecutivas**: Sistema NUNCA permite dois sinais "ENTRAR" seguidos
+  - **Bloqueio permanente**: Quando um sinal "ENTRAR" é enviado, é registrado via `registerEntraSignal()` e o sistema BLOQUEIA todas as tentativas seguintes
+  - **Sem timeout**: Não há limite de tempo - a proteção é PERMANENTE até registrar resultado
+  - **Conversão automática**: Sinais "ENTRAR" bloqueados são convertidos para "AGUARDAR" com motivo explicativo
+  - **Reset manual obrigatório**: Só permite novo "ENTRAR" após usuário registrar resultado via POST `/api/resultados-clientes`, que chama `resetEntraSignal()`
+- **Implementação em 3 camadas**:
+  1. `canSendEntraSignal()` em DbStorage - verifica se pode enviar (retorna false se pendente)
+  2. GET `/api/sacar/cyber` - verifica antes de retornar "ENTRAR", bloqueia e converte se necessário
+  3. POST `/api/resultados-clientes` - reseta proteção após registrar resultado
+- **Logs detalhados**: Todos os bloqueios, registros e resets são logados no console do servidor
 
 ## External Dependencies
 - **PostgreSQL**: Relational database for data persistence.

@@ -374,6 +374,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const historico = await storage.getHistorico(20);
       const analise = analisarOportunidadeEntrada(historico);
 
+      // 🔒 PROTEÇÃO SÉRIA: Verificar se pode enviar sinal ENTRAR
+      if (analise.sinal === "ENTRAR") {
+        const podeEnviar = storage.canSendEntraSignal();
+        
+        if (!podeEnviar) {
+          // BLOQUEAR entrada consecutiva - converter para AGUARDAR
+          console.log('[PROTEÇÃO] ⛔ Sinal ENTRAR bloqueado - convertendo para AGUARDAR');
+          res.json({
+            multiplicador: analise.multiplicador,
+            sinal: "AGUARDAR",
+            confianca: "baixa",
+            motivo: "Aguardando resultado da entrada anterior para permitir nova entrada",
+          });
+          return;
+        }
+        
+        // Registrar sinal ENTRAR permitido
+        storage.registerEntraSignal(
+          analise.multiplicador || 0, 
+          analise.multiplicador || 0
+        );
+        console.log('[PROTEÇÃO] ✅ Sinal ENTRAR permitido e registrado');
+      }
+
       res.json({
         multiplicador: analise.multiplicador,
         sinal: analise.sinal,
@@ -1076,6 +1100,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const resultado = await storage.adicionarResultadoCliente(null, apos, sacar);
+
+      // 🔓 RESETAR proteção de entrada - permite nova entrada após registrar resultado
+      storage.resetEntraSignal();
+      console.log('[PROTEÇÃO] 🔓 Proteção resetada - nova entrada permitida após registro de resultado');
 
       res.json({
         success: true,

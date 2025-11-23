@@ -169,18 +169,17 @@ class DbStorage {
       return true;
     }
 
-    // Não enviar segundo sinal ENTRAR seguido
+    // 🔒 PROTEÇÃO SÉRIA: Não enviar segundo sinal ENTRAR seguido
+    // Só permite novo ENTRAR após registrar resultado anterior via resetEntraSignal()
     const tempoDesdeUltimo = Date.now() - this.lastEntraSignalTime;
-    const pode = tempoDesdeUltimo > 5000; // Esperar ao menos 5 segundos (tempo mínimo de uma vela)
+    
+    console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {
+      tempoDesdeUltimo: Math.floor(tempoDesdeUltimo / 1000) + 's',
+      ultimoSinal: this.lastEntraSignalData,
+      motivo: 'Aguardando resultado da entrada anterior para permitir nova entrada'
+    });
 
-    if (!pode) {
-      console.log('[SINAL] ❌ Bloqueado: Não pode enviar ENTRAR seguido. Aguardando resultado anterior...', {
-        tempoDesdeUltimo: tempoDesdeUltimo + 'ms',
-        ultimoSinal: this.lastEntraSignalData
-      });
-    }
-
-    return pode;
+    return false; // SEMPRE bloquear até resetar
   }
 
   resetEntraSignal(): void {
