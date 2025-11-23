@@ -335,9 +335,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // GET /api/apos/cyber - Retorna última vela registrada
+  // GET /api/apos/cyber - Retorna última vela registrada OU sinal manual APOS
   app.get("/api/apos/cyber", async (req, res) => {
     try {
+      // 🎯 PRIORIDADE 1: Verificar sinais manuais (APOS)
+      const sinaisManual = await storage.getSinaisManual();
+      if (sinaisManual.ativo && sinaisManual.apos !== null) {
+        console.log('[APOS] Retornando sinal manual (APOS):', sinaisManual.apos);
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.json({
+          multiplicador: sinaisManual.apos,
+          timestamp: new Date().toISOString(),
+        });
+        return;
+      }
+
+      // 🤖 PRIORIDADE 2: Última vela do banco
       const ultimaVela = await storage.getUltimaVela();
 
       const response: UltimaVelaResponse = {
@@ -370,7 +385,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // GET /api/sacar/cyber - Retorna análise de oportunidade de entrada
   app.get("/api/sacar/cyber", async (req, res) => {
     try {
-      // Buscar mais velas para análise mais precisa
+      // 🎯 PRIORIDADE 1: Verificar sinais manuais
+      const sinaisManual = await storage.getSinaisManual();
+      if (sinaisManual.ativo && sinaisManual.apos !== null && sinaisManual.sacar !== null) {
+        console.log('[SACAR] Retornando sinais manuais:', {
+          apos: sinaisManual.apos,
+          sacar: sinaisManual.sacar
+        });
+        res.json({
+          multiplicador: sinaisManual.sacar,
+          sinal: "ENTRAR",
+          confianca: "alta",
+          motivo: "Sinal manual ativo (admin)",
+        });
+        return;
+      }
+
+      // 🤖 PRIORIDADE 2: Análise automática
       const historico = await storage.getHistorico(20);
       const analise = analisarOportunidadeEntrada(historico);
 
