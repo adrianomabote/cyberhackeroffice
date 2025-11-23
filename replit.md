@@ -82,11 +82,15 @@ Not specified in the original document. The AI should infer these preferences ba
   - **Mínimo de 2 velas**: Sistema só permite novo "ENTRAR" após pelo menos 2 velas novas serem registradas
   - **Conversão automática**: Sinais "ENTRAR" bloqueados são convertidos para "AGUARDAR" com motivo explicativo
   - **Independente do diálogo**: Proteção funciona de forma automática, SEM dependência do diálogo de resultados
-- **Implementação robusta em 3 camadas**:
+- **Implementação atômica em 1 transação**:
   1. Tabela `sinais_protecao` - armazena timestamp da vela do último ENTRAR (singleton: 1 registro com id='ultima_entrada')
-  2. `registerEntraSignal()` - valida vela existe, faz UPSERT no banco com timestamp
-  3. `canSendEntraSignal()` - transação com lock, conta velas novas, mínimo 2 velas
-  4. GET `/api/sacar/cyber` - verifica antes de retornar "ENTRAR", bloqueia e converte se necessário
+  2. `tryRegisterEntraSignal()` - ÚNICO método que faz TUDO atomicamente:
+     - Lock da linha (FOR UPDATE)
+     - Valida vela existe
+     - Conta velas novas (mínimo 2)
+     - Se permitido → ATUALIZA timestamp E retorna {permitido: true}
+     - Se bloqueado → retorna {permitido: false, motivo}
+  3. GET `/api/sacar/cyber` - chama tryRegisterEntraSignal(), converte ENTRAR→AGUARDAR se bloqueado
 - **Proteção contra falhas críticas**:
   - ✅ Servidor restart não perde estado (salvo no banco)
   - ✅ Race conditions bloqueadas (transação + row lock)

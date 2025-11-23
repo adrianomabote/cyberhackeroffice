@@ -152,62 +152,60 @@ class DbStorage {
     console.log('[STORAGE] Cache limpo');
   }
 
-  // Rastreamento de sinais ENTRAR - persistente no banco
-  async registerEntraSignal(apos: number, sacar: number): Promise<void> {
+  // 🔒 PROTEÇÃO ATÔMICA: Verificar E registrar em UMA transação
+  // Retorna { permitido: boolean, motivo?: string }
+  async tryRegisterEntraSignal(apos: number, sacar: number): Promise<{ permitido: boolean; motivo?: string }> {
+    const MINIMO_VELAS = 2;
+    
+    // Validar vela existe ANTES da transação
     const ultimaVela = await this.getUltimaVela();
-    
-    // 🔒 VALIDAÇÃO CRÍTICA: Não permitir registrar se não houver velas
     if (!ultimaVela || !ultimaVela.timestamp) {
-      console.error('[SINAL] ❌ ERRO CRÍTICO: Tentativa de registrar sinal sem vela válida!');
-      throw new Error('Não é possível registrar sinal ENTRAR sem vela válida no banco');
+      console.error('[SINAL] ❌ ERRO: Sem vela válida no banco');
+      return { permitido: false, motivo: 'Sistema sem dados suficientes' };
     }
-    
-    // Salvar no banco de forma persistente (UPSERT - sempre 1 registro)
-    await db.insert(sinaisProtecao)
-      .values({
-        id: 'ultima_entrada',
-        vela_timestamp: ultimaVela.timestamp,
-      })
-      .onConflictDoUpdate({
-        target: sinaisProtecao.id,
-        set: {
-          vela_timestamp: ultimaVela.timestamp,
-          registrado_em: sql`NOW()`,
-        },
-      });
-    
-    // Atualizar cache local apenas para logs
-    this.lastEntraSignalTime = Date.now();
-    this.lastEntraSignalData = { apos, sacar };
-    
-    console.log('[SINAL] 📍 Sinal ENTRAR registrado NO BANCO:', {
-      apos,
-      sacar,
-      velaId: ultimaVela.id,
-      velaTimestamp: ultimaVela.timestamp,
-      timestamp: new Date().toISOString()
-    });
-  }
 
-  async canSendEntraSignal(): Promise<boolean> {
-    const MINIMO_VELAS = 2; // Precisa passar pelo menos 2 velas
-
-    // 🔒 TRANSAÇÃO COM LOCK para prevenir race conditions
+    // 🔒 TRANSAÇÃO ATÔMICA: Lock + Check + Update em UMA operação
     return await db.transaction(async (tx) => {
-      // Buscar último registro de proteção COM LOCK (FOR UPDATE)
+      // 1. UPSERT para garantir registro existe (previne erro 500 em race)
+      // Usa timestamp epoch=0 como marcador de "primeira vez"
+      const timestampEpoch = new Date(0); // 1970-01-01 (impossível ser vela real)
+      
+      await tx
+        .insert(sinaisProtecao)
+        .values({
+          id: 'ultima_entrada',
+          vela_timestamp: timestampEpoch, // Marcador: primeira vez
+        })
+        .onConflictDoNothing(); // Se já existe, ignora
+
+      // 2. SELECT FOR UPDATE (lock garantido - registro existe)
       const [protecao] = await tx
         .select()
         .from(sinaisProtecao)
         .where(eq(sinaisProtecao.id, 'ultima_entrada'))
-        .for('update'); // Lock da linha - previne race conditions
+        .for('update');
 
-      // Se nunca enviou sinal ENTRAR, pode enviar
-      if (!protecao) {
-        console.log('[SINAL] ✅ Primeira entrada - nenhum registro de proteção encontrado');
-        return true;
+      // 3. Verificar se é primeira execução (timestamp epoch)
+      if (protecao.vela_timestamp.getTime() === 0) {
+        // Primeira vez - UPDATE para timestamp real e PERMITIR
+        await tx
+          .update(sinaisProtecao)
+          .set({
+            vela_timestamp: ultimaVela.timestamp,
+            registrado_em: sql`NOW()`,
+          })
+          .where(eq(sinaisProtecao.id, 'ultima_entrada'));
+
+        this.lastEntraSignalTime = Date.now();
+        this.lastEntraSignalData = { apos, sacar };
+
+        console.log('[SINAL] ✅ PRIMEIRA entrada registrada:', {
+          apos, sacar, velaTimestamp: ultimaVela.timestamp
+        });
+        return { permitido: true };
       }
 
-      // Contar quantas velas passaram desde o último sinal
+      // 4. Não é primeira vez - contar velas
       const result = await tx
         .select({ count: sql<number>`count(*)` })
         .from(velas)
@@ -215,24 +213,37 @@ class DbStorage {
 
       const velasNovas = Number(result[0]?.count || 0);
 
+      // 5. Bloquear se < 2 velas
       if (velasNovas < MINIMO_VELAS) {
-        console.log('[SINAL] ❌❌❌ BLOQUEADO: Entrada consecutiva não permitida!', {
+        const motivo = `Aguarde ${MINIMO_VELAS - velasNovas} vela(s) para nova entrada`;
+        console.log('[SINAL] ❌ BLOQUEADO:', {
           velasNovas,
-          minimoNecessario: MINIMO_VELAS,
-          timestampUltimoSinal: protecao.vela_timestamp,
-          registradoEm: protecao.registrado_em,
-          ultimoSinal: this.lastEntraSignalData,
-          motivo: `Aguardando ${MINIMO_VELAS - velasNovas} velas para permitir nova entrada`
+          necessario: MINIMO_VELAS,
+          timestampAtual: protecao.vela_timestamp,
+          motivo
         });
-        return false;
+        return { permitido: false, motivo };
       }
 
-      console.log('[SINAL] ✅ Proteção liberada - velas suficientes passaram', {
-        velasNovas,
-        minimoNecessario: MINIMO_VELAS,
-        timestampUltimoSinal: protecao.vela_timestamp
+      // 6. Permitir E ATUALIZAR
+      await tx
+        .update(sinaisProtecao)
+        .set({
+          vela_timestamp: ultimaVela.timestamp,
+          registrado_em: sql`NOW()`,
+        })
+        .where(eq(sinaisProtecao.id, 'ultima_entrada'));
+
+      this.lastEntraSignalTime = Date.now();
+      this.lastEntraSignalData = { apos, sacar };
+
+      console.log('[SINAL] ✅ Entrada PERMITIDA:', {
+        apos, sacar,
+        velasPassaram: velasNovas,
+        novoTimestamp: ultimaVela.timestamp
       });
-      return true;
+      
+      return { permitido: true };
     });
   }
 

@@ -374,28 +374,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const historico = await storage.getHistorico(20);
       const analise = analisarOportunidadeEntrada(historico);
 
-      // 🔒 PROTEÇÃO SÉRIA: Verificar se pode enviar sinal ENTRAR
+      // 🔒 PROTEÇÃO ATÔMICA: Verificar E registrar em UMA transação
       if (analise.sinal === "ENTRAR") {
-        const podeEnviar = await storage.canSendEntraSignal();
+        const resultado = await storage.tryRegisterEntraSignal(
+          analise.multiplicador || 0,
+          analise.multiplicador || 0
+        );
         
-        if (!podeEnviar) {
-          // BLOQUEAR entrada consecutiva - converter para AGUARDAR
-          console.log('[PROTEÇÃO] ⛔ Sinal ENTRAR bloqueado - convertendo para AGUARDAR');
+        if (!resultado.permitido) {
+          // BLOQUEADO - converter para AGUARDAR
+          console.log('[PROTEÇÃO] ⛔ Sinal ENTRAR bloqueado:', resultado.motivo);
           res.json({
             multiplicador: analise.multiplicador,
             sinal: "AGUARDAR",
             confianca: "baixa",
-            motivo: "Aguardando mais velas para permitir nova entrada",
+            motivo: resultado.motivo || "Aguardando mais velas",
           });
           return;
         }
         
-        // Registrar sinal ENTRAR permitido
-        await storage.registerEntraSignal(
-          analise.multiplicador || 0, 
-          analise.multiplicador || 0
-        );
-        console.log('[PROTEÇÃO] ✅ Sinal ENTRAR permitido e registrado');
+        console.log('[PROTEÇÃO] ✅ Sinal ENTRAR permitido e registrado atomicamente');
       }
 
       res.json({
