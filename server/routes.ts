@@ -392,7 +392,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           apos: sinaisManual.apos,
           sacar: sinaisManual.sacar
         });
-        await storage.markSinaisAsReturned(); // Rastrear quando foi retornado
         res.json({
           multiplicador: sinaisManual.sacar,
           sinal: "ENTRAR",
@@ -404,23 +403,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // 🤖 PRIORIDADE 2: Análise automática
       const historico = await storage.getHistorico(20);
-      const ultimaVela = historico[0];
       const analise = analisarOportunidadeEntrada(historico);
-
-      // 🚫 SE ENTRAR JÁ FOI RETORNADO PARA ESTA VELA, NÃO REPETIR
-      if (analise.sinal === "ENTRAR" && ultimaVela) {
-        const jaFoiRetornado = await storage.wasEntraAlreadyReturnedForVela(ultimaVela.id);
-        if (jaFoiRetornado) {
-          console.log('[ANÁLISE] ENTRAR já foi retornado para esta vela:', ultimaVela.id);
-          res.json({
-            multiplicador: analise.multiplicador,
-            sinal: "AGUARDAR",
-            confianca: "baixa",
-            motivo: "Sinal ENTRAR já foi consumido para esta vela",
-          });
-          return;
-        }
-      }
 
       // 🔒 PROTEÇÃO ATÔMICA: Verificar E registrar em UMA transação
       if (analise.sinal === "ENTRAR") {
@@ -442,11 +425,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         console.log('[PROTEÇÃO] ✅ Sinal ENTRAR permitido e registrado atomicamente');
-        
-        // ✅ MARCAR que este ENTRAR foi retornado para esta vela
-        if (ultimaVela) {
-          await storage.markVelaAsEntraReturned(ultimaVela.id);
-        }
       }
 
       res.json({
