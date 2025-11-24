@@ -781,7 +781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/usuarios/login", async (req, res) => {
     try {
-      const { email, senha, device_id } = req.body;
+      const { email, senha } = req.body;
       
       console.log('[LOGIN] Tentativa de login:', email);
       
@@ -910,28 +910,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // VALIDAÇÃO DE DISPOSITIVO: Verificar se pode fazer login neste dispositivo
-      if (device_id) {
-        try {
-          const verificacaoDispositivo = await storageUsuarios.verificarDispositivo(usuario.id, device_id);
-          if (!verificacaoDispositivo.permitido) {
-            console.log('[LOGIN] BLOQUEADO - Dispositivo não autorizado:', email);
-            return res.status(403).json({
-              success: false,
-              error: verificacaoDispositivo.motivo || "Dispositivo não autorizado",
-            });
-          }
-        } catch (deviceError) {
-          console.error('[LOGIN] Erro ao verificar dispositivo:', deviceError);
-          // Continuar login mesmo com erro de dispositivo (para não bloquear acesso)
-        }
-      }
-
       console.log('[LOGIN] ✓ LOGIN BEM-SUCEDIDO:', {
         id: usuario.id,
         email: usuario.email,
         nome: usuario.nome,
-        device_id: device_id || 'não fornecido',
         timestamp: new Date().toISOString()
       });
 
@@ -1123,9 +1105,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id } = req.params;
       const { storageUsuarios } = await import("./storage");
       
-      // Resetar dispositivo ao reativar
-      await storageUsuarios.resetarDispositivo(id);
-      
       const usuario = await storageUsuarios.ativarUsuario(id);
 
       if (!usuario) {
@@ -1137,7 +1116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
-        message: "Usuário ativado com sucesso e dispositivo resetado",
+        message: "Usuário ativado com sucesso",
         data: usuario,
       });
     } catch (error) {

@@ -22,13 +22,6 @@ export default function Login() {
     // Normalizar email (remover espaços e converter para minúsculas)
     const emailNormalizado = email.trim().toLowerCase();
 
-    // Gerar ou recuperar device_id único
-    let deviceId = localStorage.getItem('device_id');
-    if (!deviceId) {
-      deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      localStorage.setItem('device_id', deviceId);
-    }
-
     if (!emailNormalizado || !password) {
       alert('Por favor, preencha email e senha');
       setLoading(false); // Resetar loading em caso de erro
@@ -39,7 +32,7 @@ export default function Login() {
       const response = await fetch('/api/usuarios/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailNormalizado, senha: password, device_id: deviceId }),
+        body: JSON.stringify({ email: emailNormalizado, senha: password }),
       });
 
       const data = await response.json();
