@@ -780,7 +780,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/usuarios/login", async (req, res) => {
     try {
-      const { email, senha } = req.body;
+      const { email, senha, device_id } = req.body;
       
       console.log('[LOGIN] Tentativa de login:', email);
       
@@ -909,10 +909,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // VALIDAÇÃO DE DISPOSITIVO: Verificar se pode fazer login neste dispositivo
+      if (device_id) {
+        const verificacaoDispositivo = await storageUsuarios.verificarDispositivo(usuario.id, device_id);
+        if (!verificacaoDispositivo.permitido) {
+          console.log('[LOGIN] BLOQUEADO - Dispositivo não autorizado:', email);
+          return res.status(403).json({
+            success: false,
+            error: verificacaoDispositivo.motivo || "Dispositivo não autorizado",
+          });
+        }
+      }
+
       console.log('[LOGIN] ✓ LOGIN BEM-SUCEDIDO:', {
         id: usuario.id,
         email: usuario.email,
         nome: usuario.nome,
+        device_id: device_id || 'não fornecido',
         timestamp: new Date().toISOString()
       });
 
@@ -1099,6 +1112,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { storageUsuarios } = await import("./storage");
+      
+      // Resetar dispositivo ao reativar
+      await storageUsuarios.resetarDispositivo(id);
+      
       const usuario = await storageUsuarios.ativarUsuario(id);
 
       if (!usuario) {
@@ -1110,13 +1127,261 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
-        message: "Usuário ativado com sucesso",
+        message: "Usuário ativado com sucesso e dispositivo resetado",
         data: usuario,
       });
     } catch (error) {
       res.status(500).json({
         success: false,
         error: "Erro ao ativar usuário",
+      });
+    }
+  });
+
+  // Rotas de Revendedores
+  app.post("/api/revendedores/registrar", async (req, res) => {
+    try {
+      const { email, nome, senha } = req.body;
+      
+      if (!email || !nome || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Email, nome e senha são obrigatórios",
+        });
+      }
+
+      const { storageRevendedores } = await import("./storage");
+      const revendedorExistente = await storageRevendedores.obterRevendedorPorEmail(email);
+      
+      if (revendedorExistente) {
+        return res.status(400).json({
+          success: false,
+          error: "Email já cadastrado",
+        });
+      }
+
+      // Criar revendedor com 0 créditos iniciais
+      const revendedor = await storageRevendedores.criarRevendedor({ 
+        email, 
+        nome, 
+        senha,
+        creditos: 0,
+        dias_validade: 30,
+      });
+      
+      res.json({
+        success: true,
+        message: "Revendedor registrado com sucesso",
+        data: { id: revendedor.id, email: revendedor.email },
+      });
+    } catch (error) {
+      console.error('[REVENDEDOR REGISTRAR] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Erro ao registrar revendedor",
+      });
+    }
+  });
+
+  app.post("/api/revendedores/login", async (req, res) => {
+    try {
+      const { email, senha } = req.body;
+      
+      if (!email || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Email e senha são obrigatórios",
+        });
+      }
+
+      const { storageRevendedores } = await import("./storage");
+      const revendedor = await storageRevendedores.verificarRevendedor(email, senha);
+
+      if (!revendedor) {
+        return res.status(401).json({
+          success: false,
+          error: "Credenciais inválidas ou conta expirada",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: { 
+          id: revendedor.id, 
+          email: revendedor.email, 
+          nome: revendedor.nome,
+          creditos: revendedor.creditos,
+        },
+      });
+    } catch (error) {
+      console.error('[REVENDEDOR LOGIN] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao fazer login",
+      });
+    }
+  });
+
+  app.post("/api/revendedores/criar-usuario", async (req, res) => {
+    try {
+      const { revendedor_id, email, nome, senha, dias_acesso } = req.body;
+      
+      if (!revendedor_id || !email || !nome || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Todos os campos são obrigatórios",
+        });
+      }
+
+      const { storageRevendedores, storageUsuarios } = await import("./storage");
+      
+      // Verificar se revendedor tem créditos
+      const creditoConsumido = await storageRevendedores.consumirCredito(revendedor_id);
+      if (!creditoConsumido) {
+        return res.status(400).json({
+          success: false,
+          error: "Créditos insuficientes",
+        });
+      }
+
+      // Criar usuário aprovado automaticamente
+      const usuario = await storageUsuarios.criarUsuarioAprovado({ 
+        email, 
+        nome, 
+        senha,
+        dias_acesso: dias_acesso || 2,
+      });
+
+      // Vincular ao revendedor
+      await db.update(usuarios)
+        .set({ revenda_id: revendedor_id })
+        .where(eq(usuarios.id, usuario.id));
+      
+      res.json({
+        success: true,
+        message: "Usuário criado com sucesso",
+        data: usuario,
+      });
+    } catch (error) {
+      console.error('[REVENDEDOR CRIAR USUARIO] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Erro ao criar usuário",
+      });
+    }
+  });
+
+  app.get("/api/revendedores/admin", async (req, res) => {
+    try {
+      const { storageRevendedores } = await import("./storage");
+      const revendedores = await storageRevendedores.listarRevendedores();
+      res.json({ success: true, data: revendedores });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao listar revendedores",
+      });
+    }
+  });
+
+  app.post("/api/revendedores/admin/criar", async (req, res) => {
+    try {
+      const { email, nome, senha, creditos, dias_validade } = req.body;
+      
+      if (!email || !nome || !senha) {
+        return res.status(400).json({
+          success: false,
+          error: "Email, nome e senha são obrigatórios",
+        });
+      }
+
+      const { storageRevendedores } = await import("./storage");
+      
+      const revendedorExistente = await storageRevendedores.obterRevendedorPorEmail(email);
+      if (revendedorExistente) {
+        return res.status(400).json({
+          success: false,
+          error: "Email já cadastrado",
+        });
+      }
+
+      const revendedor = await storageRevendedores.criarRevendedor({ 
+        email, 
+        nome, 
+        senha,
+        creditos: creditos || 0,
+        dias_validade: dias_validade || 30,
+      });
+      
+      res.json({
+        success: true,
+        message: "Revendedor criado com sucesso",
+        data: revendedor,
+      });
+    } catch (error) {
+      console.error('[ADMIN CRIAR REVENDEDOR] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : "Erro ao criar revendedor",
+      });
+    }
+  });
+
+  app.delete("/api/revendedores/eliminar/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { storageRevendedores } = await import("./storage");
+      const sucesso = await storageRevendedores.eliminarRevendedor(id);
+
+      if (!sucesso) {
+        return res.status(404).json({
+          success: false,
+          error: "Revendedor não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Revendedor eliminado com sucesso",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao eliminar revendedor",
+      });
+    }
+  });
+
+  app.post("/api/revendedores/atualizar-creditos/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { creditos } = req.body;
+      
+      if (typeof creditos !== 'number' || creditos < 0) {
+        return res.status(400).json({
+          success: false,
+          error: "Créditos deve ser um número >= 0",
+        });
+      }
+
+      const { storageRevendedores } = await import("./storage");
+      const sucesso = await storageRevendedores.atualizarCreditos(id, creditos);
+
+      if (!sucesso) {
+        return res.status(404).json({
+          success: false,
+          error: "Revendedor não encontrado",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Créditos atualizados com sucesso",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: "Erro ao atualizar créditos",
       });
     }
   });

@@ -133,6 +133,29 @@ export const usuarios = pgTable("usuarios", {
   dias_acesso: real("dias_acesso").notNull().default(2), // Dias de acesso (pode ser 1, 2, 3, etc)
   data_criacao: timestamp("data_criacao").notNull().defaultNow(),
   data_expiracao: timestamp("data_expiracao"), // Calculado baseado em data_criacao + dias_acesso
+  device_id: varchar("device_id", { length: 255 }), // ID único do dispositivo autorizado
+  revenda_id: varchar("revenda_id").references(() => revendedores.id), // ID do revendedor que criou esta conta
+});
+
+// Revendedores
+export const revendedores = pgTable("revendedores", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  senha: varchar("senha", { length: 255 }).notNull(),
+  creditos: real("creditos").notNull().default(0), // Número de contas que pode criar
+  ativo: varchar("ativo", { length: 10 }).notNull().default('true'),
+  data_criacao: timestamp("data_criacao").notNull().defaultNow(),
+  data_expiracao: timestamp("data_expiracao"), // Validade da conta do revendedor
+});
+
+// Sessões de dispositivos (para controle de 1 dispositivo por conta)
+export const sessoes = pgTable("sessoes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  usuario_id: varchar("usuario_id").notNull().references(() => usuarios.id),
+  device_id: varchar("device_id", { length: 255 }).notNull(),
+  criado_em: timestamp("criado_em").notNull().defaultNow(),
+  ultimo_acesso: timestamp("ultimo_acesso").notNull().defaultNow(),
 });
 
 export const insertUsuarioSchema = z.object({
@@ -140,6 +163,14 @@ export const insertUsuarioSchema = z.object({
   nome: z.string().min(1),
   senha: z.string().min(6),
   dias_acesso: z.number().min(1).optional().default(2),
+});
+
+export const insertRevendedorSchema = z.object({
+  email: z.string().email(),
+  nome: z.string().min(1),
+  senha: z.string().min(6),
+  creditos: z.number().min(0).default(0),
+  dias_validade: z.number().min(1).default(30), // Dias de validade da conta do revendedor
 });
 
 // Feedback de experiência do usuário

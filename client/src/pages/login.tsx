@@ -13,15 +13,25 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // Adicionado estado de loading
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     // Normalizar email (remover espaços e converter para minúsculas)
     const emailNormalizado = email.trim().toLowerCase();
 
+    // Gerar ou recuperar device_id único
+    let deviceId = localStorage.getItem('device_id');
+    if (!deviceId) {
+      deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('device_id', deviceId);
+    }
+
     if (!emailNormalizado || !password) {
       alert('Por favor, preencha email e senha');
+      setLoading(false); // Resetar loading em caso de erro
       return;
     }
 
@@ -29,7 +39,7 @@ export default function Login() {
       const response = await fetch('/api/usuarios/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailNormalizado, senha: password }),
+        body: JSON.stringify({ email: emailNormalizado, senha: password, device_id: deviceId }),
       });
 
       const data = await response.json();
@@ -39,10 +49,12 @@ export default function Login() {
         setLocation('/welcome');
       } else {
         alert(data.error || 'Erro ao fazer login');
+        setLoading(false); // Resetar loading em caso de erro
       }
     } catch (error) {
       console.error('Erro no login:', error);
       alert('Erro de conexão. Verifique sua internet e tente novamente.');
+      setLoading(false); // Resetar loading em caso de erro
     }
   };
 
@@ -120,8 +132,9 @@ export default function Login() {
                 boxShadow: '0 0 20px rgba(255, 0, 0, 0.3)'
               }}
               data-testid="button-submit"
+              disabled={loading} // Desabilitar botão enquanto carrega
             >
-              Entrar
+              {loading ? 'Entrando...' : 'Entrar'}
             </Button>
             <p className="text-sm text-gray-400 text-center" data-testid="text-signup-link">
               Não tem uma conta?{' '}

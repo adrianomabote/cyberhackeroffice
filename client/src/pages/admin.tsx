@@ -243,6 +243,23 @@ export default function Admin() {
           </button>
         </div>
 
+        {/* Botão Gerenciar Revendedores */}
+        <div className="mb-4">
+          <button
+            onClick={() => setLocation('/admin/revendedores')}
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+            style={{
+              backgroundColor: '#ffaa00',
+              color: '#000000',
+              fontSize: '1.25rem',
+              border: 'none',
+            }}
+            data-testid="button-gerenciar-revendedores"
+          >
+            🏪 GERENCIAR REVENDEDORES
+          </button>
+        </div>
+
         {/* Botão Ver Resultados dos Clientes */}
         <div className="mb-8">
           <button

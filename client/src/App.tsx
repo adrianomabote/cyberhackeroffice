@@ -16,6 +16,9 @@ import Admin from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import AdminUsuarios from "@/pages/admin-usuarios";
 import AdminResultadosClientes from "@/pages/admin-resultados-clientes";
+import AdminRevendedores from "@/pages/admin-revendedores"; // New import
+import RevendedorLogin from "@/pages/revendedor-login"; // New import
+import PainelRevendedor from "@/pages/painel-revendedor"; // New import
 import Welcome from "@/pages/welcome";
 import NotFound from "@/pages/not-found";
 
@@ -39,8 +42,11 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/usuarios" component={AdminUsuarios} />
       <Route path="/admin/resultados-clientes" component={AdminResultadosClientes} />
+      <Route path="/admin/revendedores" component={AdminRevendedores} /> {/* New route */}
+      <Route path="/revendedor/login" component={RevendedorLogin} /> {/* New route */}
+      <Route path="/painel-revendedor" component={PainelRevendedor} /> {/* New route */}
 
-            {/* 404 */}
+      {/* 404 */}
       <Route>
         <NotFound />
       </Route>
