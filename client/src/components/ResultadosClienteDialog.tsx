@@ -30,10 +30,14 @@ const inputStyle = `
   }
 `;
 
-// ⏱️ NOVA LÓGICA DE INTERVALOS
-const FIRST_DIALOG_MS = 15 * 60 * 1000; // 15 minutos (primeira aparição)
-const RETRY_INTERVAL_MS = 10 * 60 * 1000; // 10 minutos (se não enviar)
-const AFTER_SUBMIT_MS = 7 * 60 * 60 * 1000; // 7 horas (após envio)
+// ⏱️ NOVA LÓGICA DE INTERVALOS:
+// 1. Primeira aparição: 7 minutos após entrar
+// 2. Se NÃO enviar (clicou "Depois" ou "X"): Repetir a cada 7 minutos
+// 3. Se ENVIAR: Mostrar após 5 horas
+// 4. Após 5 horas: Repetir a cada 5 horas
+const FIRST_DIALOG_MS = 7 * 60 * 1000; // 7 minutos (primeira aparição)
+const RETRY_INTERVAL_MS = 7 * 60 * 1000; // 7 minutos (se não enviar)
+const AFTER_SUBMIT_MS = 5 * 60 * 60 * 1000; // 5 horas (após envio)
 const LOADING_DURATION_MS = 4 * 1000; // 4 segundos
 
 // LocalStorage keys
@@ -53,10 +57,10 @@ export function ResultadosClienteDialog() {
   const queryClient = useQueryClient();
 
   // ⏱️ NOVA LÓGICA DE INTERVALOS:
-  // 1. Primeira aparição: 7 minutos
-  // 2. Se NÃO enviar (clicou "Depois"): Repetir a cada 10 minutos
-  // 3. Se ENVIAR: Mostrar após 7 horas
-  // 4. Após 7 horas sem enviar: Repetir a cada 7 horas
+  // 1. Primeira aparição: 7 minutos após entrar
+  // 2. Se NÃO enviar (clicou "Depois" ou "X"): Repetir a cada 7 minutos
+  // 3. Se ENVIAR: Mostrar após 5 horas
+  // 4. Após 5 horas: Repetir a cada 5 horas
   useEffect(() => {
     const calcularProximoIntervalo = (): number => {
       const primeiraVisita = localStorage.getItem(FIRST_VISIT_KEY);
@@ -69,23 +73,22 @@ export function ResultadosClienteDialog() {
         // Se nunca visitou, registrar primeira visita
         if (!primeiraVisita) {
           localStorage.setItem(FIRST_VISIT_KEY, agora.toString());
-          return 7 * 60 * 1000; // 7 minutos // 15 minutos
+          return FIRST_DIALOG_MS; // 7 minutos
         }
 
-        // Se já visitou e clicou "Depois" antes
+        // Se clicou "Depois" antes
         if (ultimoDepois) {
           const tempoDesdeDepois = agora - parseInt(ultimoDepois);
           if (tempoDesdeDepois < RETRY_INTERVAL_MS) {
-            return RETRY_INTERVAL_MS - tempoDesdeDepois; // Restante dos 10 minutos
+            return RETRY_INTERVAL_MS - tempoDesdeDepois; // Restante dos 7 minutos
           }
           return 0; // Já passou o tempo, mostrar agora
         }
 
         // Se já visitou mas nunca clicou "Depois"
         const tempoDesdeVisita = agora - parseInt(primeiraVisita);
-        const SETE_MINUTOS = 7 * 60 * 1000;
-        if (tempoDesdeVisita < SETE_MINUTOS) {
-          return SETE_MINUTOS - tempoDesdeVisita; // Restante dos 7 minutos
+        if (tempoDesdeVisita < FIRST_DIALOG_MS) {
+          return FIRST_DIALOG_MS - tempoDesdeVisita; // Restante dos 7 minutos
         }
         return 0; // Já passou o tempo, mostrar agora
       }
@@ -93,14 +96,14 @@ export function ResultadosClienteDialog() {
       // Se já enviou alguma vez
       const tempoDesdeEnvio = agora - parseInt(ultimoEnvio);
       if (tempoDesdeEnvio < AFTER_SUBMIT_MS) {
-        return AFTER_SUBMIT_MS - tempoDesdeEnvio; // Restante das 7 horas
+        return AFTER_SUBMIT_MS - tempoDesdeEnvio; // Restante das 5 horas
       }
 
-      // Já passaram 7 horas, verificar se clicou "Depois" recentemente
+      // Já passaram 5 horas, verificar se clicou "Depois" recentemente
       if (ultimoDepois) {
         const tempoDesdeDepois = agora - parseInt(ultimoDepois);
         if (tempoDesdeDepois < AFTER_SUBMIT_MS) {
-          return AFTER_SUBMIT_MS - tempoDesdeDepois; // Restante das 7 horas
+          return AFTER_SUBMIT_MS - tempoDesdeDepois; // Restante das 5 horas
         }
       }
 
@@ -154,7 +157,7 @@ export function ResultadosClienteDialog() {
 
     // Calcular próximo intervalo
     const ultimoEnvio = localStorage.getItem(LAST_SUBMIT_KEY);
-    const intervalo = ultimoEnvio ? AFTER_SUBMIT_MS : RETRY_INTERVAL_MS; // 7h se já enviou, 10min se não
+    const intervalo = ultimoEnvio ? AFTER_SUBMIT_MS : RETRY_INTERVAL_MS; // 5h se já enviou, 7min se não
 
     // Agendar próxima abertura
     timerRef.current = setTimeout(() => {
@@ -187,7 +190,7 @@ export function ResultadosClienteDialog() {
         duration: 2000,
       });
 
-      // Reagendar para 7 horas
+      // Reagendar para 5 horas
       reagendarDialog();
     },
   });
@@ -233,7 +236,7 @@ export function ResultadosClienteDialog() {
     setValorSacar("");
     setErrosValidacao({});
 
-    // Reagendar (7h se já enviou antes, 10min se não)
+    // Reagendar (5h se já enviou antes, 7min se não)
     reagendarDialog();
   };
 
