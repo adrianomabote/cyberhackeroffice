@@ -124,20 +124,18 @@ export type SinaisManualInput = z.infer<typeof sinaisManualSchema>;
 
 // Usuários
 export const usuarios = pgTable("usuarios", {
-  id: text("id").primaryKey().notNull().$defaultFn(() => crypto.randomUUID()),
-  email: text("email").notNull().unique(),
-  nome: text("nome").notNull(),
-  senha: text("senha").notNull(),
-  aprovado: text("aprovado").notNull().default('false'),
-  ativo: text("ativo").notNull().default('true'),
-  tipo: text("tipo").notNull().default('cliente'), // 'cliente' ou 'revendedor'
-  creditos: integer("creditos").notNull().default(0),
-  dias_validade: integer("dias_validade").notNull().default(30),
-  compartilhamentos: integer("compartilhamentos").notNull().default(0),
-  dias_acesso: integer("dias_acesso").notNull().default(2),
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").notNull().unique(),
+  nome: varchar("nome").notNull(),
+  senha: varchar("senha").notNull(),
+  aprovado: varchar("aprovado").notNull().default('false'),
+  ativo: varchar("ativo").notNull().default('true'),
+  compartilhamentos: real("compartilhamentos").notNull().default(0),
+  dias_acesso: real("dias_acesso").notNull().default(2),
+  data_criacao: timestamp("data_criacao").defaultNow(),
   data_expiracao: timestamp("data_expiracao"),
-  criado_em: timestamp("criado_em").defaultNow().notNull(),
-  revenda_id: text("revenda_id"),
+  device_id: varchar("device_id"),
+  revenda_id: varchar("revenda_id"),
 });
 
 // Revendedores

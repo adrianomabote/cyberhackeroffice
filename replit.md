@@ -41,6 +41,64 @@ Not specified in the original document. The AI should infer these preferences ba
   - API endpoints: POST/GET/DELETE at `/api/resultados-clientes` and `/api/resultados-clientes/lista`
   - Duplicate detection system shows visual badges for repeated entries
 
+### Admin User Management System (UPDATED Nov 2025)
+- Access: `/admin/usuarios` (requires admin authentication)
+- **User Display**: Shows all users with full status information (aprovado/desaprovado, ativo/desativado)
+- **Admin Actions per User**:
+  - ✅ **Aprovar** - Approve pending user accounts (sets aprovado='true', recalculates data_expiracao)
+  - 🟠 **Desativar** - Deactivate active user (if ativo = 'true')
+  - 🟢 **Ativar** - Reactivate deactivated user (if ativo = 'false', **recalculates data_expiracao** from current date using dias_acesso)
+  - 🔴 **Eliminar** - Permanently delete user
+- **Create New Users**: Direct user creation in admin panel with custom access duration
+- **Safety**: Confirmation dialogs for all destructive actions (deactivate, delete)
+- **IMPORTANT FIX (Nov 24, 2025)**: When a user is reactivated (Ativar), their data_expiracao is automatically recalculated based on dias_acesso, ensuring they won't show as "conta expirada" after reactivation
+- **API Endpoints**:
+  - `POST /api/usuarios/desativar/:id` - Deactivate user
+  - `POST /api/usuarios/ativar/:id` - Activate user
+  - `DELETE /api/usuarios/eliminar/:id` - Delete user
+  - `POST /api/usuarios/aprovar/:id` - Approve user
+  - `POST /api/usuarios/admin/criar` - Create new user (admin only)
+  - `GET /api/usuarios/admin` - List all users
+
+### Reseller Management System (UPDATED Nov 2025)
+- **Reseller Panel**: Secure interface at `/revendedor/login` protected with:
+  - Disabled right-click, DevTools (F12, Ctrl+Shift+C), text selection
+  - Anti-copy/cut keyboard shortcuts
+  - Protected credits field (cannot be edited or copied)
+- **User Creation**: Revendedores can create users with:
+  - Fixed 2-day access period (no editable duration)
+  - Automatic approval and account setup
+  - Automatic credit consumption (1 credit per user)
+  - Email/name/password configuration
+- **User List Display**: Shows all users created by revendedor with:
+  - User name, email, and creation date
+  - Time remaining (days/hours) until expiration
+  - Expiração status in red if expired
+  - Scrollable list with live update after creation
+- **Admin Button "Ver Usuários"**: 
+  - Purple button below "Eliminar" in admin revendedor panel
+  - Opens modal showing all users registered by that reseller
+  - Displays name, email, creation date, time remaining, and status (Ativo/Desativado)
+  - Modal has two action buttons per user:
+    - 🟠 **Desativar** - Deactivate user account (orange button)
+    - 🔴 **Deletar** - Permanently delete user (red button with trash icon)
+  - Modal closes with X button or "Fechar" button
+  - Confirmation dialogs shown before delete/deactivate actions
+- **Credit Protection**:
+  - ✅ Credits field cannot be edited in UI (readonly with anti-selection)
+  - ✅ Credits only decrease via `/api/revendedores/criar-usuario` when user is created
+  - ✅ Admin-only endpoint `/api/revendedores/atualizar-creditos` allows editing credits
+- **Admin Credits Management**:
+  - Access: `/admin/revendedores` (requires admin authentication)
+  - Edit credits via modal prompt in admin panel
+  - Automatically updates when "Editar Créditos" button is clicked
+- **API Endpoints**:
+  - `POST /api/revendedores/login` - Revendedor authentication
+  - `POST /api/revendedores/criar-usuario` - Create new user (consumes 1 credit)
+  - `GET /api/revendedores/listar-usuarios` - List users created by revendedor
+  - `POST /api/revendedores/atualizar-creditos/:id` - Update reseller credits (admin only)
+  - Admin: `POST /api/revendedores/admin/criar`, `GET /api/revendedores/admin`
+
 ### Feature Specifications
 - **Real-time Signals Dashboard**: Displays predicted "APÓS" and "SACAR" values based on an advanced pattern detection system.
 - **Advanced Pattern Detection System** (UPDATED): Sistema de análise em duas camadas:

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useProtection } from "@/hooks/use-protection";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Users, X } from "lucide-react";
 
 interface Revendedor {
   id: string;
@@ -11,6 +11,20 @@ interface Revendedor {
   creditos: number;
   ativo: string;
   data_expiracao: string;
+}
+
+interface Usuario {
+  id: string;
+  nome: string;
+  email: string;
+  ativo: string;
+  data_criacao: string;
+  data_expiracao: string;
+  tempoRestante?: {
+    dias: number;
+    horas: number;
+    expirado: boolean;
+  };
 }
 
 export default function AdminRevendedores() {
@@ -24,6 +38,19 @@ export default function AdminRevendedores() {
     senha: '',
     creditos: 10,
     dias_validade: 30,
+  });
+  const [usuariosModal, setUsuariosModal] = useState<{
+    aberto: boolean;
+    revendedorId: string;
+    revendedorNome: string;
+    usuarios: Usuario[];
+    carregando: boolean;
+  }>({
+    aberto: false,
+    revendedorId: '',
+    revendedorNome: '',
+    usuarios: [],
+    carregando: false,
   });
 
   useEffect(() => {
@@ -98,6 +125,78 @@ export default function AdminRevendedores() {
       }
     } catch (error) {
       alert('Erro ao atualizar créditos');
+    }
+  };
+
+  const abrirUsuariosModal = async (revendedorId: string, revendedorNome: string) => {
+    setUsuariosModal({
+      aberto: true,
+      revendedorId,
+      revendedorNome,
+      usuarios: [],
+      carregando: true,
+    });
+
+    try {
+      const response = await fetch(`/api/revendedores/listar-usuarios?revendedor_id=${revendedorId}`);
+      const data = await response.json();
+      if (data.success) {
+        setUsuariosModal((prev) => ({
+          ...prev,
+          usuarios: data.data,
+          carregando: false,
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+      setUsuariosModal((prev) => ({
+        ...prev,
+        carregando: false,
+      }));
+    }
+  };
+
+  const fecharUsuariosModal = () => {
+    setUsuariosModal({
+      aberto: false,
+      revendedorId: '',
+      revendedorNome: '',
+      usuarios: [],
+      carregando: false,
+    });
+  };
+
+  const desativarUsuarioModal = async (usuarioId: string, nomeUsuario: string) => {
+    if (!confirm(`Deseja desativar ${nomeUsuario}?`)) return;
+    
+    try {
+      const response = await fetch(`/api/usuarios/desativar/${usuarioId}`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Usuário desativado com sucesso!');
+        abrirUsuariosModal(usuariosModal.revendedorId, usuariosModal.revendedorNome);
+      }
+    } catch (error) {
+      alert('Erro ao desativar usuário');
+    }
+  };
+
+  const deletarUsuarioModal = async (usuarioId: string, nomeUsuario: string) => {
+    if (!confirm(`ATENÇÃO: Deseja eliminar permanentemente ${nomeUsuario}? Esta ação não pode ser desfeita!`)) return;
+    
+    try {
+      const response = await fetch(`/api/usuarios/eliminar/${usuarioId}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Usuário eliminado com sucesso!');
+        abrirUsuariosModal(usuariosModal.revendedorId, usuariosModal.revendedorNome);
+      }
+    } catch (error) {
+      alert('Erro ao eliminar usuário');
     }
   };
 
@@ -270,6 +369,7 @@ export default function AdminRevendedores() {
                         backgroundColor: '#00bfff',
                         color: '#000000',
                       }}
+                      data-testid="button-edit-credits"
                     >
                       Editar Créditos
                     </button>
@@ -280,9 +380,22 @@ export default function AdminRevendedores() {
                         backgroundColor: '#ff0000',
                         color: '#ffffff',
                       }}
+                      data-testid="button-delete-reseller"
                     >
                       <Trash2 className="w-4 h-4" />
                       Eliminar
+                    </button>
+                    <button
+                      onClick={() => abrirUsuariosModal(revendedor.id, revendedor.nome)}
+                      className="px-4 py-2 rounded font-bold hover:opacity-80 flex items-center justify-center gap-2"
+                      style={{
+                        backgroundColor: '#9933ff',
+                        color: '#ffffff',
+                      }}
+                      data-testid="button-view-users"
+                    >
+                      <Users className="w-4 h-4" />
+                      Ver Usuários
                     </button>
                   </div>
                 </div>
@@ -290,6 +403,118 @@ export default function AdminRevendedores() {
             ))
           )}
         </div>
+
+        {/* Modal de Usuários */}
+        {usuariosModal.aberto && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div
+              className="rounded-xl border p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto"
+              style={{
+                borderColor: '#9933ff',
+                borderWidth: '2px',
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-bold text-white text-2xl">
+                  Usuários de {usuariosModal.revendedorNome}
+                </h2>
+                <button
+                  onClick={fecharUsuariosModal}
+                  className="p-2 hover:bg-gray-800 rounded"
+                  data-testid="button-close-users-modal"
+                >
+                  <X className="w-6 h-6 text-white" />
+                </button>
+              </div>
+
+              {usuariosModal.carregando ? (
+                <div className="text-center text-gray-400 py-8">
+                  <p>Carregando usuários...</p>
+                </div>
+              ) : usuariosModal.usuarios.length === 0 ? (
+                <div className="text-center text-gray-400 py-8">
+                  <p>Nenhum usuário registrado por este revendedor</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {usuariosModal.usuarios.map((usuario) => (
+                    <div
+                      key={usuario.id}
+                      className="rounded-lg border p-4"
+                      style={{
+                        borderColor: '#666666',
+                        backgroundColor: 'rgba(50, 50, 50, 0.5)',
+                      }}
+                      data-testid={`user-item-${usuario.id}`}
+                    >
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <p className="font-bold text-white">{usuario.nome}</p>
+                          <p className="text-gray-400 text-sm">{usuario.email}</p>
+                          <p className={`text-xs font-bold mt-2 ${usuario.ativo === 'true' ? 'text-green-500' : 'text-red-500'}`}>
+                            Status: {usuario.ativo === 'true' ? 'Ativo' : 'Desativado'}
+                          </p>
+                          <p className="text-gray-500 text-xs mt-2">
+                            Criado: {new Date(usuario.data_criacao).toLocaleDateString('pt-BR')}
+                          </p>
+                          <p
+                            className={`text-xs mt-1 font-bold ${
+                              usuario.tempoRestante?.expirado
+                                ? 'text-red-500'
+                                : 'text-green-500'
+                            }`}
+                          >
+                            {usuario.tempoRestante?.expirado
+                              ? 'Expirado'
+                              : `Tempo restante: ${usuario.tempoRestante?.dias}d ${usuario.tempoRestante?.horas}h`}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => desativarUsuarioModal(usuario.id, usuario.nome)}
+                            className="px-3 py-1 rounded text-xs font-bold hover:opacity-80"
+                            style={{
+                              backgroundColor: '#ff9900',
+                              color: '#000000',
+                            }}
+                            data-testid="button-deactivate-user"
+                          >
+                            Desativar
+                          </button>
+                          <button
+                            onClick={() => deletarUsuarioModal(usuario.id, usuario.nome)}
+                            className="px-3 py-1 rounded text-xs font-bold hover:opacity-80 flex items-center justify-center gap-1"
+                            style={{
+                              backgroundColor: '#ff0000',
+                              color: '#ffffff',
+                            }}
+                            data-testid="button-delete-user"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Deletar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                onClick={fecharUsuariosModal}
+                className="w-full mt-4 px-4 py-2 rounded font-bold hover:opacity-80"
+                style={{
+                  backgroundColor: '#666666',
+                  color: '#ffffff',
+                }}
+                data-testid="button-close-modal"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

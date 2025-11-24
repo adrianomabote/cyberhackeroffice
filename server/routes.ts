@@ -1242,9 +1242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Vincular ao revendedor
-      await db.update(usuarios)
-        .set({ revenda_id: revendedor_id })
-        .where(eq(usuarios.id, usuario.id));
+      await storageUsuarios.vincularRevendedor(usuario.id, revendedor_id);
       
       res.json({
         success: true,
@@ -1341,6 +1339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Atualizar créditos do revendedor (ADMIN ONLY)
   app.post("/api/revendedores/atualizar-creditos/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -1368,9 +1367,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Créditos atualizados com sucesso",
       });
     } catch (error) {
+      console.error('[ADMIN ATUALIZAR CREDITOS] Erro:', error);
       res.status(500).json({
         success: false,
         error: "Erro ao atualizar créditos",
+      });
+    }
+  });
+
+  // Listar usuários criados pelo revendedor
+  app.get("/api/revendedores/listar-usuarios", async (req, res) => {
+    try {
+      const { revendedor_id } = req.query;
+      
+      if (!revendedor_id || typeof revendedor_id !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: "revendedor_id é obrigatório",
+        });
+      }
+
+      const { storageRevendedores } = await import("./storage");
+      const usuarios = await storageRevendedores.listarUsuariosDoRevendedor(revendedor_id);
+
+      res.json({
+        success: true,
+        data: usuarios,
+      });
+    } catch (error) {
+      console.error('[REVENDEDOR LISTAR USUARIOS] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao listar usuários",
       });
     }
   });

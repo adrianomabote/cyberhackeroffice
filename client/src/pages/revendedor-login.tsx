@@ -6,8 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield } from "lucide-react";
+import { useProtection } from "@/hooks/use-protection";
 
 export default function RevendedorLogin() {
+  useProtection();
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -41,14 +43,14 @@ export default function RevendedorLogin() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-gray-900 border-green-600">
+      <Card className="w-full max-w-md bg-gray-900" style={{ borderColor: '#cc0000', borderWidth: '1px' }}>
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center bg-green-600">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#cc0000' }}>
               <Shield className="w-8 h-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl text-green-500">
+          <CardTitle className="text-2xl" style={{ color: '#cc0000' }}>
             PAINEL REVENDEDOR
           </CardTitle>
         </CardHeader>
@@ -79,7 +81,10 @@ export default function RevendedorLogin() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-green-600 hover:bg-green-700"
+              style={{
+                backgroundColor: '#cc0000',
+                width: '100%'
+              }}
             >
               {loading ? "ENTRANDO..." : "ENTRAR"}
             </Button>

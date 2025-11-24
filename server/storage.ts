@@ -2,9 +2,10 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from "pg";
 const { Pool } = pkg;
 import { eq, desc, sql, and, lt } from "drizzle-orm";
-import { velas, usuarios, feedbacks, resultadosClientes, sinaisProtecao, type InsertVela, type Vela, type InsertFeedback, type Feedback, type InsertResultadoCliente, type ResultadoCliente } from "../shared/schema";
+import { velas, usuarios, revendedores, feedbacks, resultadosClientes, sinaisProtecao, type InsertVela, type Vela, type InsertFeedback, type Feedback, type InsertResultadoCliente, type ResultadoCliente } from "../shared/schema";
 import type { ManutencaoStatus, SinaisManual, PrevisaoResponse, UltimaVelaResponse } from "../shared/schema";
 import bcrypt from "bcryptjs";
+import * as crypto from "crypto";
 
 if (!process.env.DATABASE_URL) {
   console.error('[DB] DATABASE_URL não configurada. Defina a variável de ambiente.');
@@ -367,6 +368,7 @@ class StorageUsuarios {
       dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
 
       const [usuario] = await db.insert(usuarios).values({
+        id: crypto.randomUUID(),
         email: data.email,
         nome: data.nome,
         senha: senhaHash,
@@ -391,6 +393,7 @@ class StorageUsuarios {
     dataExpiracao.setDate(dataExpiracao.getDate() + diasAcesso);
 
     const [usuario] = await db.insert(usuarios).values({
+      id: crypto.randomUUID(),
       email: data.email,
       nome: data.nome,
       senha: senhaHash,
@@ -543,13 +546,27 @@ class StorageUsuarios {
   }
 
   async ativarUsuario(id: string) {
+    // Ao ativar, recalcular data de expiração a partir de agora
     const [usuario] = await db
+      .select()
+      .from(usuarios)
+      .where(eq(usuarios.id, id));
+
+    if (!usuario) return null;
+
+    const dataExpiracao = new Date();
+    dataExpiracao.setDate(dataExpiracao.getDate() + usuario.dias_acesso);
+
+    const [atualizado] = await db
       .update(usuarios)
-      .set({ ativo: 'true' })
+      .set({ 
+        ativo: 'true',
+        data_expiracao: dataExpiracao,
+      })
       .where(eq(usuarios.id, id))
       .returning();
 
-    return usuario;
+    return atualizado;
   }
 
   async eliminarUsuario(id: string) {
@@ -567,6 +584,21 @@ class StorageUsuarios {
       .returning();
 
     return usuario;
+  }
+
+  // Vincular usuário a um revendedor
+  async vincularRevendedor(usuarioId: string, revendedorId: string) {
+    try {
+      await db
+        .update(usuarios)
+        .set({ revenda_id: revendedorId })
+        .where(eq(usuarios.id, usuarioId));
+      
+      console.log('[STORAGE] Usuário vinculado a revendedor:', { usuarioId, revendedorId });
+    } catch (error) {
+      console.error('[STORAGE] Erro ao vincular revendedor:', error);
+      throw error;
+    }
   }
 
   // Tarefa automática para desativar contas expiradas
@@ -592,15 +624,12 @@ class StorageRevendedores {
       const dataExpiracao = new Date();
       dataExpiracao.setDate(dataExpiracao.getDate() + diasValidade);
 
-      const [revendedor] = await db.insert(usuarios).values({
+      const [revendedor] = await db.insert(revendedores).values({
         email: data.email,
         nome: data.nome,
         senha: senhaHash,
-        aprovado: 'true',
         ativo: 'true',
-        tipo: 'revendedor',
         creditos: data.creditos || 0,
-        dias_validade: diasValidade,
         data_expiracao: dataExpiracao,
       }).returning();
 
@@ -615,11 +644,8 @@ class StorageRevendedores {
   async obterRevendedorPorEmail(email: string) {
     const [revendedor] = await db
       .select()
-      .from(usuarios)
-      .where(and(
-        eq(usuarios.email, email),
-        eq(usuarios.tipo, 'revendedor')
-      ));
+      .from(revendedores)
+      .where(eq(revendedores.email, email));
 
     return revendedor;
   }
@@ -630,11 +656,10 @@ class StorageRevendedores {
       
       const [revendedor] = await db
         .select()
-        .from(usuarios)
+        .from(revendedores)
         .where(and(
-          eq(usuarios.email, email),
-          eq(usuarios.tipo, 'revendedor'),
-          eq(usuarios.ativo, 'true')
+          eq(revendedores.email, email),
+          eq(revendedores.ativo, 'true')
         ));
 
       if (!revendedor) {
@@ -664,24 +689,23 @@ class StorageRevendedores {
   }
 
   async listarRevendedores() {
-    const revendedores = await db
+    const vendedores = await db
       .select()
-      .from(usuarios)
-      .where(eq(usuarios.tipo, 'revendedor'));
+      .from(revendedores);
 
-    return revendedores;
+    return vendedores;
   }
 
   async eliminarRevendedor(id: string) {
-    await db.delete(usuarios).where(eq(usuarios.id, id));
+    await db.delete(revendedores).where(eq(revendedores.id, id));
     return true;
   }
 
   async desativarRevendedor(id: string) {
     const [revendedor] = await db
-      .update(usuarios)
+      .update(revendedores)
       .set({ ativo: 'false' })
-      .where(eq(usuarios.id, id))
+      .where(eq(revendedores.id, id))
       .returning();
 
     return revendedor;
@@ -691,17 +715,17 @@ class StorageRevendedores {
     try {
       const [revendedor] = await db
         .select()
-        .from(usuarios)
-        .where(eq(usuarios.id, revendedorId));
+        .from(revendedores)
+        .where(eq(revendedores.id, revendedorId));
 
       if (!revendedor || revendedor.creditos <= 0) {
         return false;
       }
 
       await db
-        .update(usuarios)
-        .set({ creditos: sql`${usuarios.creditos} - 1` })
-        .where(eq(usuarios.id, revendedorId));
+        .update(revendedores)
+        .set({ creditos: sql`${revendedores.creditos} - 1` })
+        .where(eq(revendedores.id, revendedorId));
 
       return true;
     } catch (error) {
@@ -712,17 +736,64 @@ class StorageRevendedores {
 
   async atualizarCreditos(id: string, creditos: number) {
     try {
-      await db
-        .update(usuarios)
+      const [revendedor] = await db
+        .update(revendedores)
         .set({ creditos })
-        .where(eq(usuarios.id, id));
+        .where(eq(revendedores.id, id))
+        .returning();
 
+      if (!revendedor) {
+        return false;
+      }
+
+      console.log('[STORAGE] Créditos do revendedor atualizados:', { id, creditos });
       return true;
     } catch (error) {
       console.error('[STORAGE] Erro ao atualizar créditos:', error);
       return false;
     }
   }
+
+  // Listar usuários criados por um revendedor específico
+  async listarUsuariosDoRevendedor(revendedorId: string) {
+    try {
+      const usuariosDoRevendedor = await db
+        .select()
+        .from(usuarios)
+        .where(eq(usuarios.revenda_id, revendedorId))
+        .orderBy(desc(usuarios.data_criacao));
+
+      // Calcular tempo restante para cada usuário
+      const usuariosComTempo = usuariosDoRevendedor.map(user => {
+        let tempoRestante = null;
+        if (user.data_expiracao) {
+          const agora = new Date();
+          const expiracao = new Date(user.data_expiracao);
+          const diff = expiracao.getTime() - agora.getTime();
+          
+          if (diff > 0) {
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            tempoRestante = { dias, horas, expirado: false };
+          } else {
+            tempoRestante = { dias: 0, horas: 0, expirado: true };
+          }
+        }
+        
+        return {
+          ...user,
+          tempoRestante,
+        };
+      });
+
+      console.log('[STORAGE] Usuários do revendedor recuperados:', revendedorId, usuariosComTempo.length);
+      return usuariosComTempo;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao listar usuários do revendedor:', error);
+      return [];
+    }
+  }
+
 }
 
 export const storage = new DbStorage();
