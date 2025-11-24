@@ -582,8 +582,152 @@ class StorageUsuarios {
   }
 }
 
+// Storage de revendedores
+class StorageRevendedores {
+  async criarRevendedor(data: { email: string; nome: string; senha: string; creditos?: number; dias_validade?: number }) {
+    try {
+      console.log('[STORAGE] Criando revendedor:', data.email);
+      const senhaHash = await bcrypt.hash(data.senha, 10);
+      const diasValidade = data.dias_validade || 30;
+      const dataExpiracao = new Date();
+      dataExpiracao.setDate(dataExpiracao.getDate() + diasValidade);
+
+      const [revendedor] = await db.insert(usuarios).values({
+        email: data.email,
+        nome: data.nome,
+        senha: senhaHash,
+        aprovado: 'true',
+        ativo: 'true',
+        tipo: 'revendedor',
+        creditos: data.creditos || 0,
+        dias_validade: diasValidade,
+        data_expiracao: dataExpiracao,
+      }).returning();
+
+      console.log('[STORAGE] Revendedor criado:', revendedor.id);
+      return revendedor;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao criar revendedor:', error);
+      throw error;
+    }
+  }
+
+  async obterRevendedorPorEmail(email: string) {
+    const [revendedor] = await db
+      .select()
+      .from(usuarios)
+      .where(and(
+        eq(usuarios.email, email),
+        eq(usuarios.tipo, 'revendedor')
+      ));
+
+    return revendedor;
+  }
+
+  async verificarRevendedor(email: string, senha: string) {
+    try {
+      console.log('[STORAGE] Verificando revendedor:', email);
+      
+      const [revendedor] = await db
+        .select()
+        .from(usuarios)
+        .where(and(
+          eq(usuarios.email, email),
+          eq(usuarios.tipo, 'revendedor'),
+          eq(usuarios.ativo, 'true')
+        ));
+
+      if (!revendedor) {
+        console.log('[STORAGE] Revendedor não encontrado ou inativo:', email);
+        return null;
+      }
+
+      // Verificar expiração
+      if (revendedor.data_expiracao && new Date() > new Date(revendedor.data_expiracao)) {
+        console.log('[STORAGE] Conta de revendedor expirada:', email);
+        await this.desativarRevendedor(revendedor.id);
+        return null;
+      }
+
+      const senhaValida = await bcrypt.compare(senha, revendedor.senha);
+      if (!senhaValida) {
+        console.log('[STORAGE] Senha incorreta para revendedor:', email);
+        return null;
+      }
+
+      console.log('[STORAGE] Revendedor verificado com sucesso:', email);
+      return revendedor;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao verificar revendedor:', error);
+      throw error;
+    }
+  }
+
+  async listarRevendedores() {
+    const revendedores = await db
+      .select()
+      .from(usuarios)
+      .where(eq(usuarios.tipo, 'revendedor'));
+
+    return revendedores;
+  }
+
+  async eliminarRevendedor(id: string) {
+    await db.delete(usuarios).where(eq(usuarios.id, id));
+    return true;
+  }
+
+  async desativarRevendedor(id: string) {
+    const [revendedor] = await db
+      .update(usuarios)
+      .set({ ativo: 'false' })
+      .where(eq(usuarios.id, id))
+      .returning();
+
+    return revendedor;
+  }
+
+  async consumirCredito(revendedorId: string) {
+    try {
+      const [revendedor] = await db
+        .select()
+        .from(usuarios)
+        .where(eq(usuarios.id, revendedorId));
+
+      if (!revendedor || revendedor.creditos <= 0) {
+        return false;
+      }
+
+      await db
+        .update(usuarios)
+        .set({ creditos: sql`${usuarios.creditos} - 1` })
+        .where(eq(usuarios.id, revendedorId));
+
+      return true;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao consumir crédito:', error);
+      return false;
+    }
+  }
+
+  async atualizarCreditos(id: string, creditos: number) {
+    try {
+      await db
+        .update(usuarios)
+        .set({ creditos })
+        .where(eq(usuarios.id, id));
+
+      return true;
+    } catch (error) {
+      console.error('[STORAGE] Erro ao atualizar créditos:', error);
+      return false;
+    }
+  }
+}
+
 export const storage = new DbStorage();
 export const storageUsuarios = new StorageUsuarios();
+export const storageRevendedores = new StorageRevendedores();
 
 // Executar verificação de expiração a cada hora
 setInterval(() => {
