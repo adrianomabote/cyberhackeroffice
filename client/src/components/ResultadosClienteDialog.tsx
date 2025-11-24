@@ -53,7 +53,7 @@ export function ResultadosClienteDialog() {
   const queryClient = useQueryClient();
 
   // ⏱️ NOVA LÓGICA DE INTERVALOS:
-  // 1. Primeira aparição: 15 minutos
+  // 1. Primeira aparição: 7 minutos
   // 2. Se NÃO enviar (clicou "Depois"): Repetir a cada 10 minutos
   // 3. Se ENVIAR: Mostrar após 7 horas
   // 4. Após 7 horas sem enviar: Repetir a cada 7 horas
@@ -69,7 +69,7 @@ export function ResultadosClienteDialog() {
         // Se nunca visitou, registrar primeira visita
         if (!primeiraVisita) {
           localStorage.setItem(FIRST_VISIT_KEY, agora.toString());
-          return FIRST_DIALOG_MS; // 15 minutos
+          return 7 * 60 * 1000; // 7 minutos // 15 minutos
         }
 
         // Se já visitou e clicou "Depois" antes
@@ -83,8 +83,9 @@ export function ResultadosClienteDialog() {
 
         // Se já visitou mas nunca clicou "Depois"
         const tempoDesdeVisita = agora - parseInt(primeiraVisita);
-        if (tempoDesdeVisita < FIRST_DIALOG_MS) {
-          return FIRST_DIALOG_MS - tempoDesdeVisita; // Restante dos 15 minutos
+        const SETE_MINUTOS = 7 * 60 * 1000;
+        if (tempoDesdeVisita < SETE_MINUTOS) {
+          return SETE_MINUTOS - tempoDesdeVisita; // Restante dos 7 minutos
         }
         return 0; // Já passou o tempo, mostrar agora
       }
