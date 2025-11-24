@@ -43,18 +43,39 @@ export default function Login() {
       });
 
       const data = await response.json();
+      console.log('[LOGIN FRONTEND] Resposta:', data);
 
-      if (data.success) {
+      if (!response.ok) {
+        console.error('[LOGIN FRONTEND] Erro HTTP:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: data.error
+        });
+        const errorMessage = data.error || `Erro ${response.status}: ${response.statusText}`;
+        alert(errorMessage);
+        setLoading(false);
+        return;
+      }
+
+      if (data.success && data.data) {
+        console.log('[LOGIN FRONTEND] Login bem-sucedido, guardando dados:', data.data);
         sessionStorage.setItem('user', JSON.stringify(data.data));
+        console.log('[LOGIN FRONTEND] Redirecionando para /welcome');
         setLocation('/welcome');
+        return;
       } else {
+        console.error('[LOGIN FRONTEND] Resposta sem sucesso:', data);
         alert(data.error || 'Erro ao fazer login');
-        setLoading(false); // Resetar loading em caso de erro
+        setLoading(false);
       }
     } catch (error) {
-      console.error('Erro no login:', error);
-      alert('Erro de conexão. Verifique sua internet e tente novamente.');
-      setLoading(false); // Resetar loading em caso de erro
+      console.error('[LOGIN FRONTEND] Erro crítico detalhado:', {
+        error,
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      alert(`Erro de conexão: ${error instanceof Error ? error.message : 'Verifique sua internet e tente novamente'}`);
+      setLoading(false);
     }
   };
 

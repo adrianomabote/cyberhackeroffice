@@ -760,13 +760,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const usuario = await storageUsuarios.criarUsuario({ email, nome, senha });
+      // ✅ Criar usuário JÁ APROVADO (sem necessidade de admin)
+      const usuario = await storageUsuarios.criarUsuarioAprovado({ email, nome, senha });
       
-      console.log('[REGISTRAR] Usuário criado com sucesso:', usuario.id);
+      console.log('[REGISTRAR] Usuário criado com sucesso e aprovado:', usuario.id);
       
       res.json({
         success: true,
-        message: "Cadastro enviado para aprovação do administrador",
+        message: "Cadastro realizado com sucesso! Você pode fazer login agora.",
         data: { id: usuario.id, email: usuario.email },
       });
     } catch (error) {
@@ -911,13 +912,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // VALIDAÇÃO DE DISPOSITIVO: Verificar se pode fazer login neste dispositivo
       if (device_id) {
-        const verificacaoDispositivo = await storageUsuarios.verificarDispositivo(usuario.id, device_id);
-        if (!verificacaoDispositivo.permitido) {
-          console.log('[LOGIN] BLOQUEADO - Dispositivo não autorizado:', email);
-          return res.status(403).json({
-            success: false,
-            error: verificacaoDispositivo.motivo || "Dispositivo não autorizado",
-          });
+        try {
+          const verificacaoDispositivo = await storageUsuarios.verificarDispositivo(usuario.id, device_id);
+          if (!verificacaoDispositivo.permitido) {
+            console.log('[LOGIN] BLOQUEADO - Dispositivo não autorizado:', email);
+            return res.status(403).json({
+              success: false,
+              error: verificacaoDispositivo.motivo || "Dispositivo não autorizado",
+            });
+          }
+        } catch (deviceError) {
+          console.error('[LOGIN] Erro ao verificar dispositivo:', deviceError);
+          // Continuar login mesmo com erro de dispositivo (para não bloquear acesso)
         }
       }
 
@@ -939,10 +945,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error) {
-      console.error('[LOGIN] Erro crítico:', error);
+      console.error('[LOGIN] Erro crítico detalhado:', {
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
+        stack: error instanceof Error ? error.stack : undefined,
+        error: error
+      });
       res.status(500).json({
         success: false,
-        error: "Erro no sistema. Por favor, tente novamente em alguns instantes.",
+        error: error instanceof Error ? error.message : "Erro no sistema. Por favor, tente novamente em alguns instantes.",
       });
     }
   });
