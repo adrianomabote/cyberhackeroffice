@@ -11,11 +11,26 @@ if (!process.env.DATABASE_URL) {
   console.error('[DB] DATABASE_URL não configurada. Defina a variável de ambiente.');
 }
 
-const needsSSL = /\bsslmode=require\b/i.test(process.env.DATABASE_URL || '') || /render\.com|neon\.tech/i.test(process.env.DATABASE_URL || '');
+const needsSSL = /\bsslmode=require\b/i.test(process.env.DATABASE_URL || '') || /render\.com|neon\.tech|\.onrender\.com/i.test(process.env.DATABASE_URL || '');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: needsSSL ? { rejectUnauthorized: false } : undefined,
+  // Configurações de resiliência para produção
+  max: 10, // máximo de conexões no pool
+  min: 2, // mínimo de conexões
+  idleTimeoutMillis: 30000, // tempo máximo de inatividade
+  connectionTimeoutMillis: 10000, // timeout para conexão
+  allowExitOnIdle: false, // mantém pool ativo
+});
+
+// Tratamento de erros de conexão
+pool.on('error', (err) => {
+  console.error('[DB] Erro inesperado no pool de conexões:', err.message);
+});
+
+pool.on('connect', () => {
+  console.log('[DB] Nova conexão estabelecida com o banco de dados');
 });
 
 const db = drizzle(pool);
