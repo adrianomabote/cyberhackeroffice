@@ -248,6 +248,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 🗑️ POST /api/admin/eliminar-conta - Elimina toda a conta e dados
+  app.post("/api/admin/eliminar-conta", async (req, res) => {
+    try {
+      // Limpar todos os dados
+      await storage.clearAll?.();
+      
+      res.json({
+        success: true,
+        message: "Conta eliminada com sucesso",
+      });
+    } catch (error) {
+      console.error('[ADMIN ELIMINAR CONTA] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao eliminar conta",
+      });
+    }
+  });
+
   // GET /api/cyber - Lista todos os endpoints disponíveis
   app.get("/api/cyber", (req, res) => {
     res.json({
