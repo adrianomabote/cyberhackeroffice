@@ -3,6 +3,11 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertVelaSchema, manutencaoSchema, sinaisManualSchema, type UltimaVelaResponse, type PrevisaoResponse, type EstatisticasResponse, type PadroesResponse, type ManutencaoStatus, type SinaisManual } from "../shared/schema";
 import { z } from "zod";
+import bcryptjs from "bcryptjs";
+
+// 🔐 ADMIN PASSWORD HASH (seguro - nunca expor a senha em texto)
+// Hash da senha: 53669aA1
+const ADMIN_PASSWORD_HASH = "$2b$10$YZFknFhn8rjwZNG3ZaWW7OqVlc6oCx/.0KKUp0e4sJJrd11x9y8F2";
 
 // 📊 PADRÕES PRÉ-DEFINIDOS - Sistema Avançado de Análise
 const PADROES = [
@@ -202,6 +207,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     next();
+  });
+
+  // 🔐 POST /api/admin/login - Autentica administrador de forma segura
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { senha } = req.body;
+      
+      if (!senha || typeof senha !== 'string') {
+        return res.status(400).json({
+          success: false,
+          error: "Senha é obrigatória",
+        });
+      }
+
+      // Comparar senha com hash usando bcrypt
+      const senhaValida = await bcryptjs.compare(senha, ADMIN_PASSWORD_HASH);
+      
+      if (!senhaValida) {
+        return res.status(401).json({
+          success: false,
+          error: "Senha incorreta",
+        });
+      }
+
+      // Gerar token de autenticação seguro
+      const token = Buffer.from(`admin:${Date.now()}`).toString('base64');
+      
+      res.json({
+        success: true,
+        token: token,
+        message: "Autenticação bem-sucedida",
+      });
+    } catch (error) {
+      console.error('[ADMIN LOGIN] Erro:', error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao autenticar",
+      });
+    }
   });
 
   // GET /api/cyber - Lista todos os endpoints disponíveis

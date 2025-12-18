@@ -5,28 +5,48 @@ import { useProtection } from '@/hooks/use-protection';
 import { useToast } from '@/hooks/use-toast';
 import { Shield } from 'lucide-react';
 
-const ADMIN_PASSWORD = '53669';
-
 export default function AdminLogin() {
   useProtection();
   const [, setLocation] = useLocation();
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
-    if (password === ADMIN_PASSWORD) {
-      // Salvar token de autenticação
-      sessionStorage.setItem('admin_authenticated', 'true');
-      setLocation('/admin/cyber');
-    } else {
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ senha: password }),
+      });
+
+      const data = await response.json() as { success: boolean; token?: string; error?: string };
+
+      if (data.success) {
+        // Salvar token de autenticação
+        sessionStorage.setItem('admin_authenticated', 'true');
+        sessionStorage.setItem('admin_token', data.token || '');
+        setLocation('/admin/cyber');
+      } else {
+        toast({
+          title: "Acesso Negado",
+          description: data.error || "Senha incorreta",
+          variant: "destructive",
+        });
+        setPassword('');
+      }
+    } catch (error) {
       toast({
-        title: "❌ Acesso Negado",
-        description: "Senha incorreta",
+        title: "Erro",
+        description: "Erro ao autenticar. Tente novamente.",
         variant: "destructive",
       });
       setPassword('');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,7 +124,8 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
+              disabled={loading}
+              className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80 disabled:opacity-50"
               style={{
                 backgroundColor: '#ff0000',
                 color: '#ffffff',
@@ -112,7 +133,7 @@ export default function AdminLogin() {
                 border: 'none',
               }}
             >
-              ENTRAR
+              {loading ? 'VERIFICANDO...' : 'ENTRAR'}
             </button>
           </div>
         </form>
