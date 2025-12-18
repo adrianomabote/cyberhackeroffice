@@ -29,7 +29,7 @@ export default function AdminLogin() {
         // Salvar token de autenticação
         sessionStorage.setItem('admin_authenticated', 'true');
         sessionStorage.setItem('admin_token', data.token || '');
-        setLocation('/admin/cyber');
+        setLocation('/admin/usuarios');
       } else {
         toast({
           title: "Acesso Negado",
