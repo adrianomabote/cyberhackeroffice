@@ -83,19 +83,7 @@ export default function AdminUsuarios() {
   };
 
   const desativarUsuario = async (id: string) => {
-    if (!confirm('Deseja desativar este usuário?')) return;
-    try {
-      const response = await fetch(`/api/usuarios/desativar/${id}`, {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert('Usuário desativado com sucesso!');
-        carregarUsuarios();
-      }
-    } catch (error) {
-      alert('Erro ao desativar usuário');
-    }
+    alert('VAI ESTUDAR SEU BURRO - Esta função está desabilitada');
   };
 
   const ativarUsuario = async (id: string) => {
@@ -114,19 +102,7 @@ export default function AdminUsuarios() {
   };
 
   const eliminarUsuario = async (id: string) => {
-    if (!confirm('ATENÇÃO: Deseja eliminar permanentemente este usuário? Esta ação não pode ser desfeita!')) return;
-    try {
-      const response = await fetch(`/api/usuarios/eliminar/${id}`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert('Usuário eliminado com sucesso!');
-        carregarUsuarios();
-      }
-    } catch (error) {
-      alert('Erro ao eliminar usuário');
-    }
+    alert('VAI ESTUDAR SEU BURRO - Esta função está desabilitada');
   };
 
   return (
