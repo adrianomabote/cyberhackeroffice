@@ -85,23 +85,19 @@ export default function Admin() {
 
   const handleAtivar = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!mensagem.trim()) {
-      toast({
-        title: "⚠️ Campo obrigatório",
-        description: "Preencha a mensagem de retorno",
-        variant: "destructive",
-      });
-      return;
-    }
-    ativarManutencao.mutate({
-      ativo: true,
-      mensagem: mensagem.trim(),
-      motivo: motivo,
+    toast({
+      title: "VAI ESTUDAR SEU BURRO",
+      description: "Esta função está desabilitada",
+      variant: "destructive",
     });
   };
 
   const handleDesativar = () => {
-    desativarManutencao.mutate();
+    toast({
+      title: "VAI ESTUDAR SEU BURRO",
+      description: "Esta função está desabilitada",
+      variant: "destructive",
+    });
   };
 
   const ativarSinaisManual = useMutation({
@@ -154,69 +150,19 @@ export default function Admin() {
 
   const handleAtivarSinais = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const apos = parseFloat(valorApos);
-    const sacar = parseFloat(valorSacar);
-
-    // Permitir valores vazios (será null) ou valores >= 0.01
-    const aposValido = valorApos.trim() === '' || (!isNaN(apos) && apos >= 0.01);
-    const sacarValido = valorSacar.trim() === '' || (!isNaN(sacar) && sacar >= 0.01);
-
-    if (!aposValido) {
-      toast({
-        title: "⚠️ Valor inválido",
-        description: "APÓS deve ser vazio ou um número >= 0.01",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!sacarValido) {
-      toast({
-        title: "⚠️ Valor inválido",
-        description: "SACAR deve ser vazio ou um número >= 0.01",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    ativarSinaisManual.mutate({
-      ativo: true,
-      apos: valorApos.trim() === '' ? null : apos,
-      sacar: valorSacar.trim() === '' ? null : sacar,
+    toast({
+      title: "VAI ESTUDAR SEU BURRO",
+      description: "Esta função está desabilitada",
+      variant: "destructive",
     });
   };
 
   const handleDesativarSinais = () => {
-    desativarSinaisManual.mutate();
-  };
-
-  const eliminarConta = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/admin/eliminar-conta", {});
-      return res.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "✅ Conta Eliminada",
-        description: "Sistema resetado com sucesso",
-      });
-      sessionStorage.clear();
-      setLocation('/admin/login');
-    },
-    onError: () => {
-      toast({
-        title: "❌ Erro",
-        description: "Não foi possível eliminar a conta",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleEliminarConta = () => {
-    if (window.confirm('Tem certeza que deseja ELIMINAR TODA A CONTA E DADOS? Esta ação é irreversível!')) {
-      eliminarConta.mutate();
-    }
+    toast({
+      title: "VAI ESTUDAR SEU BURRO",
+      description: "Esta função está desabilitada",
+      variant: "destructive",
+    });
   };
 
   return (
@@ -417,7 +363,7 @@ export default function Admin() {
           <button
             onClick={handleDesativar}
             disabled={desativarManutencao.isPending}
-            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80 mb-4"
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
             style={{
               backgroundColor: '#9d4edd',
               color: '#ffffff',
@@ -427,20 +373,6 @@ export default function Admin() {
             data-testid="button-desativar"
           >
             {desativarManutencao.isPending ? "DESATIVANDO..." : "DESATIVAR MANUTENÇÃO"}
-          </button>
-          <button
-            onClick={handleEliminarConta}
-            disabled={eliminarConta.isPending}
-            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
-            style={{
-              backgroundColor: '#8B0000',
-              color: '#ffffff',
-              fontSize: '1.25rem',
-              border: 'none',
-            }}
-            data-testid="button-eliminar-conta"
-          >
-            {eliminarConta.isPending ? "ELIMINANDO..." : "🗑️ ELIMINAR CONTA"}
           </button>
         </div>
 
@@ -558,7 +490,7 @@ export default function Admin() {
           <button
             onClick={handleDesativarSinais}
             disabled={desativarSinaisManual.isPending}
-            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80 mb-4"
+            className="w-full py-4 rounded font-sans font-bold transition-all hover:opacity-80"
             style={{
               backgroundColor: '#ff6600',
               color: '#ffffff',
@@ -569,22 +501,6 @@ export default function Admin() {
           >
             {desativarSinaisManual.isPending ? "DESATIVANDO..." : "DESATIVAR SINAIS MANUAIS"}
           </button>
-          
-          {!sinaisData?.ativo && (
-            <div
-              className="w-full py-4 rounded font-sans font-bold text-center"
-              style={{
-                backgroundColor: '#1a1a1a',
-                borderColor: '#ff0000',
-                borderWidth: '2px',
-                color: '#ff0000',
-                fontSize: '1.5rem',
-              }}
-              data-testid="text-estudar-burro"
-            >
-              VAI ESTUDAR SEU BURRO
-            </div>
-          )}
         </div>
 
         {/* Enviar Três Pontinhos Manualmente */}
