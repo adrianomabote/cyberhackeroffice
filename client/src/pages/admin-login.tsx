@@ -5,7 +5,7 @@ import { useProtection } from '@/hooks/use-protection';
 import { useToast } from '@/hooks/use-toast';
 import { Shield } from 'lucide-react';
 
-const ADMIN_PASSWORD = '00220022aA1';
+const ADMIN_PASSWORD = '53669';
 
 export default function AdminLogin() {
   useProtection();
