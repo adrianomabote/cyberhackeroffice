@@ -85,19 +85,15 @@ export default function Admin() {
 
   const handleAtivar = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "VAI ESTUDAR SEU BURRO",
-      description: "Esta função está desabilitada",
-      variant: "destructive",
+    ativarManutencao.mutate({
+      ativo: true,
+      mensagem,
+      motivo,
     });
   };
 
   const handleDesativar = () => {
-    toast({
-      title: "VAI ESTUDAR SEU BURRO",
-      description: "Esta função está desabilitada",
-      variant: "destructive",
-    });
+    desativarManutencao.mutate();
   };
 
   const ativarSinaisManual = useMutation({
@@ -150,19 +146,27 @@ export default function Admin() {
 
   const handleAtivarSinais = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "VAI ESTUDAR SEU BURRO",
-      description: "Esta função está desabilitada",
-      variant: "destructive",
+    const aposNum = valorApos ? parseFloat(valorApos) : null;
+    const sacarNum = valorSacar ? parseFloat(valorSacar) : null;
+    
+    if ((aposNum === null || isNaN(aposNum)) || (sacarNum === null || isNaN(sacarNum))) {
+      toast({
+        title: "❌ Erro",
+        description: "Preencha ambos os valores APÓS e SACAR",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    ativarSinaisManual.mutate({
+      ativo: true,
+      apos: aposNum,
+      sacar: sacarNum,
     });
   };
 
   const handleDesativarSinais = () => {
-    toast({
-      title: "VAI ESTUDAR SEU BURRO",
-      description: "Esta função está desabilitada",
-      variant: "destructive",
-    });
+    desativarSinaisManual.mutate();
   };
 
   return (
