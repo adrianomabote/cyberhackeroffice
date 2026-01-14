@@ -17,7 +17,7 @@ export default function Subscription() {
 
   const handleProceed = () => {
     setShowDialog(false);
-    window.open('https://mozpayment.co.mz/pagaemento?check=1752618418119x419424557279477760', '_blank');
+    window.open('https://wa.me/258877023519?text=Saudações!%20Quero%20fazer%20o%20pagamento', '_blank');
   };
 
   return (
