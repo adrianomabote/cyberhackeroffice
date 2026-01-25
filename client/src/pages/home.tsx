@@ -411,7 +411,7 @@ export default function Home() {
         <div className="w-full px-4 py-2">
           <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor: '#444444', borderWidth: '1px' }}>
             <iframe
-              src="https://go.aff.betvivo.partners/epkorle4"
+              src="https://go.aff.oddsbest.co/36ztsdgf"
               className="w-full"
               style={{ height: '800px', minHeight: '600px' }}
               title="Casa de Apostas"
