@@ -366,7 +366,7 @@ export default function Landing() {
         <div className="container mx-auto">
           <div className="text-center mb-6">
             <a
-              href="https://chat.whatsapp.com/GoJBrv28CRjEmPsdX5n8ey?mode=wwt"
+              href="https://chat.whatsapp.com/BqAAbfMWDKa9ft0GR7Oxai?mode=gi_t"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block"
