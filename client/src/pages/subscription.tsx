@@ -17,7 +17,7 @@ export default function Subscription() {
 
   const handleProceed = () => {
     setShowDialog(false);
-    window.open('https://wa.me/258869635446?text=Saudações!%20Quero%20fazer%20o%20pagamento', '_blank');
+    window.open('https://wa.me/258834228340?text=Saudações!%20Quero%20fazer%20o%20pagamento', '_blank');
   };
 
   return (
