@@ -409,11 +409,11 @@ export default function Home() {
 
         {/* Iframe Casa de Apostas */}
         <div className="w-full px-4 py-2">
-          <div className="w-full rounded-xl overflow-hidden border" style={{ borderColor: '#444444', borderWidth: '1px' }}>
+          <div className="w-full rounded-[8px] overflow-hidden border-0" style={{ borderColor: '#444444' }}>
             <iframe
               src="https://txunaplay.com/tyy5akdsx"
-              className="w-full"
-              style={{ height: '800px', minHeight: '600px' }}
+              className="w-full min-w-[350px]"
+              style={{ height: '600px', border: 'none' }}
               title="Casa de Apostas"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
