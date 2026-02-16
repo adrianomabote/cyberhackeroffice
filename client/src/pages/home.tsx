@@ -413,7 +413,7 @@ export default function Home() {
             <iframe
               src="https://txunaplay.com/tyy5akdsx"
               className="w-full min-w-[350px]"
-              style={{ height: '600px', border: 'none' }}
+              style={{ height: '800px', border: 'none' }}
               title="Casa de Apostas"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
