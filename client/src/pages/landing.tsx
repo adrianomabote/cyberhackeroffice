@@ -242,7 +242,7 @@ export default function Landing() {
                   basta clicar no botão abaixo:
                 </p>
                 <a
-                  href="https://tracking.olabet.co.mz/C.ashx?btag=a_314b_7c_&affid=309&siteid=314&adid=7&c="
+                  href="https://go.aff.oddsbest.co/epkorle4"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
